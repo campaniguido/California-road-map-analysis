@@ -231,48 +231,8 @@ def test_sorted_graph_edges():
         assert vecchio <= list(G.edges())[i][0]
         vecchio = list(G.edges())[i][0]
 
-#%%4  G_node_dct *
 
-def G_node_dct(G):
-    '''
-    It creates a dictionary. The keys are represented by the number of the node the 
-    values is its increasing position in the nodes list
 
-    Parameters
-    ----------
-    G : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    None.
-
-    '''
-    g_node_dct= {}
-    list_node = sorted(list(G.nodes()))
-    for i in range(len(G)):
-        g_node_dct[list_node[i]] = i
-    return(g_node_dct)
-
-#%%4  test G_node_dct (2)
-def test_G_node_dct_keys():
-    '''it looks if the  dct keys are the nodes of the graph in the sorted order,
-    in this example the node list is [1,4,3,5,19],
-    in the new dictioary we want to switch 3 and 4'''
-    G=nx.Graph()
-    G.add_edges_from([[1,4],[3,5],[4,3],[19,1]])
-    node_dct=G_node_dct(G)
-    for i in range(len(G)):
-        assert sorted(list(G.nodes()))[i]==list(node_dct.keys())[i]
-
-def test_G_node_dct_value():
-    '''it looks if the dct values are the order in which the nodes comes out'''
-    G=nx.Graph()
-    G.add_edges_from([[1,4],[3,5],[4,3],[19,1]])
-    node_dct=G_node_dct(G)
-    list_node = sorted(list(G.nodes()))
-    for i in range(len(G)):
-        assert i==(node_dct[list_node[i]])
 
     
 
@@ -587,9 +547,8 @@ def Time_evolution(G,step, feature):
     if feature=='degree':
         for i in range(time_step):      
             G=nx.Graph(edges[:(i+1)*step])
-            G=Sorted_graph(G)
-            g_node_dct= G_node_dct(G)
-            G=nx.relabel_nodes(G,g_node_dct, copy=True)
+            G=nx.convert_node_labels_to_integers(G)
+            
             value_time_evolution.append(Degree_ratio(Degree_dct(G)))
             value_time=np.array(list((getattr(nx, feature)(G))))[:,1]
             value_time_evolution_mean.append([np.mean(value_time),np.std(value_time)])
@@ -606,8 +565,7 @@ def Time_evolution(G,step, feature):
         for i in range(time_step):
             G=nx.Graph(edges[:(i+1)*step])
             G=Sorted_graph(G)
-            g_node_dct=G_node_dct(G)
-            G=nx.relabel_nodes(G,g_node_dct, copy=True)
+            G=nx.convert_node_labels_to_integers(G)
             value_time=np.array(list((getattr(nx, feature)(G)).items()))[:,1]
             value_time_evolution_mean.append([np.mean(value_time),np.std(value_time)])
             value_time_evolution.append(value_time)
@@ -1337,8 +1295,7 @@ def test_Max_prob_target_degree():
     edge_probability=0.4
     n_node=100
     G=nx.fast_gnp_random_graph(n_node,edge_probability, seed=None, directed=False)
-    g_node_dct=fn.G_node_dct(G)    
-    G=nx.relabel_nodes(G,g_node_dct, copy=True)
+    G=nx.convert_node_labels_to_integers(G)
     
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     source=0
@@ -1356,8 +1313,7 @@ def test_Max_prob_target_not_its_self():
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0)]
     G=nx.Graph()
     G.add_edges_from(edges)
-    g_node_dct=G_node_dct(G)
-    G=nx.relabel_nodes(G,g_node_dct, copy=True)
+    G=nx.convert_node_labels_to_integers(G)
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     source=0
     strenght_list=fn.Degree_dct(G)[3]
@@ -1376,8 +1332,7 @@ def test_Max_prob_target_is_not_its_neighbors():
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0)]
     G=nx.Graph()
     G.add_edges_from(edges)
-    g_node_dct=G_node_dct(G)
-    G=nx.relabel_nodes(G,g_node_dct, copy=True)
+    G=nx.convert_node_labels_to_integers(G)
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     source=0
     strenght_list=fn.Degree_dct(G)[2]
@@ -1450,8 +1405,7 @@ def test_Min_distance_target_is_the_nearest():
     edges=[(0, 1), (0, 3), (0, 6), (0, 8), (0, 9), (1, 2), (1, 4), (1, 9), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 5), (4, 8), (5, 7), (6, 8), (7, 9)]
     G=nx.Graph()
     G.add_edges_from(edges)
-    g_node_dct=fn.G_node_dct(G)
-    G=nx.relabel_nodes(G,g_node_dct, copy=True)
+    G=nx.convert_node_labels_to_integers(G)
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     source=0
     degree_dct=fn.Degree_dct(G)
@@ -1464,8 +1418,7 @@ def test_Min_distance_target_is_not_its_self():
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0)]
     G=nx.Graph()
     G.add_edges_from(edges)
-    g_node_dct=G_node_dct(G)
-    G=nx.relabel_nodes(G,g_node_dct, copy=True)
+    G=nx.convert_node_labels_to_integers(G)
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     source=0
     degree_3=Degree_dct(G)[3]
@@ -1477,8 +1430,7 @@ def test_Min_distance_target_is_not_its_neighbors():
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0)]
     G=nx.Graph()
     G.add_edges_from(edges)
-    g_node_dct=G_node_dct(G)
-    G=nx.relabel_nodes(G,g_node_dct, copy=True)
+    G=nx.convert_node_labels_to_integers(G)
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     source=0
     degree_3=Degree_dct(G)[2]
@@ -1490,8 +1442,7 @@ def test_Min_distance_target_degree_corrispodence():
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0),(4,1),(4,2),(4,3)]
     G=nx.Graph()
     G.add_edges_from(edges)
-    g_node_dct=G_node_dct(G)
-    G=nx.relabel_nodes(G,g_node_dct, copy=True)
+    G=nx.convert_node_labels_to_integers(G)
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     source=0
     degree_3=Degree_dct(G)[3]
@@ -1506,8 +1457,7 @@ def test_Min_distance_target_empty_list():
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0)]
     G=nx.Graph()
     G.add_edges_from(edges)
-    g_node_dct=fn.G_node_dct(G)
-    G=nx.relabel_nodes(G,g_node_dct, copy=True)
+    G=nx.convert_node_labels_to_integers(G)
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     source=0
     degree_3=fn.Degree_dct(G)[0]
@@ -1608,8 +1558,7 @@ def test_Link_2_ZeroNode_reduction():
     G=nx.Graph()
     G.add_nodes_from(list(range(10)))
     G.add_edges_from(edges)
-    g_node_dct=fn.G_node_dct(G)
-    G=nx.relabel_nodes(G,g_node_dct, copy=True)
+    G=nx.convert_node_labels_to_integers(G)
     
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     
@@ -1636,8 +1585,7 @@ def test_Link_2_ZeroNode_increment():
     G=nx.Graph()
     G.add_nodes_from(list(range(10)))
     G.add_edges_from(edges)
-    g_node_dct=fn.G_node_dct(G)
-    G=nx.relabel_nodes(G,g_node_dct, copy=True)
+    G=nx.convert_node_labels_to_integers(G)
     
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     
@@ -1664,8 +1612,7 @@ def test_Link_2_ZeroNode_constant_degree_ratio():
     G=nx.Graph()
     G.add_nodes_from(list(range(10)))
     G.add_edges_from(edges)
-    g_node_dct=fn.G_node_dct(G)
-    G=nx.relabel_nodes(G,g_node_dct, copy=True)
+    G=nx.convert_node_labels_to_integers(G)
     
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     
@@ -1756,8 +1703,8 @@ def Copymap_degree_correction(Copy_map,G,map_dct,step,max_dist_link,prob_distrib
     Merge_small_component(Copycat,deg=1, map_dct=map_dct, threshold=3)
 
             
-    Copycat_dct=G_node_dct(Copycat)
-    Copycat=nx.relabel_nodes(Copycat,Copycat_dct, copy=True)
+    
+    Copycat=nx.convert_node_labels_to_integers(Copycat)
     return Copycat
 # %% tests sorted graph
 
