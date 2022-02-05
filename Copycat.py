@@ -18,8 +18,7 @@ edges=fn.Edge_list(file, number_of_edge)
 G=nx.Graph(edges)
 G=fn.Sorted_graph(G)
 #%%
-G_node_dct=fn.G_node_dct(G)
-G=nx.relabel_nodes(G,G_node_dct, copy=True) #non so perchè ma è fondamentale questa funzione per funzione comunità'
+G=nx.convert_node_labels_to_integers(G) #non so perchè ma è fondamentale questa funzione per funzione comunità'
 edges=list(G.edges())
 
 
