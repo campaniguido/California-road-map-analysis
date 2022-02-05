@@ -58,7 +58,7 @@ plt.title("Road prova")
 plt.show(G)
 
 
-
+'riga aggiunta'
 
 
 
