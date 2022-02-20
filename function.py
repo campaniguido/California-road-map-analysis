@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Oct 20 15:17:05 2021
+Created on Tue Feb  8 23:08:20 2022
 
 @author: Guido
 """
+
 # %%
 ##################################################################
 #
@@ -19,29 +20,251 @@ import pytest
 import function as fn
 import math
 
+'seed'
 rn.seed(3)
-       
+#%% CLASS SuperGraph
+
+class SuperGraph(nx.Graph):
+    
         
+    def Sorted_graph(self):
+        '''It orders nodes list and edges list of the SuperGraph
+
+        '''
+        G_sorted =SuperGraph()
+        G_sorted.add_nodes_from(sorted(list(self.nodes())))
+        G_sorted.add_edges_from(sorted(list(self.edges())))
+        self.remove_nodes_from(list(self.nodes()))
+        self.add_nodes_from(sorted(list(G_sorted.nodes())))
+        self.add_edges_from(sorted(list(G_sorted.edges())))
+        
+    def Relable_nodes(self):
+        '''It orders nodes list and edges list of the SuperGraph and it renames the nodes
+        in order to remove any jump in the labels (e.g.: G((5,4),(4,0)->G((0,1),(1,2)) )
+
+        '''
+        nodes=sorted(list(self.nodes()))    
+        edges=list(self.edges())
+        H=fn.SuperGraph()
+        H.add_nodes_from(nodes)
+        H.add_edges_from(edges)
+        H=nx.convert_node_labels_to_integers(H)
+        self.remove_nodes_from(list(self.nodes()))
+        self.add_nodes_from(list(H.nodes()))
+        self.add_edges_from(list(H.edges()))
+            
+    def Degree_dct(self):
+        '''It returns a dictionary. The keys are the degree of the SuperGraph from 0 to the maximum.
+        The values are all and only the nodes with the key degree'''
+        
+        degree_dct={}
+        for key in range(int(max(np.array(list(self.degree))[:,1])+1)):
+            degree_dct[key]=[]
+        for i in list(self.nodes()):
+            degree=len(list(self.neighbors(i)))-list(self.neighbors(i)).count(i) 
+            for key in degree_dct:
+                if degree==key:
+                    degree_dct[key].append(i)
+        j=0
+        while j==0:
+            if len(degree_dct[max(degree_dct.keys())])==0:
+                del(degree_dct[max(degree_dct.keys())])
+            else:
+                j=1
+        return degree_dct
+    
+    def Degree_ratio(self):
+        '''It returns a np.array of the denity distribution of the nodes degree'''
+        degree_dct=self.Degree_dct()
+        degree_ratio=[]
+        for key in (degree_dct):
+            degree_ratio.append(len(degree_dct[key]))
+        degree_ratio=np.array(degree_ratio)/sum(degree_ratio)
+        return degree_ratio
+
+
+    
+    
+    
+    
+#%%Ct  test sorted_graph (2)
+def test_sorted_graph_nodes():
+    '''it tests the graph nodes are sorted after the application of the function'''
+    edges = []
+    i=0
+    while i<20:
+        a = rn.randint(0, 100)
+        b = rn.randint(0, 100)
+        edges.append([a, b])
+        i+=1
+    G =fn.SuperGraph()
+    G.add_edges_from(edges)
+    TESTER = G
+    G.Sorted_graph()
+    assert list(G.nodes()) == sorted(list(TESTER.nodes()))
+
+
+
+def test_sorted_graph_edges():
+    '''it tests the graph edgess are sorted after the application of the function'''
+    edges = []
+    for i in range(0, 100):
+        a = rn.randint(0, 100)
+        b = rn.randint(0, 100)
+        edges.append((a, b))
+    G =fn.SuperGraph()
+    G.add_edges_from(edges)
+    G.Sorted_graph()
+    vecchio = list(G.edges())[0][0]
+    for i in range(1, len(G)):
+        assert list(G.edges())[i][0] <= list(G.edges())[i][1]
+        assert vecchio <= list(G.edges())[i][0]
+        vecchio = list(G.edges())[i][0]
+
+  
+#%%Ct  test_Relable_nodes
+
+
+def test_Relable_nodes_len():
+    '''It tests the len of the graph is conserved also after the application of the function'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
+    LEN=len(G)
+    G.Relable_nodes()
+    assert LEN==len(G)
+    
+def test_Relable_nodes_sorted():
+    '''it tests the ascending order'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
+    G.Relable_nodes()
+    nodes=list(G.nodes())
+    for i in range(1,len(G)):
+        assert nodes[i-1]<nodes[i]
+
+def test_Relable_nodes_no_hole():
+    '''it tests there is no jump in the numbers labels'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
+    G.Relable_nodes()
+    nodes=list(G.nodes())
+    for i in range(len(G)):
+        assert nodes[i]==i
+        
+def test_Relable_nodes_corrispondence():
+    '''it looks for neigbours corrispondence before and after the relable'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
+    G.Relable_nodes()
+    assert list(G.neighbors(0))==[5]
+    assert list(G.neighbors(1))==[5]
+    assert list(G.neighbors(2))==[5, 3]
+    assert list(G.neighbors(3))==[2, 4]
+    assert list(G.neighbors(4))==[3]
+    assert list(G.neighbors(5))==[0, 1, 2]
+    assert list(G.neighbors(6))==[6]
+    
+#%%Ct  test_Degree_dct (5)
+
+def test_Degree_list_corrispondence():
+    '''It verifies each node has a degree equal to its key'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
+    strenght_dct=G.Degree_dct()
+    for key in strenght_dct:
+        for node in strenght_dct[key]:
+            assert G.degree(node)-2*list(G.neighbors(node)).count(node)==key
+
+def test_Degree_list_length():
+    '''It looks if the elements of the dictionary values are the same of the of the graph nodes'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
+    strenght_dct=G.Degree_dct()
+    values=[]
+    for i in strenght_dct:
+        values+=set(strenght_dct[i])
+    assert sorted(values)==list(range(1,11))
+    
+def test_Strenght_list_max_degree():
+    '''It verify the highest key value is equal to the maximum degree'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
+    strenght_dct=G.Degree_dct()
+    assert len(list(strenght_dct.keys()))==max(np.array(list(G.degree))[:,1])+1
+    
+def test_Strenght_list_autoconnected_nodes():
+    '''It looks that the function does not count as a neighbour the node its self in the case
+    of an autoconnected node'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,3],[2,2],[3,3]])
+    strenght_dct=G.Degree_dct()
+    assert strenght_dct[0]==[2]
+    assert strenght_dct[1]==[1,3]
+    
+def test_empty_high_key():
+    '''it verify the last keys doesn't have 0 length'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,1],[2,2],[5,5],[8,8],[9,9],[10,10],[10,10],[7,7],[10,10],[0,1]])
+    strenght_dct=G.Degree_dct()
+    assert len(list(strenght_dct.keys()))==2
+    
+#%%Ct   test_Degree_ratio (4)
+def test_Degree_ratio_length():
+    '''It tests the length of the graph is conserved also after the application of the function'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
+    degree_ratio=G.Degree_ratio()
+    assert len(degree_ratio)==6
+    
+def test_Degree_ratio_I_axiom():
+    '''It verifies the probability I axiom'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
+    degree_ratio=G.Degree_ratio()
+    for i in degree_ratio:
+        assert i>=0
+        
+def test_Degree_ratio_II_axiom():
+    '''It verifies the probability II axiom'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
+    degree_ratio=G.Degree_ratio()
+    assert 0.99999<sum(degree_ratio)<1
+    
+def test_Degree_ratio_III_axiom():
+    '''It verifies the probability III axiom'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
+    degre_dct=G.Degree_dct()
+    degree_ratio=G.Degree_ratio()
+    
+    for i in range(len(G)):
+        j=i+1
+        while j<len(degree_ratio):
+            assert(degree_ratio[i]+degree_ratio[j]==np.array(len(degre_dct[i])+len(degre_dct[j]))/10)
+            j=j+1
+            
 #%%1  Divide value
 def Divide_value(file):
-    '''It takes an array nx2 which represents the graph edges. It looks for any case in which
+    '''It takes an array (n,2) which represents the graph edges. It looks for any case in which
     two linked nodes are written in the same cell in a string variable and put the two variables
-    in the two columns of the same row. It substitutes any full nan row with another row
+    in the two columns of the same row. It substitutes any full nan row with the previous row
     
     Parameters
     ----------
-    file : TYPE
-        DESCRIPTION.
+    file : Dict can contain Series, arrays, constants, dataclass or list-like objects.
+           If data is a dict, column order follows insertion-order. 
+           If a dict contains Series which have an index defined, it is aligned by its index.
+           Its shape mut be (n,2)
 
     Raises
     ------
     Exception
-        DESCRIPTION.
+        Exception raises if the file shape is not (n,2)
 
     Returns
     -------
-    file : TYPE
-        DESCRIPTION.
+    file : np.array((n,2))
 
     '''
     file=pd.DataFrame(file)
@@ -63,13 +286,9 @@ def Divide_value(file):
                 if type(file[i,k+1])!=str and math.isnan(file[i,k+1]):
                     file[i]=file[i-1]                       
     return file
-#%%1  tests Divide value (3)
-#ci sono un sacco di casi che possono capitare rispetto a come sono
-#i dati in input quanto devo lavorarci sopra potrei non avere il file 
-#in colonna, potrei avere una virgola nella tring o un punto
-#TEST CHE non so come FARE: 
+#%%  tests Divide value (3)
     
-#POSITIVE TEST
+
 def test_divide_value():
     '''it tests if there is any string variable with a space inside'''
     file=[[0,134.0],['45643 3456',np.nan],[np.nan,'34 5'],[3,4.0]]
@@ -88,7 +307,7 @@ def test_divide_value_nan_cell():
         for j in range(len(file)):
             if type(file[j,i])!=str:
                 assert math.isnan(file[j,i])!=True
-#Negative test
+
 def test_divide_value_shape():
     '''it tests if the data are in the shape n*2'''
     file=[[0,134.0,4],['45643 3456',np.nan,5],[np.nan,'34 5',7],[3,4.0,8]]
@@ -97,31 +316,31 @@ def test_divide_value_shape():
     
               
 
-    
-#%%2  Edge_list
 
+#%%2  Edge_list
 def Edge_list(file, number_of_edges):
     '''
-    It takes a file of couples of number and return a list of a desired lenght(number_of_edge) of couple of numbers expressed as
-    integers 
-    
+    It takes a file of couples of number and return a list of a desired lenght(number_of_edge) of couple 
+    of numbers expressed as  integers    
 
     Parameters
     ----------
-    file : TYPE
-        DESCRIPTION.
-    number_of_edge : TYPE
-        DESCRIPTION.
+    file : list, tuple,np.array, pd.DataFrame
+        The file to be read.
+        
+    number_of_edge : Integer
+        It is the number of file couples desired
 
     Raises
     ------
     Exception
-        DESCRIPTION.
+        Exception raises if the number of edges required is major than the length of the file, or the file
+        has a shape different from (n,2)
 
     Returns
     -------
-    edges : TYPE
-        DESCRIPTION.
+    edges : list of shape (n,2)
+        
 
     '''
     file=pd.DataFrame(file)
@@ -136,7 +355,7 @@ def Edge_list(file, number_of_edges):
     edges = sorted(edges)
     return edges
 
-#%%2  tests Edge_list (5)
+#%%  tests Edge_list (5)
 
 #POSITIVE TEST
 def test_edge_list_int():
@@ -148,7 +367,7 @@ def test_edge_list_int():
             assert type(edges[j][k])==int
                     
 def test_edge_list_length():
-    ''' it looks if the fil length is equal of number of edges'''
+    ''' it looks if the output length is equal of number of edges'''
     file=[[0,134.0],['45643',' 3456'],[3,4.0]]
     number_of_edges=2
     edges=Edge_list(file,number_of_edges)
@@ -175,147 +394,43 @@ def test_edge_list_input_shape():
     with pytest.raises(Exception):
         Edge_list(file,number_of_edges)
 
-#%%3  Sorted_graph *
-def Sorted_graph(G):
-    '''It takes a graph G and it orders its nodes list
-
-    Parameters
-    ----------
-    G : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    G : TYPE
-        DESCRIPTION.
-
-    '''
-
-
-    G_sorted = nx.Graph()
-    G_sorted.add_nodes_from(sorted(list(G.nodes())))
-    G_sorted.add_edges_from(sorted(list(G.edges())))
-    G = nx.Graph(G_sorted)
-    return G
-#%%3  test sorted_graph (2)
-def test_sorted_graph_nodes():
-    edges = []
-    i=0
-    while i<20:
-        a = rn.randint(0, 100)
-        b = rn.randint(0, 100)
-        edges.append([a, b])
-        i+=1
-    G = nx.Graph()
-    G.add_edges_from(edges)
-    TESTER = G
-    G = Sorted_graph(G)
-    assert list(G.nodes()) == sorted(list(TESTER.nodes()))
-
-
-
-def test_sorted_graph_edges():
-    edges = []
-    for i in range(0, 100):
-        a = rn.randint(0, 100)
-        b = rn.randint(0, 100)
-        edges.append((a, b))
-    G = nx.Graph()
-    G.add_edges_from(edges)
-    G = Sorted_graph(G)
-    vecchio = list(G.edges())[0][0]
-    for i in range(1, len(G)):
-        assert list(G.edges())[i][0] <= list(G.edges())[i][1]
-        assert vecchio <= list(G.edges())[i][0]
-        vecchio = list(G.edges())[i][0]
 
 
 
 
     
-#%%4  Relable_nodes *
 
-def Relable_nodes(G):
-    nodes=sorted(list(G.nodes()))    
-    edges=list(G.edges())
-    H=nx.Graph()
-    H.add_nodes_from(nodes)
-    H.add_edges_from(edges)
-    G=nx.Graph(H)
-    G=nx.convert_node_labels_to_integers(G)
-    return G
     
 
 
-#%%   test_Relable_nodes
 
-'''Voglio te stare che i nodi siano in ordine che neanche un nodo sia saltato
- che la dimensione sia la stessa, 
- che ci sia corrispondenza: se un nodo era legato con il nodo n, anche quando cambia nome rimane link.
-'''
-
-def test_Relable_nodes_len():
-    G=nx.Graph()
-    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
-    LEN=len(G)
-    G=fn.Relable_nodes(G)
-    assert LEN==len(G)
-    
-def test_Relable_nodes_sorted():
-    G=nx.Graph()
-    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
-    G=fn.Relable_nodes(G)
-    nodes=list(G.nodes())
-    for i in range(1,len(G)):
-        assert nodes[i-1]<nodes[i]
-
-def test_Relable_nodes_no_hole():
-    G=nx.Graph()
-    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
-    G=fn.Relable_nodes(G)
-    nodes=list(G.nodes())
-    for i in range(len(G)):
-        assert nodes[i]==i
-        
-def test_Relable_nodes_corrispondence():
-    '''it looks for neigbours corrispondence before and after the relable'''
-    G=nx.Graph()
-    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
-    G=fn.Relable_nodes(G)
-    assert list(G.neighbors(0))==[5]
-    assert list(G.neighbors(1))==[5]
-    assert list(G.neighbors(2))==[5, 3]
-    assert list(G.neighbors(3))==[2, 4]
-    assert list(G.neighbors(4))==[3]
-    assert list(G.neighbors(5))==[0, 1, 2]
-    assert list(G.neighbors(6))==[6]
-    
     
         
         
-#%%5  Unfreeze_into_list
+#%%3  Unfreeze_into_list
 def Unfreeze_into_list(comunity):
-    '''It takes a variable of n elements and transform each element in a list variables
+    '''It takes a (support item assignment) variable of n elements and transform each element in a list
+    of variables
     
 
     Parameters
     ----------
-    comunity : TYPE
-        DESCRIPTION. support item assignment
+    comunity : Support item assignment variable
+         
 
     Returns
     -------
-    comunity : TYPE
+    comunity : It returns the same variable but each item is a list
         DESCRIPTION.
 
     '''
     for i in range(len(comunity)):
         comunity[i]=list(comunity[i])
     return comunity
-#%%   tests Unfreeze_into_list(2)
-'''Ad esempio qua per la funzione mi andrebbe bene sia un dct che una list come elemento in entrata
-    ma quanto ha senso che io verifichi per tutte le variabili che supportano item assigment'''
+#%%  tests Unfreeze_into_list(2)
+
 def test_Unfreeze_into_list_is_a_list_1():
+    '''It verifies the output items are lists'''
     A = frozenset([1, 2, 3, 4])
     B = frozenset([3, 4, 5, 6])
     C = frozenset([5, 6])
@@ -326,6 +441,7 @@ def test_Unfreeze_into_list_is_a_list_1():
         assert(type(list_[i])==list)
 
 def test_Unfreeze_into_list_is_a_list_2():
+    '''it verifies the output items are lists'''
     A = frozenset([1, 2, 3, 4])
     B = frozenset([3, 4, 5, 6])
     C = frozenset([5, 6])
@@ -334,7 +450,7 @@ def test_Unfreeze_into_list_is_a_list_2():
     dct_=Unfreeze_into_list(dct_)
     for i in range(len(dct_)):
         assert(type(dct_[i])==list)
-#%%6  Set_comunity
+#%%4  Set_comunity
 
 def Set_community_number(G, community):
     '''It assigns to each node to the graph a community number. Node with the same number
@@ -346,15 +462,15 @@ def Set_community_number(G, community):
 
     Parameters
     ----------
-    G : TYPE
-        DESCRIPTION.
-    comunity : TYPE
-        DESCRIPTION.
+    G : networkx.classes.graph.Graph
+        
+    comunity : Support item assignment variable
+        
 
     Returns
     -------
-    comunity_number : TYPE
-        DESCRIPTION.
+    comunity_number : dictionary
+        
 
     '''    
     community_number={}
@@ -381,7 +497,8 @@ def Set_community_number(G, community):
     che gli elementi diversi della comunità sono lo stesso numero dei nodi (ha senso sia fare un raise nella funzione sia testarlo in maniera positiva che negativa)
     il numero di elementi unici dei valori del dizionario sia uguale alla grandezza della community'''
 
-def test_Set_community_number_corrispondence():    
+def test_Set_community_number_corrispondence():   
+    '''It verifies the community corrispondence is right'''
     community=[[1,3,6,9],[5,10],[7],[2,4,8]]
     G=nx.Graph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -390,6 +507,7 @@ def test_Set_community_number_corrispondence():
         assert community[community_number[i]].count(i)==1
         
 def test_Set_community_number_length():
+    '''It tests the length of the output is the same of the one of the Graph'''
     community=[[1,3,6,9],[5,10],[7],[2,4,8]]
     G=nx.Graph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -399,7 +517,7 @@ def test_Set_community_number_length():
 
         
 def test_Set_community_number_doubble():
-    '''the four is in two different communities'''
+    '''It tests if the node are in just one community. e.g.:the four is in two different communities'''
     community=[[1,3,6,9],[5,10],[7,4],[2,4,8]]
     G=nx.Graph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -407,7 +525,7 @@ def test_Set_community_number_doubble():
         Set_community_number(G, community)
 
 def test_Set_community_number_missing_number():
-    '''the eight is missing'''
+    '''It tests if all the node are in the community variable. e.g.:the eight is missing'''
     community=[[1,3,6,9],[5,10],[7],[2,4]]
     G=nx.Graph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -415,7 +533,7 @@ def test_Set_community_number_missing_number():
         Set_community_number(G, community)
 
 def test_Set_community_number_extra_number():
-    '''the 999 is not a node number'''
+    '''It tests if the community has only the nodes labels of the graph. e.g.:the 999 is not a node number'''
     community=[[1,3,6,9],[5,10],[7],[2,4,8,999]]
     G=nx.Graph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -423,6 +541,7 @@ def test_Set_community_number_extra_number():
         Set_community_number(G, community)
 
 def test_Set_community_number_all_wrong():
+    '''It tests the behaviours for the three previous mistakes'''
     community=[[1,3,6,4],[5,10],[7],[2,4,999]]
     G=nx.Graph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -430,142 +549,20 @@ def test_Set_community_number_all_wrong():
         Set_community_number(G, community)
             
     
-#%%7  Degree_dct *
-def Degree_dct(G):
-    '''It returns a dictionary. The keys are the degree of the graph from 0 to the maximum.
-    The values are all and only the nodes with the key degree
-    
 
-    Parameters
-    ----------
-    G : networkx.classes.graph.Graph
 
-    Returns
-    -------
-    strenght_dct : TYPE
-        DESCRIPTION.
 
-    '''
-    strenght_dct={}
-    for key in range(int(max(np.array(list(G.degree))[:,1])+1)):
-        strenght_dct[key]=[]
-    for i in list(G.nodes()):
-        degree=len(list(G.neighbors(i)))-list(G.neighbors(i)).count(i) 
-        for key in strenght_dct:
-            if degree==key:
-                strenght_dct[key].append(i)
-    j=0
-    while j==0:
-        if len(strenght_dct[max(strenght_dct.keys())])==0:
-            del(strenght_dct[max(strenght_dct.keys())])
-        else:
-            j=1
-    return strenght_dct
-
-#%%   test_Degree_dct (5)
-
-def test_Degree_list_corrispondence():
-    '''It verifies each node has a degree equal to its key'''
-    G=nx.Graph()
-    G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
-    strenght_dct=Degree_dct(G)
-    for key in strenght_dct:
-        for node in strenght_dct[key]:
-            assert G.degree(node)-2*list(G.neighbors(node)).count(node)==key
-
-def test_Degree_list_length():
-    '''It looks if the elements of the dictionary values are the same of the of the graph nodes'''
-    G=nx.Graph()
-    G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
-    strenght_dct=Degree_dct(G)
-    values=[]
-    for i in strenght_dct:
-        values+=set(strenght_dct[i])
-    assert sorted(values)==list(range(1,11))
-    
-def test_Strenght_list_max_degree():
-    '''It verify the highest key value is equal to the maximum degree'''
-    G=nx.Graph()
-    G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
-    strenght_dct=Degree_dct(G)
-    assert len(list(strenght_dct.keys()))==max(np.array(list(G.degree))[:,1])+1
-    
-def test_Strenght_list_autoconnected_nodes():
-    '''It looks that the function does not count as a neighbour the node its self in the case
-    of an autoconnected node'''
-    G=nx.Graph()
-    G.add_edges_from([[1,3],[2,2],[3,3]])
-    strenght_dct=Degree_dct(G)
-    assert strenght_dct[0]==[2]
-    assert strenght_dct[1]==[1,3]
-    
-def test_empty_high_key():
-    '''it verify the last keys doesn't have 0 length'''
-    G=nx.Graph()
-    G.add_edges_from([[1,1],[2,2],[5,5],[8,8],[9,9],[10,10],[10,10],[7,7],[10,10],[0,1]])
-    strenght_dct=Degree_dct(G)
-    assert len(list(strenght_dct.keys()))==2
 
 
     
     
     
     
-#%%8  Degree ratio *
 
-def Degree_ratio(strenght_dct):
-    '''From a dictionary degre:[nodes], it returns the probability distribution of the nodes degree
-    
 
-    Parameters
-    ----------
-    strenght_list : TYPE
-        DESCRIPTION.
 
-    Returns
-    -------
-    degree_ratio : TYPE
-        DESCRIPTION.
-
-    '''
-    degree_ratio=[]
-    for key in (strenght_dct):
-        degree_ratio.append(len(strenght_dct[key]))
-    degree_ratio=np.array(degree_ratio)/sum(degree_ratio)
-    return degree_ratio
-
-#%%   test_Degree_ratio (4)
-def test_Degree_ratio_length():
-    strenght_dct={0: [2], 1: [3, 6, 8, 9, 10], 2: [5, 4, 7], 3: [], 4: [], 5: [1]}
-    degree_ratio=Degree_ratio(strenght_dct)
-    assert len(degree_ratio)==6
-    
-def test_Degree_ratio_I_axiom():
-    '''It verifies the probability I axiom'''
-    strenght_dct={0: [2], 1: [3, 6, 8, 9, 10], 2: [5, 4, 7], 3: [], 4: [], 5: [1]}
-    degree_ratio=Degree_ratio(strenght_dct)
-    for i in degree_ratio:
-        assert i>=0
-        
-def test_Degree_ratio_II_axiom():
-    '''It verifies the probability II axiom'''
-    strenght_dct={0: [2], 1: [3, 6, 8, 9, 10], 2: [5, 4, 7], 3: [], 4: [], 5: [1]}
-    degree_ratio=Degree_ratio(strenght_dct)
-    assert 0.99999<sum(degree_ratio)<1
-    
-def test_Degree_ratio_III_axiom():
-    '''It verifies the probability III axiom'''
-    strenght_dct={0: [2], 1: [3, 6, 8, 9, 10], 2: [5, 4, 7], 3: [], 4: [], 5: [1]}
-    degree_ratio=Degree_ratio(strenght_dct)
-    strenght_dct_2={0: [2,1], 1: [3, 6, 8, 9, 10, 5, 4, 7], 2: [], 3: [], 4: [], 5: []}
-    degree_ratio_2=Degree_ratio(strenght_dct_2)
-    assert degree_ratio[0]+degree_ratio[5]==degree_ratio_2[0]
-    assert degree_ratio[1]+degree_ratio[2]==degree_ratio_2[1]
-    
-    
-    
                         
-#%%9  Time evolution (3)
+#%%5  Time evolution (3)
 def Time_evolution(G,step, feature):
     '''
     It takes back information related to the network G feature along its size increasing.
@@ -574,26 +571,29 @@ def Time_evolution(G,step, feature):
     The outputs are three lists related to the size of the graph at each step, 
     the value of the feature of each node at each step and
     the mean value and its standard deviation of the feature at each step.
-    In the case of the feature='degree' it instead of the value of each node it returns
-    the degree distribution. 
+    In the case of the feature='degree' it returns  the degree distribution. 
 
     Parameters
     ----------
-    G : TYPE
-        DESCRIPTION.
-    step : TYPE
-        DESCRIPTION.
-    feature : TYPE
-        DESCRIPTION.
+    G : networkx.classes.graph.Graph
+        
+    step : integer
+        
+    feature : degree, closeness_centrality, betweenness_centrality, clustering
 
     Returns
     -------
-    size : TYPE
-        DESCRIPTION.
-    value_time_evolution : TYPE
-        DESCRIPTION.
-    value_time_evolution_mean : TYPE
-        DESCRIPTION.
+    size : np.array of integers
+        Each integer is the size of the graph at that step
+    value_time_evolution : If feature=='degree' it returns a numpy.ndarray((#G.edges/step,max degree G +1)).
+                           It represents the degree ratio of the graph at each step.
+                           Else it returns a list #G.edges/step long. Each item of the list is a numpy.ndarray
+                           of the nodes values of the selected features
+        
+    value_time_evolution_mean : It returns numpy.ndarray((#G.edges/step,2)). 
+                                Each entry is the mean value of the degree and its std
+                                
+        
 
     '''
     value_time_evolution=[]
@@ -603,10 +603,10 @@ def Time_evolution(G,step, feature):
     size=[]
     if feature=='degree':
         for i in range(time_step):      
-            G=nx.Graph(edges[:(i+1)*step])
-            G=Relable_nodes(G)
+            G=fn.SuperGraph(edges[:(i+1)*step])
+            G.Relable_nodes()
             
-            value_time_evolution.append(Degree_ratio(Degree_dct(G)))
+            value_time_evolution.append(G.Degree_ratio())
             value_time=np.array(list((getattr(nx, feature)(G))))[:,1]
             value_time_evolution_mean.append([np.mean(value_time),np.std(value_time)])
             size.append(len(G))  
@@ -620,9 +620,9 @@ def Time_evolution(G,step, feature):
         return size, value_time_evolution,value_time_evolution_mean
     else:
         for i in range(time_step):
-            G=nx.Graph(edges[:(i+1)*step])
-            G=Sorted_graph(G)
-            G=Relable_nodes(G)
+            G=fn.SuperGraph(edges[:(i+1)*step])
+            G.Sorted_graph()
+            G.Relable_nodes()
             value_time=np.array(list((getattr(nx, feature)(G)).items()))[:,1]
             value_time_evolution_mean.append([np.mean(value_time),np.std(value_time)])
             value_time_evolution.append(value_time)
@@ -631,7 +631,8 @@ def Time_evolution(G,step, feature):
         return size, value_time_evolution,value_time_evolution_mean
 #%%   test_Time_evolution
 def test_Time_evolution_size():
-    G=nx.Graph()
+    '''It tests the richt len of each output'''
+    G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     step=1
     nstep=int(len(G.edges)/step)
@@ -644,7 +645,8 @@ def test_Time_evolution_size():
     assert len(size)==nstep and len(value_time_evolution)==nstep and len(value_time_evolution_mean)==nstep
 
 def test_Time_evolution_size_increasing_size():
-    G=nx.Graph()
+    '''It tests the output 'size' increases at each step'''
+    G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     step=1
     nstep=int(len(G.edges)/step)
@@ -659,7 +661,8 @@ def test_Time_evolution_size_increasing_size():
         assert size[i]<size[i+1]
 
 def test_Time_evolution_size_degree_constant_len():
-    G=nx.Graph()
+    '''It tests, for the degree feature, the lenght of the value_time_evolution it is always the same'''
+    G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     step=1
     nstep=int(len(G.edges)/step)
@@ -668,22 +671,22 @@ def test_Time_evolution_size_degree_constant_len():
     for i in range(nstep):
         assert len(value_time_evolution[i])==4
     
-#%%10 Dct_dist_link 
+#%%6 Dct_dist_link 
 def Dct_dist_link(edges,map_dct):
-    '''It calculates all the distances of the nodes linked together whose position is decribed by
+    '''It calculates all the distances of the nodes linked together whose position is described by
     the dictionary map
     
 
     Parameters
     ----------
-    edges : TYPE
-        DESCRIPTION.
-    map_dct : TYPE
-        DESCRIPTION.
+    edges : Support item assignment variable
+        It represents all the links of the network
+    map_dct : Support item assignment variable
+        It describes the position of the nodes
 
     Returns
     -------
-    None.
+    dct_dist_link : dictionary of all the nodes linked together. key:value= edge:distance
 
     '''
     for i in edges:
@@ -695,13 +698,13 @@ def Dct_dist_link(edges,map_dct):
         x1=map_dct[i[1]]
         dist=np.linalg.norm(x0-x1)
         dct_dist_link[i]=dist
-    return(dct_dist_link)
+    return dct_dist_link
 
 #%%   test_List_dist_link (4)
 
     
 def test_List_dist_link_length():
-    '''it verify in the dictionary are not present symmetric object (e.g.: (1,2), (2,1))
+    '''it verifies in the dictionary are not present symmetric object (e.g.: (1,2), (2,1))
     and it removes autoedges (e.g.: (1,1))
     '''
     edges=[(1,2),(3,1),(1,1),(1,2),(2,1)]    
@@ -712,6 +715,7 @@ def test_List_dist_link_length():
     assert len(dct_dist_link)==2
 
 def test_List_dist_link_non_negativity():
+    '''It tests distances are not negative'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     edges=list(G.edges())
@@ -721,6 +725,7 @@ def test_List_dist_link_non_negativity():
         assert i>=0
         
 def test_List_dist_link_simmetry():
+    '''It tests link distance symmetry'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     edges=list(G.edges())
@@ -733,6 +738,7 @@ def test_List_dist_link_simmetry():
     assert list(dct_dist_link2.values())==list(dct_dist_link1.values())
     
 def test_List_dist_link_triangular_inequality():
+    '''It tests triangular inequality'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     edges=list(G.edges())
@@ -763,7 +769,7 @@ def test_List_dist_link_triangular_inequality():
     
 
 
-#%%11 Dct_dist 
+#%%7 Dct_dist 
 def Dct_dist(G,map_dct):
     '''
     It returns all the distance among the nodes, even the not linked one. 
@@ -772,15 +778,15 @@ def Dct_dist(G,map_dct):
 
     Parameters
     ----------
-    G : TYPE
-        DESCRIPTION.
-    map_dct : TYPE
-        DESCRIPTION.
+    G : networkx.classes.graph.Graph
+        
+    map_dct : Support item assignment variable
+        It describes the position of the nodes
 
     Returns
     -------
-    list_dist : TYPE
-        DESCRIPTION.
+    dct_dist : dictionary of all the nodes linked together. key:value= (node_i,node_j):distance
+        
 
     '''
     
@@ -809,6 +815,7 @@ def test_List_dist_length():
     assert len(list_dist)==6
 
 def test_List_dist_non_negativity():
+    '''It tests distances are not negative'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
@@ -817,6 +824,7 @@ def test_List_dist_non_negativity():
         assert i>=0
     
 def test_List_dist_triangular_inequality():
+    '''It tests triangular inequality'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     edges=list(G.edges())
@@ -839,10 +847,26 @@ def test_List_dist_triangular_inequality():
                             else:
                                 dist2+=dct_dist[(all_simple_paths[i][j+1],all_simple_paths[i][j])]
                 assert dist<dist2
-#%%12 Node_distance_frequency 
+#%%8 Node_distance_frequency 
 def Node_distance_frequency(dct_dist,nstep,step):
     '''It returns a binned not normalized nodes distance distribution. 
     It puts all the elements>nstep*step in the last bin 
+    
+
+    Parameters
+    ----------
+    dct_dist : Support item assignment variable
+        It describes all the distances among nodes
+    nstep : integer
+        
+    step : integer
+        
+
+    Returns
+    -------
+    node_distance_frequency : numpy.ndarray
+        Each entry is the frequency of elements with the same distance inside the bin of length==step.
+        It puts all the elements>nstep*step in the last bin 
     '''
     n=[0]*nstep
     for key in (dct_dist):
@@ -942,9 +966,36 @@ def test_Node_distance_frequency_III_axiom():
     for i in range(0,50,2):
         assert node_distance_frequency_1[i]+node_distance_frequency_1[i+1]==node_distance_frequency_2[int(i/2)]
 
-#%%13 Link_distance_conditional_probability(dct_dist_link,nstep,distance_frequency)
+#%%9 Link_distance_conditional_probability 
 
 def Link_distance_conditional_probability(dct_dist_link,nstep,distance_frequency):
+    '''
+    It returns the probability density binned function of having a link at a fixed disstance 
+    
+
+    Parameters
+    ----------
+    dct_dist_link : Support item assignment variable
+        It describes all the distances among nodes linked together
+        
+    nstep : integer
+        
+    distance_frequency : Support item assignment variable
+        It represents the frequency of nodes that are in a distance equal to n*step. Where 0<n<nstep and
+        step=max(dct_dist_link.values())/nstep
+
+    Raises
+    ------
+    ZeroDivisionError
+        It raise the error when some linked node distance is in a bin i but no node distance is present in
+        in the same bin
+
+    Returns
+    -------
+    link_distance_probability : TYPE
+        DESCRIPTION.
+
+    '''
     step=max(dct_dist_link.values())/nstep
     n_link=[0]*nstep
     for key in (dct_dist_link):
@@ -960,8 +1011,8 @@ def Link_distance_conditional_probability(dct_dist_link,nstep,distance_frequency
             link_distance_probability[(i+1)*step]=(0)
         else:
             print(i)
-            raise ZeroDivisionError('so qua')
-    
+            raise ZeroDivisionError('There is no couple of nodes with this distance')
+            
     return link_distance_probability
     
 #%%   test_Link_distance_probability (4)
@@ -969,7 +1020,7 @@ def Link_distance_conditional_probability(dct_dist_link,nstep,distance_frequency
    
 def test_Link_distance_probability_I_axiom():
     '''It verifies the probability I axiom'''
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     edges=list(G.edges())
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
@@ -1034,33 +1085,29 @@ def test_Link_distance_probability_maximum_value():
     assert list(link_distance_conditional_probability.keys())[-1]==max(list(dct_dist_link.values()))
     
 
-#%%14 Add_edges_from_map(G,map_dct,distance_linking_probability)                           
+#%%10 Add_edges_from_map(G,map_dct,distance_linking_probability)                           
 def Add_edges_from_map(G,map_dct,distance_linking_probability):
     '''
-    It creates links among nodes of graph with no links. 
+    It creates links among nodes of graph. 
     It exploits the nodes positions informations conteined in the map dictionary, map_dct,
     and the conditional distribution probability to make a link in function of the distance.
     
 
     Parameters
     ----------
-    Copy_map : TYPE
-        DESCRIPTION.
-    map_dct : TYPE
-        DESCRIPTION.
-    prob_distribution : TYPE
-        DESCRIPTION.
-    list_dist_link : TYPE
-        DESCRIPTION.
-    nstep : TYPE
-        DESCRIPTION.
-    step : TYPE
-        DESCRIPTION.
+    G: networkx.classes.graph.Graph
+        
+    map_dct : Support item assignment variable
+        It describes the position of all the nodes
+        
+    distance_linking_probability : Support item assignment variable
+        It describe the probability to have a link among two nodes at a given distance
+    
 
     Returns
     -------
-    Copy_map : TYPE
-        DESCRIPTION.
+    G : networkx.classes.graph.Graph
+        it returns the old graph but with the additon of the new links
 
     '''
     i=0
@@ -1138,45 +1185,44 @@ def test_Add_edges_from_map_Bernoulli_trials():
               
         assert LG*p-3*(p*(1-p)*LG)**0.5<=LCopymap<=LG*p+3*(p*(1-p)*LG)**0.5
     
-'''voglio testare che preso un  grafo il numero di linkati è uguale a più o meno il numero di grafi  
-    il numero di nodi rimane lo stesso
-    
-'''
-#%%15 Break_strong_nodes
+
+#%%11 Break_strong_nodes
 
 def Break_strongest_nodes(G, threshold):
     '''
     It breaks randomly links of nodes with the highest degree
     till the node with the maximum degree has a value under or equal to the trheshold
-    
 
     Parameters
     ----------
-    G_strong : TYPE
-        DESCRIPTION.
-    G_weak : TYPE
-        DESCRIPTION.
+    G : networkx.classes.graph.Graph
+        
+    threshold : integer
+        It is the maximum of the degree allows. all the edges of the nodes with
+        a higher degree will be dissolved
 
     Returns
     -------
     None.
 
     '''
-    dct_degree=Degree_dct(G)
+
+
+    
+    dct_degree=G.Degree_dct()
     while threshold<max(np.array(list(G.degree))[:,1]):
         source=rn.choice(list(dct_degree.values())[len(dct_degree)-1])
         node=rn.choice(list(G.neighbors(source)))
         G.remove_edge(source,node)
-        dct_degree=Degree_dct(G)
+        dct_degree=G.Degree_dct()
         
 #%% test_Break_strongest_nodes (2)
-''' testo che il grafo abbia stessa grandezza, che il massimo del max degree sia sotto threshold 
-'''
+
 def test_Break_strongest_nodes_size():
     '''it tests len of the graph is kept constant'''
     
     edges=[(1,2), (3,1), (1,1), (1,2), (2,1), (1,4), (1,5), (5,4), (5,3), (1,6), (6,2), (5,2)]    
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from(edges)
     len_before=len(G)
     Break_strongest_nodes(G,2)
@@ -1187,21 +1233,21 @@ def test_Break_strongest_nodes_maximum_value():
     '''it verify the nodes with the highest degree is under the threshold'''
     
     edges=[(1,2), (3,1),(1,1), (1,1), (1,2), (2,1), (1,4), (1,5), (5,4), (5,3), (1,6), (6,2), (5,2)]    
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from(edges)
     Break_strongest_nodes(G,2)
-    deg=Degree_dct(G)
+    deg=G.Degree_dct()
     assert max(deg.keys())<=2
 
 
-#%%16 Find_mode(pfd) 
+#%%12 Find_mode(pfd) 
 def Find_mode(pdf):
     '''
     It returns the x value of the maximum of function p(x). Where x represent a bin 
 
     Parameters
     ----------
-    pdf : TYPE
+    pdf : Support item assignment variable
         DESCRIPTION.
 
     Raises
@@ -1232,7 +1278,7 @@ def test_Find_mode():
     
     
         
-#%%17 Equalize_strong_nodes
+#%%13 Equalize_strong_nodes
 def Equalize_strong_nodes(G_strong, G_weak):
     '''
     It compares two graph. It takes the strongest node of the first graph which have a degree value major 
@@ -1241,20 +1287,20 @@ def Equalize_strong_nodes(G_strong, G_weak):
 
     Parameters
     ----------
-    G_strong : TYPE
-        DESCRIPTION.
-    G_weak : TYPE
-        DESCRIPTION.
+    G_strong : function.SuperGraph
+        
+    G_weak : function.SuperGraph
+        
 
     Returns
     -------
     None.
 
     '''
-    dct_degree_strong=Degree_dct(G_strong)
-    dct_degree_weak=Degree_dct(G_weak)
-    degree_ratio_strong=Degree_ratio(dct_degree_strong)
-    degree_ratio_weak=Degree_ratio(dct_degree_weak)
+    dct_degree_strong=G_strong.Degree_dct()
+    dct_degree_weak=G_weak.Degree_dct()
+    degree_ratio_strong=G_strong.Degree_ratio()
+    degree_ratio_weak=G_weak.Degree_ratio()
     
     threshold=Find_mode(degree_ratio_weak)
     
@@ -1273,22 +1319,20 @@ def Equalize_strong_nodes(G_strong, G_weak):
             node=rn.choice(list(G_strong.neighbors(source)))
             
             G_strong.remove_edge(source,node)              
-            dct_degree_strong=Degree_dct(G_strong)
-            degree_ratio_strong=Degree_ratio(dct_degree_strong)            
+            dct_degree_strong=G_strong.Degree_dct()
+            degree_ratio_strong=G_strong.Degree_ratio()            
         i=i-1
             
 #%% test_Equalize_strong_nodes (2)
 
-'''voglio verificare il numero di nodi di G_strong sia lo stesso e che i degree massimi siano minori dell'altro grafo'''
-
 def test_Equalize_strong_nodes_size():
-    '''it tests len of the first graph is kept constant'''
+    '''it tests length of the first graph is kept constant'''
     
     edges=[(1,2), (3,1), (6,3), (4,2), (2,3), (1,4), (1,5), (5,4), (5,3), (1,6), (5,3), (5,2), (5,6), (7,1)]    
-    G_strong=nx.Graph()
+    G_strong=fn.SuperGraph()
     G_strong.add_edges_from(edges)
     edges=[(1,2), (5,7), (1,1), (1,2), (2,1), (3,4), (4,5), (2,4), (5,6), (1,6), (1,2), (6,2), (5,6), (7,6)]
-    G_weak=nx.Graph()
+    G_weak=fn.SuperGraph()
     G_weak.add_edges_from(edges)
     len_before=len(G_strong)
     Equalize_strong_nodes(G_strong, G_weak) 
@@ -1299,26 +1343,63 @@ def test_Equalize_strong_nodes_maximum_value():
     '''it verify if the  degree ratio of highest node of the first graph is lower than the second one'''
     
     edges=[(1,2), (3,1), (6,3), (4,2), (2,3), (1,4), (1,5), (5,4), (5,3), (1,6), (5,3), (5,2), (5,6), (7,1)]    
-    G_strong=nx.Graph()
+    G_strong=fn.SuperGraph()
     G_strong.add_edges_from(edges)
     edges=[(1,2), (5,7), (1,1), (1,2), (2,1), (3,4), (4,5), (2,4), (5,6), (1,6), (1,2), (6,2), (5,6), (7,6)]
-    G_weak=nx.Graph()
+    G_weak=fn.SuperGraph()
     G_weak.add_edges_from(edges)
-    Equalize_strong_nodes(G_strong, G_weak) 
-    dct_degree_strong=fn.Degree_dct(G_strong)
-    dct_degree_weak=fn.Degree_dct(G_weak)
-    degree_ratio_strong=fn.Degree_ratio(dct_degree_strong)
-    degree_ratio_weak=fn.Degree_ratio(dct_degree_weak)
-    mode=Find_mode(degree_ratio_weak)
+    fn.Equalize_strong_nodes(G_strong, G_weak) 
+    dct_degree_strong=G_strong.Degree_dct()
+    dct_degree_weak=G_weak.Degree_dct()
+    degree_ratio_strong=G_strong.Degree_ratio()
+    degree_ratio_weak=G_weak.Degree_ratio()
+    mode=fn.Find_mode(degree_ratio_weak)
     i=max(dct_degree_strong.keys())
     while i>mode:
         assert degree_ratio_strong[i]<=degree_ratio_weak[i]
         i=i-1
 
-#%%18 Max_prob_target
+#%%14 Max_prob_target
 
     
 def Max_prob_target (source,strenght_dct,degree,map_dct,distance_linking_probability,max_dist,G):
+    '''
+    It finds the best linking target for a surce node of the graph G. The target,
+    if it is possible, has the degree chosen in the input, it's not a source's neighbour, 
+    it's not its self and among the the nodes with the previous three characteristic is the most
+    probable one
+
+    Parameters
+    ----------
+    source : integer
+        It represents the node label of the source.
+        
+    strenght_dct :  Support item assignment variable
+        each items is the group of nodes with the same degree
+        
+    degree : integer
+        It represents the desired degree of the target
+        
+    map_dct : Support item assignment variable
+        Each item represents the spatial position of a node of the graph
+        
+    distance_linking_probability :Support item assignment variable
+        It represents a binned density function distribution related to the distance, each bin distance 
+        entry is the ptobability to have a link at tthat distance
+        
+    max_dist : integer
+        It is the ditance threshold among the source and the others nodes. Node distances above it
+        will not take into account
+        
+    G : networkx.classes.graph.Graph
+        
+
+    Returns
+    -------
+    target : integer
+        It is the label of node chosen
+
+    '''
     x0=map_dct[source]
     max_prob=-1
     target=-5
@@ -1338,7 +1419,7 @@ def Max_prob_target (source,strenght_dct,degree,map_dct,distance_linking_probabi
 
     
     if target==-5:
-        (print('min'))
+
         target=fn.Min_distance_target(source, strenght_dct,degree, map_dct, list(G.neighbors(source)))
     return target
   
@@ -1349,14 +1430,16 @@ def Max_prob_target (source,strenght_dct,degree,map_dct,distance_linking_probabi
 potrei aggiungere bernoulli trials per verificare i link ad una determinata distanza
 '''
 def test_Max_prob_target_degree():
+    ''''It verifies the degree of the target is the one given'''
     edge_probability=0.4
     n_node=100
-    G=nx.fast_gnp_random_graph(n_node,edge_probability, seed=None, directed=False)
-    G=fn.Relable_nodes(G)
+    G=fn.SuperGraph(nx.fast_gnp_random_graph(n_node,edge_probability, seed=None, directed=False))
+    
+    G.Relable_nodes()
     
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     source=0
-    strenght_dct=fn.Degree_dct(G)
+    strenght_dct=G.Degree_dct()
     degree=edge_probability*n_node
     dct_dist_link=fn.Dct_dist_link(list(G.edges()), map_dct)
     max_dist=max(dct_dist_link.values())
@@ -1365,13 +1448,14 @@ def test_Max_prob_target_degree():
     for i in range(10):
         prob_distribution[step*(i+1)]=0.4        
     target=fn.Max_prob_target (source,strenght_dct,degree,map_dct,prob_distribution,max_dist,G)
-    assert len(list(G.neighbors(target)))==edge_probability*n_node
+    assert len(list(G.neighbors(target)))==degree
 
 def test_Max_prob_target_not_its_self():
+    '''It verifies the taget is not the ource'''
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0),(4,4)]
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from(edges)
-    G=fn.Relable_nodes(G)
+    G.Relable_nodes()
     map_dct={0: np.array([ 0, 0]),
          1: np.array([-1, -1]),
          2: np.array([-0.5, -0.2]),
@@ -1380,7 +1464,7 @@ def test_Max_prob_target_not_its_self():
     
     
     source=0
-    strenght_dct=fn.Degree_dct(G)
+    strenght_dct=G.Degree_dct()
     degree=3
     dct_dist_link=fn.Dct_dist_link(list(G.edges()), map_dct)
     max_dist=max(dct_dist_link.values())
@@ -1393,17 +1477,18 @@ def test_Max_prob_target_not_its_self():
         assert source!=fn.Max_prob_target (source,strenght_dct,degree,map_dct,prob_distribution,max_dist,G)
     
 def test_Max_prob_target_is_not_its_neighbors():
+    '''it verifies the target is not a source's neighbors'''
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0),(4,4)]
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from(edges)
-    G=fn.Relable_nodes(G)
+    G.Relable_nodes()
     map_dct={0: np.array([ 0, 0]),
          1: np.array([-1, -1]),
          2: np.array([-0.5, -0.2]),
          3: np.array([1, 2]),
          4: np.array([5, 5])}
     source=0
-    strenght_dct=fn.Degree_dct(G)
+    strenght_dct=G.Degree_dct()
     degree=2
     dct_dist_link=fn.Dct_dist_link(list(G.edges()), map_dct)
     max_dist=max(dct_dist_link.values())
@@ -1415,33 +1500,34 @@ def test_Max_prob_target_is_not_its_neighbors():
     for i in range(100):
         assert source!=fn.Max_prob_target (source,strenght_dct,degree,map_dct,prob_distribution,max_dist,G)
        
-#%%19 Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_list)
+#%%15 Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_list)
 
 def Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_list):
     '''
     Given a distance map of the nodes, From a starting vertice (the source) of the graph it returns the nearest node 
-    with a given degree and which is not already linked to the source
+    with a given degree and which is not already linked to the source.    
 
     Parameters
     ----------
-    source : TYPE
-        DESCRIPTION.
-    strenght_list : TYPE
-        DESCRIPTION.
-    map_dct : TYPE
-        DESCRIPTION.
-    source_neighbour_list : TYPE
-        DESCRIPTION.
-
-    Raises
-    ------
-    ValueError
-        DESCRIPTION.
+    ----------
+    source : integer
+        It represents the node label of the source.
+        
+    strenght_dct :  Support item assignment variable
+        each items is a group of nodes with the same degree
+        
+    degree : integer
+        It represents the desired degree of the target        
+        
+    map_dct : Support item assignment variable
+        Each item represents the spatial position of a node of the graph
+        
+    source_neighbour_list : list
 
     Returns
     -------
-    target : TYPE
-        DESCRIPTION.
+    target : integer
+        It is the label of node chosen for the linkage
 
     '''
     x0=map_dct[source]
@@ -1471,16 +1557,12 @@ def Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_lis
 
 #%% test_Min_distance_target (5)
 
-''' voglio verificare che è effettivamente il più vicino e che non è un suo vicino 
-che non è se stesso e che ha il grado richiesto
-se strength list vuota mi da un errore
-'''
-
 def test_Min_distance_target_is_the_nearest():
+    '''It tests the target is the nearest node which is not itself or one of its neighbor'''
     edges=[(0, 1), (0, 3), (0, 6), (0, 8), (0, 9), (1, 2), (1, 4), (1, 9), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 5), (4, 8), (5, 7), (6, 8), (7, 9)]
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from(edges)
-    G=Relable_nodes(G)
+    G.Relable_nodes()
     map_dct={0: np.array([ 0, 0]),
              1: np.array([-1, -1]),
              2: np.array([-0.5, -0.2]),
@@ -1493,68 +1575,97 @@ def test_Min_distance_target_is_the_nearest():
              9: np.array([1, 1])}
     
     source=0
-    degree_dct=fn.Degree_dct(G)
+    degree_dct=G.Degree_dct()
     neighbour_0=list(G.neighbors(0))
     target=fn.Min_distance_target (source,degree_dct,3,map_dct,neighbour_0)
     
     assert target==2
     
 def test_Min_distance_target_is_not_its_self():
+    '''It tests the target is not its self'''
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0),(4,4)]
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from(edges)
-    G=fn.Relable_nodes(G)
+    G.Relable_nodes()
     map_dct={0: np.array([ 0, 0]),
          1: np.array([-1, -1]),
          2: np.array([-0.5, -0.2]),
          3: np.array([1, 2]),
          4: np.array([5, 5])}
     source=0
-    degree_dct=fn.Degree_dct(G)
+    degree_dct=G.Degree_dct()
     neighbour_0=list(G.neighbors(0))
     for i in range(100):
         assert source!=Min_distance_target (source,degree_dct,3,map_dct,neighbour_0)
         
 def test_Min_distance_target_is_not_its_neighbors():
+    '''It test the target is not one of its neighbors'''
     edges=[(0,1),(0,2),(1,3),(1,2),(0,0)]
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from(edges)
-    G=Relable_nodes(G)
+    G.Relable_nodes()
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     source=0
-    degree_dct=Degree_dct(G)
+    degree_dct=G.Degree_dct()
     neighbour_0=list(G.neighbors(0))
     for i in range(100):
         assert 2!=Min_distance_target (source,degree_dct,2,map_dct,neighbour_0)
         
 def test_Min_distance_target_degree_corrispodence():
+    '''It tests the target degree is the one chosen'''
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0),(4,1),(4,2),(4,3)]
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from(edges)
-    G=Relable_nodes(G)
+    G.Relable_nodes()
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     source=0
-    degree_3=Degree_dct(G)
+    degree_dct=G.Degree_dct()
     neighbour_0=list(G.neighbors(0))
-    target=Min_distance_target (source,degree_3,3,map_dct,neighbour_0)
+    target=Min_distance_target (source,degree_dct,3,map_dct,neighbour_0)
     assert len(list(G.neighbors(target)))==3
     
     
     
-#%%20 Merge_small_component
+#%%16 Merge_small_component
 def Merge_small_component(G, deg,map_dct,threshold):
-    print('deg',deg)
+    '''
+    It merge all the graph component smaller than a given threshold, by linking a random node of
+    the component with a node of the graph with a given degre==deg
+
+    Parameters
+    ----------
+    G : function.SuperGraph
+        
+    deg : degree of the target node
+        DESCRIPTION.
+        
+    map_dct : Support item assignment variable
+        Each item represents the spatial position of a node of the graph
+        
+    threshold : integer
+        
+
+    Raises
+    ------
+    Exception
+        it raises an exception if the node list with the degree chosen is empty
+
+    Returns
+    -------
+    None.
+
+    '''
     i=0
     all_components=list(nx.connected_components(G))
     while i < len(all_components):
     
         if len(list(all_components)[i])<threshold:
             source=rn.choice(list(all_components[i]))
-            list_nodes=Degree_dct(G)[deg]
+            list_nodes=G.Degree_dct()[deg]
             if len(list_nodes)==0:
-                raise Exception('the node list is empty')
+                raise Exception('the node list with the degree chosen is empty')
                 
-            target=Min_distance_target(source,fn.Degree_dct(G),deg,map_dct,list(G.neighbors(source)))
+            target=Min_distance_target(source,G.Degree_dct(),deg,map_dct,list(G.neighbors(source)))
             G.add_edge(source,target)
             
         i=i+1
@@ -1564,8 +1675,9 @@ def Merge_small_component(G, deg,map_dct,threshold):
  voglio verificare che sia alzato un errore se la lista con un determinato grado finisce'''
 
 def test_Merge_small_component():
+    '''It verifies all the components are bigger than the threshold'''
     edges=[(1,2), (3,4), (6,7), (7,5), (8,8)]    
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from(edges)
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     Merge_small_component(G, 1,map_dct,threshold=3)
@@ -1573,66 +1685,68 @@ def test_Merge_small_component():
         assert len(i)>=3
         
 def test_Merge_small_component_Exception():
+    '''It test if raises an exception for empty list'''
     edges=[(1,2), (3,4), (6,7), (7,5), (8,8)]    
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from(edges)
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     with pytest.raises(Exception):
         Merge_small_component(G, 0,map_dct,threshold=3)
 
     
-#%%21 Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_dct)
+#%%17 Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_dct)
 def Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_dct):
-    '''It takes an isolated node of the graph and it creates n links (n=n_links) with n different nodes.
+    '''
+    It takes an isolated node of the graph and it creates n links (n=n_links) with n different nodes.
     The degree of the nodes are 0, 1, 2 ... n-1. At in the of the process the number of nodes with degree
     equal to n increase of 2 and the number of isolated nodes decrease of two. 
     The degree ratio of the other values remains constant. The attachment rule of the links follow the
     Max_prob_target function.
-    
 
     Parameters
     ----------
-    source : TYPE
-        DESCRIPTION.
-    map_dct : TYPE
-        DESCRIPTION.
-    prob_distribution : TYPE
-        DESCRIPTION.
-    step : TYPE
-        DESCRIPTION.
-    max_dist_link : TYPE
-        DESCRIPTION.
-    G : TYPE
-        DESCRIPTION.
-    threshold : TYPE
-        DESCRIPTION.
-    degree_dct : TYPE
-        DESCRIPTION.
+    map_dct : Support item assignment variable
+        Each item represents the spatial position of a node of the graph
+        
+    prob_distribution : Support item assignment variable
+        It represents a binned density function distribution related to the distance, each bin distance 
+        entry is the ptobability to have a link at tthat distance
+        
+    max_dist : integer
+        It is the ditance threshold among the source and the others nodes. Node distances above it
+        will not take into account
+        
+    G : function.SuperGraph
+        
+    n_links : integer
+            number of links to create
+        
+    degree_dct : Support item assignment variable
+        each items is the group of nodes with the same degree
 
     Returns
     -------
     None.
 
     '''
-    source=rn.choice(degree_dct[0])
-    for i in range(n_links):
-                      
-        target=fn.Max_prob_target(source,degree_dct,i,map_dct,prob_distribution,max_dist_link,G)
-        print(source,target)
-        G.add_edge(source, target)
-        degree_dct=Degree_dct(G)
-#%% test_Link_2_ZeroNode (3)
 
+    source=rn.choice(degree_dct[0])
+    for i in range(n_links):                      
+        target=fn.Max_prob_target(source,degree_dct,i,map_dct,prob_distribution,max_dist_link,G)
+        G.add_edge(source, target)
+        degree_dct=G.Degree_dct()
+#%% test_Link_2_ZeroNode (3)
 ''' voglio testare che il degree ratio segue andamento voluto, che i degree dei nodi sono tutti presenti
     
 '''
 def test_Link_2_ZeroNode_reduction():
+    '''It verifies the right increasing of  '0' degree ratio'''
     edges=[(0, 3), (0, 2), (0, 8), (0, 9), (1, 2), (1, 4), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 8), (2, 8), (8, 9)]
     
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_nodes_from(list(range(10)))
     G.add_edges_from(edges)
-    G=Relable_nodes(G)
+    G.Relable_nodes()
     
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     
@@ -1645,21 +1759,22 @@ def test_Link_2_ZeroNode_reduction():
     prob_distribution=fn.Link_distance_conditional_probability(dct_dist_link, nstep, distance_frequency)
     
     max_dist_link=max(dct_dist_link.values())
-    degree_dct=fn.Degree_dct(G)
-    degree_ratio_0_before=fn.Degree_ratio(degree_dct)[0]
+    degree_dct=G.Degree_dct()
+    degree_ratio_0_before=G.Degree_ratio()[0]
     n_links=4
     fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G, n_links , degree_dct)
-    degree_dct=fn.Degree_dct(G)
-    degree_ratio_0_after=fn.Degree_ratio(degree_dct)[0]
+    degree_dct=G.Degree_dct()
+    degree_ratio_0_after=G.Degree_ratio()[0]
     assert degree_ratio_0_before==degree_ratio_0_after+2/10
 
 def test_Link_2_ZeroNode_increment():
+    '''It verifies the right decreasing of  '4' degree ratio'''
     edges=[(0, 3), (0, 2), (0, 8), (0, 9), (1, 2), (1, 4), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 8), (2, 8), (8, 9)]
     
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_nodes_from(list(range(10)))
     G.add_edges_from(edges)
-    G=Relable_nodes(G)
+    G.Relable_nodes()
     
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     
@@ -1672,21 +1787,22 @@ def test_Link_2_ZeroNode_increment():
     prob_distribution=fn.prob_distribution=fn.Link_distance_conditional_probability(dct_dist_link, nstep, distance_frequency)
     
     
-    degree_dct=fn.Degree_dct(G)
-    degree_ratio_4_before=fn.Degree_ratio(degree_dct)[4]
+    degree_dct=G.Degree_dct()
+    degree_ratio_4_before=G.Degree_ratio()[4]
     n_links=4
     fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G, n_links , degree_dct)
-    degree_dct=fn.Degree_dct(G)
-    degree_ratio_4_after=fn.Degree_ratio(degree_dct)[4]
+    degree_dct=G.Degree_dct()
+    degree_ratio_4_after=G.Degree_ratio()[4]
     assert degree_ratio_4_before==degree_ratio_4_after-2/10
 
 def test_Link_2_ZeroNode_constant_degree_ratio():
+    '''It tests that the degree ratio between the source and the target degree do not change'''
     edges=[(0, 3), (0, 2), (0, 8), (0, 9), (1, 2), (1, 4), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 8), (2, 8), (8, 9)]
     
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_nodes_from(list(range(10)))
     G.add_edges_from(edges)
-    G=Relable_nodes(G)
+    G.Relable_nodes()
     
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     
@@ -1699,24 +1815,44 @@ def test_Link_2_ZeroNode_constant_degree_ratio():
     prob_distribution=fn.prob_distribution=fn.Link_distance_conditional_probability(dct_dist_link, nstep, distance_frequency)
     
     
-    degree_dct=fn.Degree_dct(G)
-    degree_ratio_before=fn.Degree_ratio(degree_dct)
+    degree_dct=G.Degree_dct()
+    degree_ratio_before=G.Degree_ratio()
     n_links=4
     fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G, n_links , degree_dct)
-    degree_dct=fn.Degree_dct(G)
-    degree_ratio_after=fn.Degree_ratio(degree_dct)
+    degree_dct=G.Degree_dct()
+    degree_ratio_after=G.Degree_ratio()
     for i in range (1,4):
         assert degree_ratio_before[i]==degree_ratio_after[i]
-#%% Remove_edge_of_degree *
+
+
+
+
+#%%18 Remove_edge_of_degree 
 
 def Remove_edge_of_degree(degree,G):
-    degree_dct=fn.Degree_dct(G)
-    degree_ratio=fn.Degree_ratio(degree_dct)          
+    '''
+    It removes a link of a node with a given degree
+    
+
+    Parameters
+    ----------
+    degree : integer
+            Degree of the node of which we wants to remove a link
+        
+    G : function.SuperGraph
+        
+
+    Returns
+    -------
+    degree_ratio : numpy.ndarray
+        It represent the new degree ratio of the grpah nodes
+
+    ''' 
+    degree_dct=G.Degree_dct()
     source=rn.choice(degree_dct[degree])
     node=rn.choice(list(G.neighbors(source)))
     G.remove_edge(source,node)            
-    degree_dct=fn.Degree_dct(G)
-    degree_ratio=fn.Degree_ratio(degree_dct)
+    degree_ratio=G.Degree_ratio()
     return degree_ratio
 
 #%% test_Remove_edge_of_degree
@@ -1725,34 +1861,69 @@ def Remove_edge_of_degree(degree,G):
 '''
 
 def test_Remove_edge_of_degree_local():
+    '''It verifies the ratio that had been changed it is right '''
     edges=[(1,2), (3,1), (1,1), (1,2), (2,1), (1,4), (1,5), (5,4), (5,3), (1,6), (6,2), (5,2), (1,7)]    
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from(edges)
     degree_ratio=fn.Remove_edge_of_degree(6,G)
-    assert list(degree_ratio)==1/7
+    assert list(degree_ratio)[5]==1/7
     
 def test_Remove_edge_of_degree_total():
+    ''' It verifies the ratio of all the degree are right after the application of the function'''
     edges=[(1,2), (3,1), (1,1), (1,2), (1,4), (5,4), (5,3), (1,6), (6,7), (5,2)]    
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from(edges)
     degree_ratio=fn.Remove_edge_of_degree(4,G)
     assert list(degree_ratio)==[0, 2/7, 3/7, 2/7]
 
 def test_Remove_edge_of_degree_len():
+    '''It tests the length of the Graph does not change'''
     edges=[(1,2), (3,1), (1,1), (1,2), (1,4), (5,4), (5,3), (1,6), (6,2), (5,2)]    
-    G=nx.Graph()
+    G=fn.SuperGraph()
     G.add_edges_from(edges)
     fn.Remove_edge_of_degree(4,G)
     assert len(G)==6
     
-               
-#%% Copymap_degree_correction(Copy_map,G,map_dct,step,max_dist_link,prob_distribution, ) 
-              
-def Copymap_degree_correction(Copy_map,G,map_dct,step,max_dist_link,prob_distribution,Merge=False):
-    degree_dct_G=fn.Degree_dct(G)
-    degree_ratio_G=fn.Degree_ratio(degree_dct_G)
-    Copycat=nx.Graph(Copy_map)
 
+    
+               
+#%%19 Copymap_degree_correction():               
+def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False):
+    '''
+    
+
+    Parameters
+    ----------
+    Copy_map : function.SuperGraph
+        Graph we want to change
+        
+    G : function.SuperGraph
+        Model Graph
+        
+    map_dct : Support item assignment variable
+        Each item represents the spatial position of a node of the graph         
+    
+    max_dist : integer
+        It is the ditance threshold among the source and the others nodes. Node distances above it
+        will not take into account
+        
+    prob_distribution : Support item assignment variable
+        It represents a binned density function distribution related to the distance, each bin distance 
+        entry is the ptobability to have a link at tthat distance
+        
+    Merge : bool, optional
+        If True at the end of the process the function merge the small components.
+        The default is False.
+
+    Returns
+    -------
+    Copycat : function.SuperGraph
+        It returns the graph with the degree ratio corrected
+    '''
+    
+    degree_ratio_G=G.Degree_ratio()
+    Copycat=fn.SuperGraph(Copy_map)
+    
     fn.Break_strongest_nodes(Copycat, max(np.array(list(G.degree()))[:,1]))
     
     fn.Equalize_strong_nodes(Copycat, G)
@@ -1761,79 +1932,96 @@ def Copymap_degree_correction(Copy_map,G,map_dct,step,max_dist_link,prob_distrib
     rn.seed(3)
     mode=fn.Find_mode(degree_ratio_G)
     
-    degree_dct_Copycat=fn.Degree_dct(Copycat)
-    degree_ratio_Copycat=fn.Degree_ratio(degree_dct_Copycat)
-    
+    degree_dct_Copycat=Copycat.Degree_dct()
+    degree_ratio_Copycat=Copycat.Degree_ratio()
+    print(Copycat)
     while len(degree_dct_Copycat[0])>0:
-    
         
+    
+        print(len(degree_dct_Copycat[0]))
+        print('')
+        print('')
+        print('')
         source=rn.choice(degree_dct_Copycat[0])
         if(degree_ratio_G[mode])< degree_ratio_Copycat[mode]:
             fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,Copycat,mode, degree_dct_Copycat)
             
-            degree_dct_Copycat=fn.Degree_dct(Copycat)
-            degree_ratio_Copycat=fn.Degree_ratio(degree_dct_Copycat)
+            degree_dct_Copycat=Copycat.Degree_dct()
+            degree_ratio_Copycat=Copycat.Degree_ratio()
               
         else:
             
             fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,Copycat,mode+1, degree_dct_Copycat)
-            degree_ratio_Copycat=fn.Degree_ratio(Copycat)
+            degree_ratio_Copycat=Copycat.Degree_ratio()
+            print(degree_ratio_Copycat[4],'<', degree_ratio_G[4])
  
             
             if len(degree_dct_Copycat[0])>0:
+                
                 target=fn.Max_prob_target(source,degree_dct_Copycat,0,map_dct,prob_distribution,max_dist_link,Copycat)
                 
                 Copycat.add_edge(source, target)
-                degree_dct_Copycat=fn.Degree_dct(Copycat)
-                degree_ratio_Copycat=fn.Degree_ratio(degree_dct_Copycat)
+                degree_dct_Copycat=Copycat.Degree_dct()
+                degree_ratio_Copycat=Copycat.Degree_ratio()
             else:
-                target=(fn.Max_prob_target(source,degree_dct_Copycat,2,map_dct,prob_distribution,step,max_dist_link,Copycat))
+                target=(fn.Max_prob_target(source,degree_dct_Copycat,2,map_dct,prob_distribution,max_dist_link,Copycat))
                 Copycat.add_edge(source, target)
                 
-                degree_dct_Copycat=fn.Degree_dct(Copycat)
-                degree_ratio_Copycat=fn.Degree_ratio(degree_dct_Copycat)
+                degree_dct_Copycat=Copycat.Degree_dct()
+                degree_ratio_Copycat=Copycat.Degree_ratio()
                 
-        while degree_ratio_Copycat[5]> degree_ratio_G[5]:            
-            degree_ratio_Copycat=fn.Remove_edge_of_degree(5, Copycat) 
-        
-        while degree_ratio_Copycat[3]> degree_ratio_G[3]:            
-            degree_ratio_Copycat=fn.Remove_edge_of_degree(3, Copycat) 
+                
+        if len((degree_ratio_Copycat))>5:
+            print(len(degree_ratio_Copycat))
+            print(degree_ratio_Copycat)
+            print(degree_ratio_Copycat[5])
+            print(degree_ratio_G[5])
+            while degree_ratio_Copycat[5]> degree_ratio_G[5]:            
+                degree_ratio_Copycat=fn.Remove_edge_of_degree(5, Copycat) 
             
         while degree_ratio_Copycat[1]> degree_ratio_G[1]:
+            
+            #print('1',degree_ratio_Copycat[1],'>',degree_ratio_G[1])
             source=rn.choice(degree_dct_Copycat[1])                                     
             target=(fn.Max_prob_target(source,degree_dct_Copycat,2,map_dct,prob_distribution,max_dist_link,Copycat))
             Copycat.add_edge(source, target)            
-            degree_dct_Copycat=fn.Degree_dct(Copycat)
-            degree_ratio_Copycat=fn.Degree_ratio(degree_dct_Copycat) 
-            
+            degree_dct_Copycat=Copycat.Degree_dct()
+            degree_ratio_Copycat=Copycat.Degree_ratio() 
         
-        while(degree_ratio_Copycat[2])> (degree_ratio_G[2]):            
+        while degree_ratio_Copycat[4]< degree_ratio_G[4]:
+            print(degree_ratio_Copycat[4],'<', degree_ratio_G[4])
+            fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,Copycat,mode+1, degree_dct_Copycat)
+            degree_ratio_Copycat=Copycat.Degree_ratio() 
+        
+        while(degree_ratio_Copycat[2])> (degree_ratio_G[2]):  
+            
+            #print('2',degree_ratio_Copycat[1],'>',degree_ratio_G[2])
             degree_ratio_Copycat=fn.Remove_edge_of_degree(2, Copycat)
         
         
     if Merge==True:
-        Merge_small_component(Copycat,deg=1, map_dct=map_dct, threshold=3)
-
-            
+         Merge_small_component(Copycat,deg=1, map_dct=map_dct, threshold=3)
+                  
+    fn.Break_strongest_nodes(Copycat, max(np.array(list(G.degree()))[:,1]))
+    Copycat.Relable_nodes()
     
-    Copycat=fn.Relable_nodes(Copycat)
     return Copycat
-#%% test_Copymap_degree_correction 
-''' Voglio testare  che i ratio siano accettabili con quelli di riferimento'''
+# %% test_test_Copymap_degree_correction()
 
 def test_test_Copymap_degree_correction():
+    '''It tests if the degree ratios are all 'near' to the one of the model graph'''
     
     file=pd.read_table('C:/Users/Guido/Desktop/guido/Complex_networks/python/California/roadnet-ca.txt')
     file=np.array(file)
     file=fn.Divide_value(file)
     number_of_edge=1000
     edges=fn.Edge_list(file, number_of_edge)
-    G=nx.Graph(edges)
-    G=fn.Sorted_graph(G)
-    G=fn.Relable_nodes(G)
+    G=fn.SuperGraph(edges)
+    G.Sorted_graph()
+    G.Relable_nodes()
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     edge_probability=2*G.number_of_edges()/((len(G)-1)*(len(G)))
-    ERG=nx.fast_gnp_random_graph(len(G),edge_probability, seed=None, directed=False)
+    ERG=fn.SuperGraph(nx.fast_gnp_random_graph(len(G),edge_probability, seed=None, directed=False))
     
     
     dct_dist_link=fn.Dct_dist_link(list(G.edges()),map_dct)
@@ -1845,23 +2033,16 @@ def test_test_Copymap_degree_correction():
     
     prob_distribution=fn.Link_distance_conditional_probability(dct_dist_link,nstep,distance_frequency)
     
-    ERG=fn.Copymap_degree_correction(ERG,G,map_dct,step,max(dct_dist_link.values()),prob_distribution)
-    degree_dct_G=fn.Degree_dct(G)
-    degree_dct_ERG=fn.Degree_dct(ERG)
-    for i in range(max((np.array(G.degree()))[:,1])):
+                                               
+    ERG=fn.SuperGraph(fn.Copymap_degree_correction(ERG,G,map_dct,max(dct_dist_link.values()),prob_distribution,Merge=True))
+    degree_dct_G=G.Degree_dct()
+    degree_dct_ERG=ERG.Degree_dct()
+    for i in range(1,max((np.array(G.degree()))[:,1])):
         p=len(degree_dct_G[i])/len(G)
         q=(1-p)
+        print(len(degree_dct_G[i])-3*(len(degree_dct_G[i])*q)**0.5,'<=',len(degree_dct_ERG[i]),'<=',len(degree_dct_G[i])+3*(len(degree_dct_G[i])*q)**0.5)
         assert len(degree_dct_G[i])-3*(len(degree_dct_G[i])*q)**0.5<=len(degree_dct_ERG[i])<=len(degree_dct_G[i])+3*(len(degree_dct_G[i])*q)**0.5
-
-
-
-
-
-
-
-
-
+    
 
 
        
-
