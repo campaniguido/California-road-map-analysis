@@ -15,10 +15,10 @@ file=fn.Divide_value(file)
 
 number_of_edge=1000
 edges=fn.Edge_list(file, number_of_edge)
-G=nx.Graph(edges)
-G=fn.Sorted_graph(G)
+G=fn.SuperGraph(edges)
+G.Sorted_graph()
 #%%
-G=nx.convert_node_labels_to_integers(G) #non so perchè ma è fondamentale questa funzione per funzione comunità'
+G.Relable_nodes() #non so perchè ma è fondamentale questa funzione per funzione comunità'
 edges=list(G.edges())
 
 
@@ -150,7 +150,7 @@ distance_linking_probability=fn.Link_distance_conditional_probability(dct_dist_l
 
 
 
-Copy_map=nx.Graph()
+Copy_map=fn.SuperGraph()
 Copy_map.add_nodes_from(list(G.nodes))
 Copy_map=fn.Add_edges_from_map(Copy_map, map_dct, distance_linking_probability)
 
@@ -209,7 +209,7 @@ plt.show()
 
 #%% Copycat degree correction
 
-Copycat=fn.Copymap_degree_correction(Copy_map, G, map_dct, step, max(dct_dist_link.values()), distance_linking_probability)
+Copycat=fn.Copymap_degree_correction(Copy_map, G, map_dct, step, max(dct_dist_link.values()), distance_linking_probability, Merge=True)
 
 #%%
 '''Strenght_G_copy_cat=np.array(list(G_copy_cat.degree))
@@ -234,7 +234,7 @@ colors = (cm.CMRmap(np.linspace(0, 1, max(community_color_Copycat))))
 #%%
             
 
-n, bins, patches=plt.hist(Strenght_G_copy_cat[:,1],color=colors[2], bins=10)
+n, bins, patches=plt.hist(Strenght_G_copy_cat[:,1],color=colors[5],bins=16)
 plt.xlabel("Degree")
 plt.ylabel("Number of nodes")
 plt.title("Degree distribution-Copycat graph 5000 nodes")
