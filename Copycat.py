@@ -6,7 +6,7 @@ import matplotlib.cm as cm
 
 #%%
 
-file=pd.read_table('C:/Users/Guido/Desktop/guido/Complex_networks/python/California/roadnet-ca.txt')
+file=pd.read_table('https://raw.githubusercontent.com/campaniguido/Software_and_Computing/main/roadnet-ca.txt')
 file=np.array(file)
 file=fn.Divide_value(file)
 #%%itialize the graph
