@@ -5,23 +5,20 @@ Created on Tue Feb  8 23:08:20 2022
 @author: Guido
 """
 
-# %%
-##################################################################
-#
-#           ALL MY FUNCTION
-#
-######################################################################################
-
+# %%libraries
 import random as rn
 import networkx as nx
 import pandas as pd
 import numpy as np
 import pytest
 import function as fn
+import matplotlib.pyplot as plt
 import math
+import matplotlib.cm as cm
+#%%seed
 
-'seed'
 rn.seed(3)
+
 #%% CLASS SuperGraph
 
 class SuperGraph(nx.Graph):
@@ -79,13 +76,8 @@ class SuperGraph(nx.Graph):
         degree_ratio=[]
         for key in (degree_dct):
             degree_ratio.append(len(degree_dct[key]))
-        degree_ratio=np.array(degree_ratio)/sum(degree_ratio)
+        degree_ratio=np.array(degree_ratio)/sum(degree_ratio) 
         return degree_ratio
-
-
-    
-    
-    
     
 #%%Ct  test sorted_graph (2)
 def test_sorted_graph_nodes():
@@ -102,9 +94,7 @@ def test_sorted_graph_nodes():
     TESTER = G
     G.Sorted_graph()
     assert list(G.nodes()) == sorted(list(TESTER.nodes()))
-
-
-
+    
 def test_sorted_graph_edges():
     '''it tests the graph edgess are sorted after the application of the function'''
     edges = []
@@ -121,7 +111,6 @@ def test_sorted_graph_edges():
         assert vecchio <= list(G.edges())[i][0]
         vecchio = list(G.edges())[i][0]
 
-  
 #%%Ct  test_Relable_nodes
 
 
@@ -562,8 +551,8 @@ def test_Set_community_number_all_wrong():
 
 
                         
-#%%5  Time evolution (3)
-def Time_evolution(G,step, feature):
+#%%5  Size evolution (3)
+def Size_evolution(G,step, feature):
     '''
     It takes back information related to the network G feature along its size increasing.
     Starting from the graph size equal to the number of edge indicated by the step variable,
@@ -585,91 +574,91 @@ def Time_evolution(G,step, feature):
     -------
     size : np.array of integers
         Each integer is the size of the graph at that step
-    value_time_evolution : If feature=='degree' it returns a numpy.ndarray((#G.edges/step,max degree G +1)).
+    value_size_evolution : If feature=='degree' it returns a numpy.ndarray((#G.edges/step,max degree G +1)).
                            It represents the degree ratio of the graph at each step.
                            Else it returns a list #G.edges/step long. Each item of the list is a numpy.ndarray
                            of the nodes values of the selected features
         
-    value_time_evolution_mean : It returns numpy.ndarray((#G.edges/step,2)). 
+    value_size_evolution_mean : It returns numpy.ndarray((#G.edges/step,2)). 
                                 Each entry is the mean value of the degree and its std
                                 
         
 
     '''
-    value_time_evolution=[]
-    time_step=int(len(G.edges)/step)
-    value_time_evolution_mean=[]
+    value_size_evolution=[]
+    size_step=int(len(G.edges)/step)
+    value_size_evolution_mean=[]
     edges=list(G.edges())
     size=[]
     if feature=='degree':
-        for i in range(time_step):      
+        for i in range(size_step):      
             G=fn.SuperGraph(edges[:(i+1)*step])
             G.Relable_nodes()
             
-            value_time_evolution.append(G.Degree_ratio())
-            value_time=np.array(list((getattr(nx, feature)(G))))[:,1]
-            value_time_evolution_mean.append([np.mean(value_time),np.std(value_time)])
+            value_size_evolution.append(G.Degree_ratio())
+            value_size=np.array(list((getattr(nx, feature)(G))))[:,1]
+            value_size_evolution_mean.append([np.mean(value_size),np.std(value_size)])
             size.append(len(G))  
         
-        for i in range(len(value_time_evolution)):
-            while len(value_time_evolution[i])<len(value_time_evolution[-1]):
-                value_time_evolution[i]=np.append(value_time_evolution[i],0)
-        value_time_evolution_mean=np.array(value_time_evolution_mean)
-        value_time_evolution=np.array(value_time_evolution)
+        for i in range(len(value_size_evolution)):
+            while len(value_size_evolution[i])<len(value_size_evolution[-1]):
+                value_size_evolution[i]=np.append(value_size_evolution[i],0)
+        value_size_evolution_mean=np.array(value_size_evolution_mean)
+        value_size_evolution=np.array(value_size_evolution)
         size=np.array(size)
-        return size, value_time_evolution,value_time_evolution_mean
+        return size, value_size_evolution,value_size_evolution_mean
     else:
-        for i in range(time_step):
+        for i in range(size_step):
             G=fn.SuperGraph(edges[:(i+1)*step])
             G.Sorted_graph()
             G.Relable_nodes()
-            value_time=np.array(list((getattr(nx, feature)(G)).items()))[:,1]
-            value_time_evolution_mean.append([np.mean(value_time),np.std(value_time)])
-            value_time_evolution.append(value_time)
+            value_size=np.array(list((getattr(nx, feature)(G)).items()))[:,1]
+            value_size_evolution_mean.append([np.mean(value_size),np.std(value_size)])
+            value_size_evolution.append(value_size)
             size.append(len(G))
-        value_time_evolution_mean=np.array(value_time_evolution_mean)
-        return size, value_time_evolution,value_time_evolution_mean
-#%%   test_Time_evolution
-def test_Time_evolution_size():
+        value_size_evolution_mean=np.array(value_size_evolution_mean)
+        return size, value_size_evolution,value_size_evolution_mean
+#%%   test_size_evolution
+def test_size_evolution_size():
     '''It tests the richt len of each output'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     step=1
     nstep=int(len(G.edges)/step)
     feature='degree'
-    size, value_time_evolution,value_time_evolution_mean=Time_evolution(G, step, feature)
-    assert len(size)==nstep and len(value_time_evolution)==nstep and len(value_time_evolution_mean)==nstep
+    size, value_size_evolution,value_size_evolution_mean=Size_evolution(G, step, feature)
+    assert len(size)==nstep and len(value_size_evolution)==nstep and len(value_size_evolution_mean)==nstep
     
     feature='betweenness_centrality'
-    size, value_time_evolution,value_time_evolution_mean=Time_evolution(G, step, feature)
-    assert len(size)==nstep and len(value_time_evolution)==nstep and len(value_time_evolution_mean)==nstep
+    size, value_size_evolution,value_size_evolution_mean=Size_evolution(G, step, feature)
+    assert len(size)==nstep and len(value_size_evolution)==nstep and len(value_size_evolution_mean)==nstep
 
-def test_Time_evolution_size_increasing_size():
+def test_size_evolution_size_increasing_size():
     '''It tests the output 'size' increases at each step'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     step=1
     nstep=int(len(G.edges)/step)
     feature='degree'
-    size=Time_evolution(G, step, feature)[0]
+    size=Size_evolution(G, step, feature)[0]
     for i in range(nstep-1):
         assert size[i]<size[i+1]
     
     feature='betweenness_centrality'
-    size, value_time_evolution,value_time_evolution_mean=Time_evolution(G, step, feature)
+    size, value_size_evolution,value_size_evolution_mean=Size_evolution(G, step, feature)
     for i in range(nstep-1):
         assert size[i]<size[i+1]
 
-def test_Time_evolution_size_degree_constant_len():
-    '''It tests, for the degree feature, the lenght of the value_time_evolution it is always the same'''
+def test_size_evolution_size_degree_constant_len():
+    '''It tests, for the degree feature, the lenght of the value_size_evolution it is always the same'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     step=1
     nstep=int(len(G.edges)/step)
     feature='degree'
-    value_time_evolution=Time_evolution(G, step, feature)[1]
+    value_size_evolution=Size_evolution(G, step, feature)[1]
     for i in range(nstep):
-        assert len(value_time_evolution[i])==4
+        assert len(value_size_evolution[i])==4
     
 #%%6 Dct_dist_link 
 def Dct_dist_link(edges,map_dct):
@@ -1281,7 +1270,7 @@ def test_Find_mode():
 #%%13 Equalize_strong_nodes
 def Equalize_strong_nodes(G_strong, G_weak):
     '''
-    It compares two graph. It takes the strongest node of the first graph which have a degree value major 
+    It compares two graph. It takes the strongest node of the first graph which have nodes witha degree value major 
     then the degree mode of the second graph. It remove random links of these nodes untill the degree ratio
     of the the first graph (G_strong) of these high degree values are above the ones of the second graph(G_weak)
 
@@ -1729,12 +1718,12 @@ def Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_
     None.
 
     '''
-
-    source=rn.choice(degree_dct[0])
-    for i in range(n_links):                      
-        target=fn.Max_prob_target(source,degree_dct,i,map_dct,prob_distribution,max_dist_link,G)
-        G.add_edge(source, target)
-        degree_dct=G.Degree_dct()
+    if len(degree_dct[0])!=0:
+        source=rn.choice(degree_dct[0])
+        for i in range(n_links):                      
+            target=fn.Max_prob_target(source,degree_dct,i,map_dct,prob_distribution,max_dist_link,G)
+            G.add_edge(source, target)
+            degree_dct=G.Degree_dct()
 #%% test_Link_2_ZeroNode (3)
 ''' voglio testare che il degree ratio segue andamento voluto, che i degree dei nodi sono tutti presenti
     
@@ -1828,7 +1817,6 @@ def test_Link_2_ZeroNode_constant_degree_ratio():
 
 
 #%%18 Remove_edge_of_degree 
-
 def Remove_edge_of_degree(degree,G):
     '''
     It removes a link of a node with a given degree
@@ -1844,16 +1832,14 @@ def Remove_edge_of_degree(degree,G):
 
     Returns
     -------
-    degree_ratio : numpy.ndarray
-        It represent the new degree ratio of the grpah nodes
+        None.
 
     ''' 
     degree_dct=G.Degree_dct()
     source=rn.choice(degree_dct[degree])
     node=rn.choice(list(G.neighbors(source)))
     G.remove_edge(source,node)            
-    degree_ratio=G.Degree_ratio()
-    return degree_ratio
+    
 
 #%% test_Remove_edge_of_degree
 
@@ -1887,7 +1873,10 @@ def test_Remove_edge_of_degree_len():
 
     
                
-#%%19 Copymap_degree_correction():               
+
+
+#%%19 Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False):
+
 def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False):
     '''
     
@@ -1920,84 +1909,24 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
     Copycat : function.SuperGraph
         It returns the graph with the degree ratio corrected
     '''
-    
-    degree_ratio_G=G.Degree_ratio()
+    rn.seed(3)
     Copycat=fn.SuperGraph(Copy_map)
     
     fn.Break_strongest_nodes(Copycat, max(np.array(list(G.degree()))[:,1]))
     
     fn.Equalize_strong_nodes(Copycat, G)
     
-     
-    rn.seed(3)
-    mode=fn.Find_mode(degree_ratio_G)
-    
-    degree_dct_Copycat=Copycat.Degree_dct()
-    degree_ratio_Copycat=Copycat.Degree_ratio()
-    print(Copycat)
-    while len(degree_dct_Copycat[0])>0:
+    while len(Copycat.Degree_dct()[0])>0:
         
-    
-        print(len(degree_dct_Copycat[0]))
-        print('')
-        print('')
-        print('')
-        source=rn.choice(degree_dct_Copycat[0])
-        if(degree_ratio_G[mode])< degree_ratio_Copycat[mode]:
-            fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,Copycat,mode, degree_dct_Copycat)
-            
-            degree_dct_Copycat=Copycat.Degree_dct()
-            degree_ratio_Copycat=Copycat.Degree_ratio()
-              
-        else:
-            
-            fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,Copycat,mode+1, degree_dct_Copycat)
-            degree_ratio_Copycat=Copycat.Degree_ratio()
-            print(degree_ratio_Copycat[4],'<', degree_ratio_G[4])
- 
-            
-            if len(degree_dct_Copycat[0])>0:
-                
-                target=fn.Max_prob_target(source,degree_dct_Copycat,0,map_dct,prob_distribution,max_dist_link,Copycat)
-                
-                Copycat.add_edge(source, target)
-                degree_dct_Copycat=Copycat.Degree_dct()
-                degree_ratio_Copycat=Copycat.Degree_ratio()
-            else:
-                target=(fn.Max_prob_target(source,degree_dct_Copycat,2,map_dct,prob_distribution,max_dist_link,Copycat))
-                Copycat.add_edge(source, target)
-                
-                degree_dct_Copycat=Copycat.Degree_dct()
-                degree_ratio_Copycat=Copycat.Degree_ratio()
-                
-                
-        if len((degree_ratio_Copycat))>5:
-            print(len(degree_ratio_Copycat))
-            print(degree_ratio_Copycat)
-            print(degree_ratio_Copycat[5])
-            print(degree_ratio_G[5])
-            while degree_ratio_Copycat[5]> degree_ratio_G[5]:            
-                degree_ratio_Copycat=fn.Remove_edge_of_degree(5, Copycat) 
-            
-        while degree_ratio_Copycat[1]> degree_ratio_G[1]:
-            
-            #print('1',degree_ratio_Copycat[1],'>',degree_ratio_G[1])
-            source=rn.choice(degree_dct_Copycat[1])                                     
-            target=(fn.Max_prob_target(source,degree_dct_Copycat,2,map_dct,prob_distribution,max_dist_link,Copycat))
-            Copycat.add_edge(source, target)            
-            degree_dct_Copycat=Copycat.Degree_dct()
-            degree_ratio_Copycat=Copycat.Degree_ratio() 
-        
-        while degree_ratio_Copycat[4]< degree_ratio_G[4]:
-            print(degree_ratio_Copycat[4],'<', degree_ratio_G[4])
-            fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,Copycat,mode+1, degree_dct_Copycat)
-            degree_ratio_Copycat=Copycat.Degree_ratio() 
-        
-        while(degree_ratio_Copycat[2])> (degree_ratio_G[2]):  
-            
-            #print('2',degree_ratio_Copycat[1],'>',degree_ratio_G[2])
-            degree_ratio_Copycat=fn.Remove_edge_of_degree(2, Copycat)
-        
+        for i in range(len(G.Degree_ratio())-1,0,-1):
+            if i< len(Copycat.Degree_ratio()):           
+                while Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:            
+                    fn.Remove_edge_of_degree(i, Copycat) 
+                  
+        for i in range(1,len(G.Degree_ratio())):
+                while len(Copycat.Degree_dct()[0])>0 and Copycat.Degree_ratio()[i]< G.Degree_ratio()[i]:  
+                    fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,Copycat,i, Copycat.Degree_dct())
+                    
         
     if Merge==True:
          Merge_small_component(Copycat,deg=1, map_dct=map_dct, threshold=3)
@@ -2006,43 +1935,214 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
     Copycat.Relable_nodes()
     
     return Copycat
-# %% test_test_Copymap_degree_correction()
+#%%                         PLOT FUNCTION
+#%%20 Hist_plot
 
-def test_test_Copymap_degree_correction():
-    '''It tests if the degree ratios are all 'near' to the one of the model graph'''
-    
-    file=pd.read_table('C:/Users/Guido/Desktop/guido/Complex_networks/python/California/roadnet-ca.txt')
-    file=np.array(file)
-    file=fn.Divide_value(file)
-    number_of_edge=1000
-    edges=fn.Edge_list(file, number_of_edge)
-    G=fn.SuperGraph(edges)
-    G.Sorted_graph()
-    G.Relable_nodes()
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    edge_probability=2*G.number_of_edges()/((len(G)-1)*(len(G)))
-    ERG=fn.SuperGraph(nx.fast_gnp_random_graph(len(G),edge_probability, seed=None, directed=False))
-    
-    
-    dct_dist_link=fn.Dct_dist_link(list(G.edges()),map_dct)
-    dct_dist=fn.Dct_dist(G, map_dct)
-    nstep=50
-    step=max(dct_dist_link.values())/nstep
-    distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
-    
-    
-    prob_distribution=fn.Link_distance_conditional_probability(dct_dist_link,nstep,distance_frequency)
-    
-                                               
-    ERG=fn.SuperGraph(fn.Copymap_degree_correction(ERG,G,map_dct,max(dct_dist_link.values()),prob_distribution,Merge=True))
-    degree_dct_G=G.Degree_dct()
-    degree_dct_ERG=ERG.Degree_dct()
-    for i in range(1,max((np.array(G.degree()))[:,1])):
-        p=len(degree_dct_G[i])/len(G)
-        q=(1-p)
-        print(len(degree_dct_G[i])-3*(len(degree_dct_G[i])*q)**0.5,'<=',len(degree_dct_ERG[i]),'<=',len(degree_dct_G[i])+3*(len(degree_dct_G[i])*q)**0.5)
-        assert len(degree_dct_G[i])-3*(len(degree_dct_G[i])*q)**0.5<=len(degree_dct_ERG[i])<=len(degree_dct_G[i])+3*(len(degree_dct_G[i])*q)**0.5
+def Hist_plot(distribution, color, title, save_fig=False):
+    '''
+    It shows the distribution histogram of an input set of data, it provides labels for the axis and  the graph.
+    It can also save the plot.
     
 
+    Parameters
+    ----------
+    distribution : (n,) array or sequence of (n,) arrays
+        Input values, this takes either a single array or a sequence of
+        arrays which are not required to be of the same length.
+        
+    color : color or array-like of colors or None, default: None
+        Color or sequence of colors, one per dataset.  Default (``None``)
+        uses the standard line color sequence.
+        
+    title : str
+        Title of the histogram
+        
+    save_fig : bool, optional
+        If ''True'' save a pdf file with the name title.pdf . The default is False.
 
+    Returns
+    -------
+    None.
+
+    '''
+    n, bins, patches=plt.hist(distribution,color=color)
+    plt.xlabel("Values")
+    plt.ylabel("Frequency")
+    plt.title(title)
+    if save_fig==True:
+        plt.savefig(title+'.pdf', dpi=500)
+    plt.show()
+
+#%%21 Scatter_plot
+
+def Scatter_plot(distribution1, name_distribution1, distribution2, name_distribution2, color, save_fig=False):
+    '''
+    It shows the the scatter plot of two set of input data, it provides labels for the axis and the graph.
+    It can also save the plot.
+    
+
+    Parameters
+    ----------
+    distribution1 : float or array-like, shape (n, )
+        The data positions.
+        
+    name_distribution1 : str
+        Name of the distribution.
+        
+    distribution2 : float or array-like, shape (n, )
+        The data positions.
+        
+    name_distribution2 : str
+        Name of the distribution.
+        
+    color : array-like or list of colors or color, optional
+        The marker colors. Possible values:
+    
+        - A scalar or sequence of n numbers to be mapped to colors using
+          *cmap* and *norm*.
+        - A 2D array in which the rows are RGB or RGBA.
+        - A sequence of colors of length n.
+        - A single color format string.
+        
+    save_fig : bool, optional
+        If ''True'' save a pdf file with the name title.pdf . The default is False.
+
+    Returns
+    -------
+    None.
+
+    '''
+    fig, ax = plt.subplots()
+    ax.scatter(distribution1,distribution2,c=color,s=2)
+    plt.xlabel(name_distribution1)
+    plt.ylabel(name_distribution2)
+    plt.title(name_distribution1+ ' vs '+  name_distribution2)
+    if save_fig==True:
+        plt.savefig(name_distribution1+ ' vs '+  name_distribution2 +".pdf", dpi=500)
+    plt.show()
        
+#%%22 Feature_mean_evolution
+
+def Feature_mean_evolution(feature_size,feature_mean, feature_name, save_fig=False):
+    '''
+    It shows the the scatter plot of a set of input data,  it provides labels for the axis and the graph.
+    It can also save the plot.
+    
+
+    Parameters
+    ----------
+    feature_size :  float or array-like, shape (n, )
+        The data positions.
+        
+    feature_mean :  float or array-like, shape (n, 2)
+        In the first column there are the values, in the second the errors of them .
+        
+    feature_name : str
+        It is the name of the values distribution
+        
+    save_fig : bool, optional
+        If ''True'' save a pdf file with the name title.pdf . The default is False.
+
+    Returns
+    -------
+    None.
+
+    '''
+    x =feature_mean
+    colors = (cm.CMRmap(np.linspace(0.01, 0.9, len(x))))
+    fig, ax = plt.subplots()
+    ax.scatter(feature_size, list(x[:,0]),c=colors,s=10)
+    ax.errorbar(feature_size,list(x[:,0]), yerr=list(x[:,1]), xerr=None,fmt='o', ecolor=colors,markersize=0)
+    plt.xlabel("number of nodes")
+    plt.ylabel(feature_name)
+    plt.title("Mean"+feature_name)
+    if save_fig==True:
+        plt.savefig("Mean"+feature_name+".pdf", dpi=500)
+    plt.show()
+#%%23 Feature_cumulative_evolution
+
+
+def Feature_cumulative_evolution(feature, feature_name, save_fig=False):
+    '''
+    It shows the cumulative distribution(normalized on the number of data) of n distributions of input data,
+    it provides labels for the axis and the graph.
+    It can also save the plot.
+    
+
+    Parameters
+    ----------
+    feature : n dimension array_like
+        Each dimension is a different distribution of the input data
+        
+    feature_name : str
+        name of the distribution.
+        
+    save_fig :  bool, optional
+        If ''True'' save a pdf file with the name title.pdf . The default is False.
+
+    Returns
+    -------
+    None.
+
+    '''
+    x=feature
+    fig, ax = plt.subplots()
+    colors = (cm.magma(np.linspace(0, 1, len(x))))
+    for i in range(len(x)):
+        size=len(x[i])
+        values, base = np.histogram(x[i],bins=500)
+        cumulative = np.cumsum(values/size)
+        ax.plot(base[:-1], cumulative, c=colors[-i-1],label=size)        
+    ax.set_xlabel("Values")
+    ax.set_ylabel("Cumulative probability")    
+    ax.legend(prop={'size': 10})
+    ax.set_title('Cumulative distribution of '+  feature_name)
+    if save_fig==True:
+        plt.savefig("Cc-cumulative-convergence.pdf", dpi=500)
+    plt.show()
+
+#%%24 Feature_ratio_evolution
+
+def Feature_ratio_evolution(feature_position,feature_ratio, feature_name, save_fig=False):
+    '''
+    It plot a scatter plot: at each position it scatter a vector of n point corrisponding to the n values of,
+    of each element of the feature ratio.
+    it provides labels for the axis and the graph.
+    It can also save the plot.
+    
+
+    Parameters
+    ----------
+    feature_size : 1 dimension array_like
+        number label of each set of data
+    
+    feature_ratio :  n dimension array_like
+        Each dimension represent a set of data of the same dimension
+        .
+    feature_name : str
+        Name of the distribution.
+        
+    save_fig : bool, optional
+        If ''True'' save a pdf file with the name title.pdf . The default is False.
+
+    Returns
+    -------
+    None.
+
+    '''
+    x=feature_ratio
+    colors = (cm.tab10(np.linspace(0, 1, len(x.transpose()))))
+    fig, ax = plt.subplots()
+    x=feature_ratio
+    for i in range(len(x.transpose())):
+        size=feature_position
+        ax.scatter(feature_position,    x[:,i], c=[colors[i]], s=2,label='%s' %i)
+        
+    ax.legend(loc='upper left', shadow=True, fontsize=8)  
+    plt.xlabel("number of nodes")
+    plt.xlim(-30, max(size+10))
+    plt.ylabel("ratio of each " + feature_name)
+    plt.title("ratio of each " + feature_name + " for increasing nodes")
+    if save_fig==True:
+        plt.savefig("ratio of each"+ feature_name +".pdf", dpi=500)
+    plt.show()
