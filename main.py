@@ -49,7 +49,7 @@ community=fn.Unfreeze_into_list(community)
 community_color=fn.Set_community_number(G, community)
 colors = (cm.CMRmap(np.linspace(0, 1, max(community_color))))
 
-#%% Visualizzazione network
+#%% Network Visualization
 Betweeness_Centrality_edges=nx.edge_betweenness_centrality(G)
 node_size=np.exp((Betweeness_Centrality[:,1]+1)*100)
 width=(np.array(list(Betweeness_Centrality_edges.values()))+0.95)
@@ -91,7 +91,7 @@ fn.Scatter_plot(Betweeness_Centrality[:,1], 'Betweeness_Centrality' , Strenght[:
     
 
         
-#%% Main features size evolution 
+#%% Main features size-evolution 
 
 degree_size, degree_ratio_size_evolution,degree_mean=fn.Size_evolution(G,len(G)**0.5,'degree')
 fn.Feature_ratio_evolution(degree_size,degree_ratio_size_evolution, 'degree')
