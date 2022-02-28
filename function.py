@@ -81,6 +81,7 @@ class SuperGraph(nx.Graph):
     
 #%%Ct  test sorted_graph (2)
 def test_sorted_graph_nodes():
+    rn.seed(3)
     '''it tests the graph nodes are sorted after the application of the function'''
     edges = []
     i=0
@@ -96,6 +97,7 @@ def test_sorted_graph_nodes():
     assert list(G.nodes()) == sorted(list(TESTER.nodes()))
     
 def test_sorted_graph_edges():
+    rn.seed(3)
     '''it tests the graph edgess are sorted after the application of the function'''
     edges = []
     for i in range(0, 100):
@@ -1036,7 +1038,7 @@ def test_Link_distance_probability_II_axiom():
     node_distance_frequency=Node_distance_frequency(dct_dist,nstep,step)
     link_distance_conditional_probability=Link_distance_conditional_probability(dct_dist_link,nstep,node_distance_frequency)
     link_distance_probability=list(link_distance_conditional_probability.values())*node_distance_frequency/len(dct_dist_link)
-    assert 0.99999<sum(link_distance_probability)<=1
+    assert 0.999<sum(link_distance_probability)<=1
     
 def test_Link_distance_probability_III_axiom():
     '''It verifies the probability III axiom'''
@@ -1099,6 +1101,7 @@ def Add_edges_from_map(G,map_dct,distance_linking_probability):
         it returns the old graph but with the additon of the new links
 
     '''
+    rn.seed(3)
     i=0
     step=list(distance_linking_probability.keys())[0]
     nodes=list(G.nodes())
@@ -1195,7 +1198,7 @@ def Break_strongest_nodes(G, threshold):
     None.
 
     '''
-
+    rn.seed(3)
 
     
     dct_degree=G.Degree_dct()
@@ -1286,30 +1289,24 @@ def Equalize_strong_nodes(G_strong, G_weak):
     None.
 
     '''
-    dct_degree_strong=G_strong.Degree_dct()
+    rn.seed(3)
     dct_degree_weak=G_weak.Degree_dct()
-    degree_ratio_strong=G_strong.Degree_ratio()
-    degree_ratio_weak=G_weak.Degree_ratio()
-    
-    threshold=Find_mode(degree_ratio_weak)
-    
-
+    degree_ratio_weak=G_weak.Degree_ratio()    
+    threshold=fn.Find_mode(degree_ratio_weak)
     i=max(dct_degree_weak.keys())
     
-    if i<max(np.array(list(G_strong.degree))[:,1]):
+    if i<max(np.array(list(G_strong.degree))[:,1]):       
+        fn.Break_strongest_nodes(G_strong, i) 
         
-        Break_strongest_nodes(G_strong, i)        
     while i>threshold:
         
-        while (degree_ratio_strong[i])>(degree_ratio_weak[i]):
-            
-            
-            source=rn.choice(dct_degree_strong[i])
+        
+        while len(G_strong.Degree_ratio())>=len(G_weak.Degree_ratio()) and (G_strong.Degree_ratio()[i])>(G_weak.Degree_ratio()[i]):
+            source=rn.choice(G_strong.Degree_dct()[i])
             node=rn.choice(list(G_strong.neighbors(source)))
-            
             G_strong.remove_edge(source,node)              
-            dct_degree_strong=G_strong.Degree_dct()
-            degree_ratio_strong=G_strong.Degree_ratio()            
+            
+                       
         i=i-1
             
 #%% test_Equalize_strong_nodes (2)
@@ -1339,7 +1336,6 @@ def test_Equalize_strong_nodes_maximum_value():
     G_weak.add_edges_from(edges)
     fn.Equalize_strong_nodes(G_strong, G_weak) 
     dct_degree_strong=G_strong.Degree_dct()
-    dct_degree_weak=G_weak.Degree_dct()
     degree_ratio_strong=G_strong.Degree_ratio()
     degree_ratio_weak=G_weak.Degree_ratio()
     mode=fn.Find_mode(degree_ratio_weak)
@@ -1415,9 +1411,7 @@ def Max_prob_target (source,strenght_dct,degree,map_dct,distance_linking_probabi
     
 
 #%% test_Max_prob_target (3)
-'''
-potrei aggiungere bernoulli trials per verificare i link ad una determinata distanza
-'''
+
 def test_Max_prob_target_degree():
     ''''It verifies the degree of the target is the one given'''
     edge_probability=0.4
@@ -1519,6 +1513,7 @@ def Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_lis
         It is the label of node chosen for the linkage
 
     '''
+    rn.seed(3)
     x0=map_dct[source]
     min_=999
     target=-5
@@ -1644,6 +1639,7 @@ def Merge_small_component(G, deg,map_dct,threshold):
     None.
 
     '''
+    rn.seed(3)
     i=0
     all_components=list(nx.connected_components(G))
     while i < len(all_components):
@@ -1729,6 +1725,7 @@ def Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_
     
 '''
 def test_Link_2_ZeroNode_reduction():
+    rn.seed(3)
     '''It verifies the right increasing of  '0' degree ratio'''
     edges=[(0, 3), (0, 2), (0, 8), (0, 9), (1, 2), (1, 4), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 8), (2, 8), (8, 9)]
     
@@ -1835,6 +1832,7 @@ def Remove_edge_of_degree(degree,G):
         None.
 
     ''' 
+    rn.seed(3)
     degree_dct=G.Degree_dct()
     source=rn.choice(degree_dct[degree])
     node=rn.choice(list(G.neighbors(source)))
@@ -1851,16 +1849,16 @@ def test_Remove_edge_of_degree_local():
     edges=[(1,2), (3,1), (1,1), (1,2), (2,1), (1,4), (1,5), (5,4), (5,3), (1,6), (6,2), (5,2), (1,7)]    
     G=fn.SuperGraph()
     G.add_edges_from(edges)
-    degree_ratio=fn.Remove_edge_of_degree(6,G)
-    assert list(degree_ratio)[5]==1/7
+    fn.Remove_edge_of_degree(6,G)
+    assert list(G.Degree_ratio())[5]==1/7
     
 def test_Remove_edge_of_degree_total():
     ''' It verifies the ratio of all the degree are right after the application of the function'''
     edges=[(1,2), (3,1), (1,1), (1,2), (1,4), (5,4), (5,3), (1,6), (6,7), (5,2)]    
     G=fn.SuperGraph()
     G.add_edges_from(edges)
-    degree_ratio=fn.Remove_edge_of_degree(4,G)
-    assert list(degree_ratio)==[0, 2/7, 3/7, 2/7]
+    fn.Remove_edge_of_degree(4,G)
+    assert list(G.Degree_ratio())==[0, 2/7, 3/7, 2/7]
 
 def test_Remove_edge_of_degree_len():
     '''It tests the length of the Graph does not change'''
@@ -1909,6 +1907,7 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
     Copycat : function.SuperGraph
         It returns the graph with the degree ratio corrected
     '''
+    
     rn.seed(3)
     Copycat=fn.SuperGraph(Copy_map)
     
