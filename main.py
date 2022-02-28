@@ -34,9 +34,8 @@ number_of_edge=5000
 edges=fn.Edge_list(file, number_of_edge)
 G=fn.SuperGraph(edges)
 G.Sorted_graph()
-edges=list(G.edges())
 G.Relable_nodes()
-edges=list(G.edges())
+
 
 
 #%% Main features
