@@ -588,12 +588,12 @@ def Size_evolution(G,step, feature):
 
     '''
     value_size_evolution=[]
-    size_step=int(len(G.edges)/step)
+    n_step=int(len(G.edges)/step)
     value_size_evolution_mean=[]
     edges=list(G.edges())
     size=[]
     if feature=='degree':
-        for i in range(size_step):      
+        for i in range(n_step):      
             G=fn.SuperGraph(edges[:(i+1)*step])
             G.Relable_nodes()
             
@@ -610,7 +610,7 @@ def Size_evolution(G,step, feature):
         size=np.array(size)
         return size, value_size_evolution,value_size_evolution_mean
     else:
-        for i in range(size_step):
+        for i in range(n_step):
             G=fn.SuperGraph(edges[:(i+1)*step])
             G.Sorted_graph()
             G.Relable_nodes()
@@ -2101,6 +2101,11 @@ def Feature_cumulative_evolution(feature, feature_name, save_fig=False):
     plt.show()
 
 #%%24 Feature_ratio_evolution
+
+
+'''mettere a posto lettura file
+
+scrivere il readme'''
 
 def Feature_ratio_evolution(feature_position,feature_ratio, feature_name, save_fig=False):
     '''
