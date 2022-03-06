@@ -14,14 +14,13 @@ Let’s define a network as a set of elements(N) that have some linking relation
 them. Each element is called node. If two node are linked together there will be an
 edge. Essentially, a graph G= (V, L) is a combination of these two sets; a set V of
 N nodes and a set L of E links connecting the corresponding nodes.
-The next step is to define the adjacency matrix A (NxN), in which aij=1.If there
-is a link between vertices i and j, otherwise, aij=0. Please note in this report only
-unweighted and undirected graph are taken into account.
+
 In order to classify the nodes in a graph is it important to study the connection
 among them and how to get from one to another. So a walk is the sequence of all
 nodes and edges between 2 nodes and a path is a walk with all distinct nodes and
 links. Instead a closed path is called cycle.
-In this report a first analysis of the graph has been made using the definition of
+
+The features taken into account inreport a first analysis of the graph has been made using the definition of
 degree, centrality of a node, closeness centrality and clustering coefficient.
 Degree
 The degree k of th node v is the number of edges adjacent to it.
