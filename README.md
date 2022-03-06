@@ -1,3 +1,5 @@
+ <script src="ASCIIMathML.js"></script>
+
 # California Road map analisys
 
 The codes here presented were used as a visual first step in the data analisys of the California road map. The codes have four main pourposes:
@@ -20,11 +22,18 @@ among them and how to get from one to another. So a walk is the sequence of all
 nodes and edges between 2 nodes and a path is a walk with all distinct nodes and
 links. Instead a closed path is called cycle.
 
-The features taken into account inreport a first analysis of the graph has been made using the definition of
-degree, centrality of a node, closeness centrality and clustering coefficient.
-Degree
+The next step is to define the adjacency matrix A (NxN), in which aij=1.If there
+is a link between vertices i and j, otherwise, aij=0.
+
+The features taken into account are the node degree, the betweeness centrality, the closeness centrality and clustering coefficient.
+# Degree
+
+sum_(i=1)^n i^3=((n(n+1))/2)^2
+$\sum_{i=1}^{10} t_i$
+$$e^x=\sum_{i=0}^\infty \frac{1}{i!}x^i$$
 The degree k of th node v is the number of edges adjacent to it.
 k(v) = X
+\sum_{i=1}^{10} t_i
 j∈V
 avj (2.1)
 Betweeness centrality
