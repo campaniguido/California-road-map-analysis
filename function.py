@@ -1937,7 +1937,7 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
 #%%                         PLOT FUNCTION
 #%%20 Hist_plot
 
-def Hist_plot(distribution, color, title, save_fig=False):
+def Hist_plot(distribution, color, title, save_fig=False, extention='pdf'):
     '''
     It shows the distribution histogram of an input set of data, it provides labels for the axis and  the graph.
     It can also save the plot.
@@ -1958,7 +1958,9 @@ def Hist_plot(distribution, color, title, save_fig=False):
         
     save_fig : bool, optional
         If ''True'' save a pdf file with the name title.pdf . The default is False.
-
+        
+    extention: str, optional
+               it represent the file extension of the file to save. The default is 'pdf'
     Returns
     -------
     None.
@@ -1969,7 +1971,7 @@ def Hist_plot(distribution, color, title, save_fig=False):
     plt.ylabel("Frequency")
     plt.title(title)
     if save_fig==True:
-        plt.savefig(title+'.pdf', dpi=500)
+        plt.savefig(title+'.'+extention, dpi=500)
     plt.show()
 
 #%%21 Scatter_plot
