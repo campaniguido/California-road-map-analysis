@@ -25,7 +25,8 @@ import matplotlib.pyplot as plt
 
 
 #%% file reading
-file=pd.read_table('https://raw.githubusercontent.com/campaniguido/Software_and_Computing/main/roadnet-ca.txt')
+file_position='https://raw.githubusercontent.com/campaniguido/Software_and_Computing/main/roadnet-ca.txt'
+file=pd.read_table(file_position)
 file=np.array(file)
 file=fn.Divide_value(file)
 
@@ -79,7 +80,6 @@ fn.Scatter_plot(list(community_color.values()), 'Community' , Closeness_Centrali
 fn.Scatter_plot(list(community_color.values()), 'Community' , Betweeness_Centrality[:,1], 'Betweeness_Centrality', list(community_color.values()))
 
 #_______________-confronto con strenght______
-
 fn.Scatter_plot(Betweeness_Centrality[:,1], 'Betweeness_Centrality' , Strenght[:,1], 'Degree', list(community_color.values()))
 fn.Scatter_plot(Closeness_Centrality[:,1], 'Closeness_Centrality' , Strenght[:,1], 'Degree', list(community_color.values()))
 fn.Scatter_plot(Betweeness_Centrality[:,1], 'Betweeness_Centrality' , Strenght[:,1], 'Degree', list(community_color.values()))
