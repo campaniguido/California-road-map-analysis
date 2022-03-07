@@ -40,7 +40,7 @@ G.Relable_nodes()
 
 
 #%% Main features
-Strenght=np.array(list(G.degree))
+Degree=np.array(list(G.degree))
 Closeness_Centrality=np.array(list((nx.closeness_centrality(G)).items()))
 Betweeness_Centrality=np.array(list((nx.betweenness_centrality(G)).items()))
 Clustering=np.array(list((nx.clustering(G)).items()))
@@ -50,7 +50,7 @@ community=fn.Unfreeze_into_list(community)
 community_color=fn.Set_community_number(G, community)
 colors = (cm.CMRmap(np.linspace(0, 1, max(community_color))))
 
-#%% Network Visualization
+#%% Network Drawing
 Betweeness_Centrality_edges=nx.edge_betweenness_centrality(G)
 node_size=np.exp((Betweeness_Centrality[:,1]+1)*100)
 width=(np.array(list(Betweeness_Centrality_edges.values()))+0.95)
@@ -65,7 +65,7 @@ plt.show(G)
 
 #%% Histograms
 
-fn.Hist_plot(Strenght[:,1],colors[5], 'Degree distribution')
+fn.Hist_plot(Degree[:,1],colors[5], 'Degree distribution',True, 'png')
 fn.Hist_plot(Betweeness_Centrality[:,1],colors[5], 'Betweeness_Centrality distribution')
 fn.Hist_plot(Closeness_Centrality[:,1],colors[5], 'Closeness_Centrality distribution')
 fn.Hist_plot(Clustering[:,1],colors[5], 'Clustering distribution')
@@ -74,15 +74,15 @@ fn.Hist_plot(Clustering[:,1],colors[5], 'Clustering distribution')
 
 
 
-fn.Scatter_plot(list(community_color.values()), 'Community' , Strenght[:,1], 'Degree', list(community_color.values()))
+fn.Scatter_plot(list(community_color.values()), 'Community' , Degree[:,1], 'Degree', list(community_color.values()))
 fn.Scatter_plot(list(community_color.values()), 'Community' , Clustering[:,1], 'Clustering', list(community_color.values()))
 fn.Scatter_plot(list(community_color.values()), 'Community' , Closeness_Centrality[:,1], 'Closeness_Centrality', list(community_color.values()))
 fn.Scatter_plot(list(community_color.values()), 'Community' , Betweeness_Centrality[:,1], 'Betweeness_Centrality', list(community_color.values()))
 
 #_______________-confronto con strenght______
-fn.Scatter_plot(Betweeness_Centrality[:,1], 'Betweeness_Centrality' , Strenght[:,1], 'Degree', list(community_color.values()))
-fn.Scatter_plot(Closeness_Centrality[:,1], 'Closeness_Centrality' , Strenght[:,1], 'Degree', list(community_color.values()))
-fn.Scatter_plot(Betweeness_Centrality[:,1], 'Betweeness_Centrality' , Strenght[:,1], 'Degree', list(community_color.values()))
+fn.Scatter_plot(Betweeness_Centrality[:,1], 'Betweeness_Centrality' , Degree[:,1], 'Degree', list(community_color.values()))
+fn.Scatter_plot(Closeness_Centrality[:,1], 'Closeness_Centrality' , Degree[:,1], 'Degree', list(community_color.values()))
+fn.Scatter_plot(Betweeness_Centrality[:,1], 'Betweeness_Centrality' , Degree[:,1], 'Degree', list(community_color.values()))
 
 
 
