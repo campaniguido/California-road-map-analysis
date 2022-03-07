@@ -312,7 +312,7 @@ def test_divide_value_shape():
 def Edge_list(file, number_of_edges):
     '''
     It takes a file of couples of number and return a list of a desired lenght(number_of_edge) of couple 
-    of numbers expressed as  integers    
+    of numbers expressed as  integers. The list has an ascending order following the first element of the couples   
 
     Parameters
     ----------
@@ -2103,9 +2103,6 @@ def Feature_cumulative_evolution(feature, feature_name, save_fig=False):
 #%%24 Feature_ratio_evolution
 
 
-'''mettere a posto lettura file
-
-scrivere il readme'''
 
 def Feature_ratio_evolution(feature_position,feature_ratio, feature_name, save_fig=False):
     '''
