@@ -1144,7 +1144,7 @@ def test_Add_edges_from_map_nodes_number():
     assert list(Copy_map.nodes())==list(G.nodes)
     
 def test_Add_edges_from_map_Bernoulli_trials():
-    '''It tests if the nodes number is conserved'''
+    
       
     G=nx.Graph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
@@ -1273,9 +1273,10 @@ def test_Find_mode():
 #%%13 Equalize_strong_nodes
 def Equalize_strong_nodes(G_strong, G_weak):
     '''
-    It compares two graph. It takes the strongest node of the first graph which have nodes witha degree value major 
-    then the degree mode of the second graph. It remove random links of these nodes untill the degree ratio
-    of the the first graph (G_strong) of these high degree values are above the ones of the second graph(G_weak)
+    It compares two graph. It breaks links of the highest degree nodes of G_strong, until the maximum degree of G_strong
+    is equal or minor the one of G_weak.
+    Then it break links of the nodes with degree in between the degree mode of G_weak and the max degree of G_weak unitl 
+    the ratio of these degree are equal or lower the ones of the weak network.
 
     Parameters
     ----------
@@ -1918,7 +1919,7 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
     while len(Copycat.Degree_dct()[0])>0:
         
         for i in range(len(G.Degree_ratio())-1,0,-1):
-            if i< len(Copycat.Degree_ratio()):           
+            if i<= len(Copycat.Degree_ratio()):           
                 while Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:            
                     fn.Remove_edge_of_degree(i, Copycat) 
                   
@@ -1976,7 +1977,7 @@ def Hist_plot(distribution, color, title, save_fig=False, extention='pdf'):
 
 #%%21 Scatter_plot
 
-def Scatter_plot(distribution1, name_distribution1, distribution2, name_distribution2, color, save_fig=False):
+def Scatter_plot(distribution1, name_distribution1, distribution2, name_distribution2, color, save_fig=False, extention='pdf'):
     '''
     It shows the the scatter plot of two set of input data, it provides labels for the axis and the graph.
     It can also save the plot.
@@ -2007,7 +2008,9 @@ def Scatter_plot(distribution1, name_distribution1, distribution2, name_distribu
         
     save_fig : bool, optional
         If ''True'' save a pdf file with the name title.pdf . The default is False.
-
+        
+    extention: str, optional
+               it represent the file extension of the file to save. The default is 'pdf'
     Returns
     -------
     None.
@@ -2019,7 +2022,7 @@ def Scatter_plot(distribution1, name_distribution1, distribution2, name_distribu
     plt.ylabel(name_distribution2)
     plt.title(name_distribution1+ ' vs '+  name_distribution2)
     if save_fig==True:
-        plt.savefig(name_distribution1+ ' vs '+  name_distribution2 +".pdf", dpi=500)
+        plt.savefig(name_distribution1+ ' vs '+  name_distribution2 +"."+ extention, dpi=500)
     plt.show()
        
 #%%22 Feature_mean_evolution
