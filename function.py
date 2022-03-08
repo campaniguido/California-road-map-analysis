@@ -52,7 +52,8 @@ class SuperGraph(nx.Graph):
             
     def Degree_dct(self):
         '''It returns a dictionary. The keys are the degree of the SuperGraph from 0 to the maximum.
-        The values are all and only the nodes with the key degree'''
+        The values are all and only the nodes with the key degree.
+        It doesn't take into account as a link a self connected node'''
         
         degree_dct={}
         for key in range(int(max(np.array(list(self.degree))[:,1])+1)):
@@ -166,7 +167,7 @@ def test_Degree_list_corrispondence():
         for node in strenght_dct[key]:
             assert G.degree(node)-2*list(G.neighbors(node)).count(node)==key
 
-def test_Degree_list_length():
+def test_Degree_list_elements():
     '''It looks if the elements of the dictionary values are the same of the of the graph nodes'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -176,16 +177,16 @@ def test_Degree_list_length():
         values+=set(strenght_dct[i])
     assert sorted(values)==list(range(1,11))
     
-def test_Strenght_list_max_degree():
+def test_Degree_list_max_degree():
     '''It verify the highest key value is equal to the maximum degree'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
     strenght_dct=G.Degree_dct()
     assert len(list(strenght_dct.keys()))==max(np.array(list(G.degree))[:,1])+1
     
-def test_Strenght_list_autoconnected_nodes():
+def test_Degree_list_selfconnected_nodes():
     '''It looks that the function does not count as a neighbour the node its self in the case
-    of an autoconnected node'''
+    of an selfconnected node'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,3],[2,2],[3,3]])
     strenght_dct=G.Degree_dct()
@@ -270,8 +271,13 @@ def Divide_value(file):
             if type(file[i,k])==str:            
                 j=0
                 while j <(len(file[i,k])):
-                    if file[i,k][j]==' ':
-                        file[i]=[file[i,k][:j],file[i,k][j+1:len(file[i,k])]]
+                    '''the second condition avoids problem in situation like: ['1 ', 3.0]'''
+                    if file[i,k][j]==' ' and j<len(file[i,k])-1:
+                        l=j
+                        'It could be more than one space'
+                        while l<len(file[i,k]) and file[i,k][l]==' ':
+                            l=l+1                            
+                        file[i]=[file[i,k][:j],file[i,k][l:len(file[i,k])]]
                     j=j+1
             elif math.isnan(file[i,k])==True and k==0:
                 if type(file[i,k+1])!=str and math.isnan(file[i,k+1]):
@@ -283,12 +289,28 @@ def Divide_value(file):
 def test_divide_value():
     '''it tests if there is any string variable with a space inside'''
     file=[[0,134.0],['45643 3456',np.nan],[np.nan,'34 5'],[3,4.0]]
+    file=fn.Divide_value(file)
+    for i in range(2):
+        for j in range(len(file)):
+            if type(file[j,i])==str:
+                for k in range(len(file[j,i])):
+                    assert file[j,i][k]!=' '
+                    
+def test_divide_value_more_space():
+    '''it tests if there is any string variable with one or more spaces inside'''
+    file=[[0,134.0],['45643            3456',np.nan],[np.nan,'34 5'],[3,4.0]]
     file=Divide_value(file)
     for i in range(2):
         for j in range(len(file)):
             if type(file[j,i])==str:
                 for k in range(len(file[j,i])):
                     assert file[j,i][k]!=' '
+                    
+def test_divide_value_nothing_to_divide():
+    '''In this case the space after one should not be considered'''
+    file=[['1 ', 2.0],['3', '4'],['5', '6']]
+    file=Divide_value(file)
+    assert file[0,1]==2.0                   
                     
 def test_divide_value_nan_cell():
     ''' it looks for any nan variable'''
@@ -2104,10 +2126,10 @@ def Feature_cumulative_evolution(feature, feature_name, save_fig=False, extentio
         ax.plot(base[:-1], cumulative, c=colors[-i-1],label=size)        
     ax.set_xlabel("Values")
     ax.set_ylabel("Cumulative probability")    
-    ax.legend(prop={'size': 10})
-    ax.set_title('Cumulative distribution of '+  feature_name)
+    ax.legend(title="# nodes",prop={'size': 10})
+    ax.set_title('Cumulative distributions of '+  feature_name)
     if save_fig==True:
-        plt.savefig(feature_name+"cumulative-convergence""."+ extention, dpi=500)
+        plt.savefig(feature_name+"cumulative-convergence""."+ extention, dpi=100)
     plt.show()
 
 #%%24 Feature_ratio_evolution
@@ -2152,11 +2174,11 @@ def Feature_ratio_evolution(feature_position,feature_ratio, feature_name, save_f
         size=feature_position
         ax.scatter(feature_position,    x[:,i], c=[colors[i]], s=2,label='%s' %i)
         
-    ax.legend(loc='upper left', shadow=True, fontsize=8)  
+    ax.legend(title="degree",loc='upper left', shadow=True, fontsize=8)  
     plt.xlabel("number of nodes")
     plt.xlim(-30, max(size+10))
     plt.ylabel("ratio of each " + feature_name)
-    plt.title("ratio of each " + feature_name + " for increasing nodes")
+    plt.title("ratio of each " + feature_name + " for increasing size")
     if save_fig==True:
         plt.savefig("ratio of each"+ feature_name +"."+ extention, dpi=100)
     plt.show()
