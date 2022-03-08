@@ -1972,7 +1972,7 @@ def Hist_plot(distribution, color, title, save_fig=False, extention='pdf'):
     plt.ylabel("Frequency")
     plt.title(title)
     if save_fig==True:
-        plt.savefig(title+'.'+extention, dpi=500)
+        plt.savefig(title+'.'+extention, dpi=100)
     plt.show()
 
 #%%21 Scatter_plot
@@ -2022,12 +2022,12 @@ def Scatter_plot(distribution1, name_distribution1, distribution2, name_distribu
     plt.ylabel(name_distribution2)
     plt.title(name_distribution1+ ' vs '+  name_distribution2)
     if save_fig==True:
-        plt.savefig(name_distribution1+ ' vs '+  name_distribution2 +"."+ extention, dpi=500)
+        plt.savefig(name_distribution1+ ' vs '+  name_distribution2 +"."+ extention, dpi=100)
     plt.show()
        
 #%%22 Feature_mean_evolution
 
-def Feature_mean_evolution(feature_size,feature_mean, feature_name, save_fig=False):
+def Feature_mean_evolution(feature_size,feature_mean, feature_name, save_fig=False, extention='pdf'):
     '''
     It shows the the scatter plot of a set of input data,  it provides labels for the axis and the graph.
     It can also save the plot.
@@ -2046,7 +2046,9 @@ def Feature_mean_evolution(feature_size,feature_mean, feature_name, save_fig=Fal
         
     save_fig : bool, optional
         If ''True'' save a pdf file with the name title.pdf . The default is False.
-
+        
+    extention: str, optional
+               it represent the file extension of the file to save. The default is 'pdf'
     Returns
     -------
     None.
@@ -2061,12 +2063,12 @@ def Feature_mean_evolution(feature_size,feature_mean, feature_name, save_fig=Fal
     plt.ylabel(feature_name)
     plt.title("Mean"+feature_name)
     if save_fig==True:
-        plt.savefig("Mean"+feature_name+".pdf", dpi=500)
+        plt.savefig("Mean"+feature_name+"."+ extention, dpi=100)
     plt.show()
 #%%23 Feature_cumulative_evolution
 
 
-def Feature_cumulative_evolution(feature, feature_name, save_fig=False):
+def Feature_cumulative_evolution(feature, feature_name, save_fig=False, extention='pdf'):
     '''
     It shows the cumulative distribution(normalized on the number of data) of n distributions of input data,
     it provides labels for the axis and the graph.
@@ -2083,6 +2085,9 @@ def Feature_cumulative_evolution(feature, feature_name, save_fig=False):
         
     save_fig :  bool, optional
         If ''True'' save a pdf file with the name title.pdf . The default is False.
+        
+    extention: str, optional
+               it represent the file extension of the file to save. The default is 'pdf'
 
     Returns
     -------
@@ -2102,14 +2107,14 @@ def Feature_cumulative_evolution(feature, feature_name, save_fig=False):
     ax.legend(prop={'size': 10})
     ax.set_title('Cumulative distribution of '+  feature_name)
     if save_fig==True:
-        plt.savefig("Cc-cumulative-convergence.pdf", dpi=500)
+        plt.savefig(feature_name+"cumulative-convergence""."+ extention, dpi=500)
     plt.show()
 
 #%%24 Feature_ratio_evolution
 
 
 
-def Feature_ratio_evolution(feature_position,feature_ratio, feature_name, save_fig=False):
+def Feature_ratio_evolution(feature_position,feature_ratio, feature_name, save_fig=False, extention='pdf'):
     '''
     It plot a scatter plot: at each position it scatter a vector of n point corrisponding to the n values of,
     of each element of the feature ratio.
@@ -2131,6 +2136,9 @@ def Feature_ratio_evolution(feature_position,feature_ratio, feature_name, save_f
     save_fig : bool, optional
         If ''True'' save a pdf file with the name title.pdf . The default is False.
 
+    extention: str, optional
+               it represent the file extension of the file to save. The default is 'pdf'
+
     Returns
     -------
     None.
@@ -2150,5 +2158,5 @@ def Feature_ratio_evolution(feature_position,feature_ratio, feature_name, save_f
     plt.ylabel("ratio of each " + feature_name)
     plt.title("ratio of each " + feature_name + " for increasing nodes")
     if save_fig==True:
-        plt.savefig("ratio of each"+ feature_name +".pdf", dpi=500)
+        plt.savefig("ratio of each"+ feature_name +"."+ extention, dpi=100)
     plt.show()
