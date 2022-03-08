@@ -1277,8 +1277,8 @@ def Find_mode(pdf):
 
     Returns
     -------
-    mode : TYPE
-        DESCRIPTION.
+    mode : int
+        the mode of the function
 
     '''
     max_pdf=max(pdf)
@@ -1293,7 +1293,8 @@ def Find_mode(pdf):
 
 #%% test_Find_mode (1)
 def test_Find_mode():
-    a=[-1,-5,-0.1,-3]
+    '''the value calculated in the mode is the max'''
+    a=[-1,-5,-0.1,-3,]
     assert a[Find_mode(a)]==max(a)
     
     
@@ -1322,11 +1323,12 @@ def Equalize_strong_nodes(G_strong, G_weak):
     dct_degree_weak=G_weak.Degree_dct()
     degree_ratio_weak=G_weak.Degree_ratio()    
     threshold=fn.Find_mode(degree_ratio_weak)
-    i=max(dct_degree_weak.keys())
+    max_weak=max(dct_degree_weak.keys())
+    max_strong=max(np.array(list(G_strong.degree))[:,1])
     
-    if i<max(np.array(list(G_strong.degree))[:,1]):       
-        fn.Break_strongest_nodes(G_strong, i) 
-        
+    if max_weak<max_strong:       
+        fn.Break_strongest_nodes(G_strong, max_weak) 
+    i=max_weak    
     while i>threshold:
         
         
@@ -1431,7 +1433,7 @@ def Max_prob_target (source,strenght_dct,degree,map_dct,distance_linking_probabi
                         max_prob=prob
                         target=i                    
 
-    
+    '''In the case there was no nodes with the right conditions to link to'''
     if target==-5:
 
         target=fn.Min_distance_target(source, strenght_dct,degree, map_dct, list(G.neighbors(source)))
@@ -1463,7 +1465,7 @@ def test_Max_prob_target_degree():
     assert len(list(G.neighbors(target)))==degree
 
 def test_Max_prob_target_not_its_self():
-    '''It verifies the taget is not the ource'''
+    '''It verifies the taget is not the source'''
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0),(4,4)]
     G=fn.SuperGraph()
     G.add_edges_from(edges)
@@ -1517,7 +1519,7 @@ def test_Max_prob_target_is_not_its_neighbors():
 def Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_list):
     '''
     Given a distance map of the nodes, From a starting vertice (the source) of the graph it returns the nearest node 
-    with a given degree and which is not already linked to the source.    
+    with a given degree and which is not already linked to the source. If it is impossible a random one is chosen  
 
     Parameters
     ----------
@@ -1535,6 +1537,7 @@ def Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_lis
         Each item represents the spatial position of a node of the graph
         
     source_neighbour_list : list
+                          list of the neighbour of the node
 
     Returns
     -------
@@ -1546,8 +1549,9 @@ def Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_lis
     x0=map_dct[source]
     min_=999
     target=-5
-    'It verifies there is some node left to bind to'
+    'to avoids to start an endless while loop'
     assert len(source_neighbour_list)!=len(map_dct)
+    
     for i in strenght_dct[degree]:
         
         x1=map_dct[i]
@@ -1560,6 +1564,7 @@ def Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_lis
                 min_=dist
                 target=i
     while target<0:
+        'In order to find a target to link with even if it has a different degree in respect to the one chosen'
         list_target=rn.choice(list(strenght_dct.values()))
         if len(list_target)!=0:
             target_prova=rn.choice(list_target)
@@ -1685,8 +1690,6 @@ def Merge_small_component(G, deg,map_dct,threshold):
         i=i+1
         
 #%%  test_Merge_small_component (2)
-'''voglio verificare che funzioni e che quindi non esistano componenti con dimensione più piccola di un tot,
- voglio verificare che sia alzato un errore se la lista con un determinato grado finisce'''
 
 def test_Merge_small_component():
     '''It verifies all the components are bigger than the threshold'''
@@ -1712,8 +1715,9 @@ def test_Merge_small_component_Exception():
 def Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_dct):
     '''
     It takes an isolated node of the graph and it creates n links (n=n_links) with n different nodes.
-    The degree of the nodes are 0, 1, 2 ... n-1. At in the of the process the number of nodes with degree
-    equal to n increase of 2 and the number of isolated nodes decrease of two. 
+    For each degree group, from 0 to the degree n-1, node will be chosen as a target till reaching n targets.
+    At the end of the process the number of nodes with degree equal to n increase of 2 
+    and the number of isolated nodes decrease of two. 
     The degree ratio of the other values remains constant. The attachment rule of the links follow the
     Max_prob_target function.
 
@@ -1750,12 +1754,12 @@ def Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_
             G.add_edge(source, target)
             degree_dct=G.Degree_dct()
 #%% test_Link_2_ZeroNode (3)
-''' voglio testare che il degree ratio segue andamento voluto, che i degree dei nodi sono tutti presenti
+
     
-'''
+
 def test_Link_2_ZeroNode_reduction():
     rn.seed(3)
-    '''It verifies the right increasing of  '0' degree ratio'''
+    '''It verifies the right decreasing of  '0' degree ratio'''
     edges=[(0, 3), (0, 2), (0, 8), (0, 9), (1, 2), (1, 4), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 8), (2, 8), (8, 9)]
     
     G=fn.SuperGraph()
@@ -1783,7 +1787,7 @@ def test_Link_2_ZeroNode_reduction():
     assert degree_ratio_0_before==degree_ratio_0_after+2/10
 
 def test_Link_2_ZeroNode_increment():
-    '''It verifies the right decreasing of  '4' degree ratio'''
+    '''It verifies the right incrasing of  target degree ratio'''
     edges=[(0, 3), (0, 2), (0, 8), (0, 9), (1, 2), (1, 4), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 8), (2, 8), (8, 9)]
     
     G=fn.SuperGraph()
@@ -1906,7 +1910,9 @@ def test_Remove_edge_of_degree_len():
 
 def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False):
     '''
-    
+    It returns a network in which new links are added to the isolated node of the Copy_map 
+    and some other links are removed in order to make the degree distribution of the new network similar
+    to the degree distribution of G
 
     Parameters
     ----------
@@ -1963,6 +1969,39 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
     Copycat.Relable_nodes()
     
     return Copycat
+
+
+#%%Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False)
+
+def test_Copymap_degree_correction():
+    '''It test the final network has a degree distribution compatible with the distribution of the reference network'''
+    
+    G=fn.SuperGraph(nx.newman_watts_strogatz_graph(300, 3, p=0.4, seed=3))
+    edge_probability=2*G.number_of_edges()/((len(G)-1)*(len(G)))
+    
+    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    dct_dist_link=fn.Dct_dist_link(list(G.edges),map_dct)
+    dct_dist=fn.Dct_dist(G=G, map_dct=map_dct)
+    nstep=50
+    
+    step=max(dct_dist_link.values())/nstep
+
+    distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
+    distance_linking_probability=fn.Link_distance_conditional_probability(dct_dist_link,nstep,distance_frequency)
+
+
+    ERG=nx.fast_gnp_random_graph(len(G),edge_probability, seed=None, directed=False)
+    ERG=fn.SuperGraph(ERG)
+    ERG_map_dct=nx.spring_layout(ERG, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    ERG_dct_dist_link=fn.Dct_dist_link(list(ERG.edges),map_dct)
+    max_dist_link=max(ERG_dct_dist_link.values())
+    
+    ERG=fn.Copymap_degree_correction(ERG,G,ERG_map_dct,max_dist_link,distance_linking_probability,Merge=False)
+    
+    for i in range(len(ERG.Degree_ratio())):
+        print(G.Degree_ratio()[i]-2*(G.Degree_ratio()[i])**0.5,'<=',ERG.Degree_ratio()[i],'<=',G.Degree_ratio()[i]+2*(G.Degree_ratio()[i])**0.5)
+        assert (G.Degree_ratio()[i]-2*(G.Degree_ratio()[i])**0.5<=ERG.Degree_ratio()[i]<=G.Degree_ratio()[i]+2*(G.Degree_ratio()[i])**0.5)
+    
 #%%                         PLOT FUNCTION
 #%%20 Hist_plot
 
