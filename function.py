@@ -283,7 +283,7 @@ def Divide_value(file):
                 if type(file[i,k+1])!=str and math.isnan(file[i,k+1]):
                     file[i]=file[i-1]                       
     return file
-#%%  tests Divide value (3)
+#%%  tests Divide value (5)
     
 
 def test_divide_value():
@@ -400,6 +400,7 @@ def test_edge_list_too_long():
     number_of_edges=5
     with pytest.raises(Exception):
         Edge_list(file,number_of_edges)
+        
 def test_edge_list_input_shape():
     ''' If the shape of the file is not n*2 it will raise an exception'''    
     file=[[0,134.0,88],['45643',' 3456',7],[3,4.0,'33']]
@@ -407,11 +408,6 @@ def test_edge_list_input_shape():
     with pytest.raises(Exception):
         Edge_list(file,number_of_edges)
 
-
-
-
-
-    
 
     
 
@@ -467,7 +463,7 @@ def test_Unfreeze_into_list_is_a_list_2():
 
 def Set_community_number(G, community):
     '''It assigns to each node to the graph a community number. Node with the same number
-    are in the same community, each number cannot belongs to different communities. G is the graph,
+    are in the same community, each node cannot belongs to different communities. G is the graph,
     while each entry of the community  variable represents node of the same community. It returns 
     a dictionary: the keys are the nodes numbers, the values are the numbers of the community
     they belong to.
@@ -477,12 +473,13 @@ def Set_community_number(G, community):
     ----------
     G : networkx.classes.graph.Graph
         
-    comunity : Support item assignment variable
+    comunity : Support item assignment variable. Each item contain a group of nodes.
+               The union of all the group has to be the ensamble of nodes
         
 
     Returns
     -------
-    comunity_number : dictionary
+    comunity_number : dictionary key:item<->node number: community number
         
 
     '''    
@@ -642,9 +639,9 @@ def Size_evolution(G,step, feature):
             size.append(len(G))
         value_size_evolution_mean=np.array(value_size_evolution_mean)
         return size, value_size_evolution,value_size_evolution_mean
-#%%   test_size_evolution
+#%%   test_size_evolution (3)
 def test_size_evolution_size():
-    '''It tests the richt len of each output'''
+    '''It tests the len of each output'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     step=1
@@ -1212,8 +1209,9 @@ def Break_strongest_nodes(G, threshold):
     G : networkx.classes.graph.Graph
         
     threshold : integer
-        It is the maximum of the degree allows. all the edges of the nodes with
-        a higher degree will be dissolved
+        It is the maximum of the degree allows. The edges of a node with
+        a higher degree will be dissolved until the node reaches
+        a degrre value smaller than the threshold 
 
     Returns
     -------
@@ -1252,7 +1250,15 @@ def test_Break_strongest_nodes_maximum_value():
     Break_strongest_nodes(G,2)
     deg=G.Degree_dct()
     assert max(deg.keys())<=2
-
+    
+def test_Break_strongest_nodes_untouchable_edges():
+    '''it verify the edges which are not involved in the function are conserved'''
+    
+    edges=[(1,1), (1,2), (2,1), (3,4), (1,5),(6,7), (5,2), (2,7),(10,11)]    
+    G=fn.SuperGraph()
+    G.add_edges_from(edges)
+    Break_strongest_nodes(G,3)
+    assert list(G.neighbors(4))==[3]
 
 #%%12 Find_mode(pfd) 
 def Find_mode(pdf):
