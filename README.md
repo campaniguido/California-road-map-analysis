@@ -1,4 +1,4 @@
-# California Road map analysis
+# California road map analysis
 
 ## Introduction
 The codes here presented were used as a visual first step in the data analysis of the California road map. The codes have four main purposes:
