@@ -78,13 +78,7 @@ class SuperGraph(nx.Graph):
             degree_ratio.append(len(degree_dct[key]))
         degree_ratio=np.array(degree_ratio)/sum(degree_ratio) 
         return degree_ratio
-    
 
-
-    G.Relable_nodes()
-    nodes=list(G.nodes())
-    for i in range(1,len(G)):
-        assert nodes[i-1]<nodes[i]
 
 def test_Relable_nodes_no_hole():
     '''it tests there is no jump in the numbers labels'''
@@ -261,7 +255,7 @@ def Set_community_number(G, community):
     return community_number
 
                         
-#%%5  Size evolution (3)
+#%%5  Size evolution
 def Size_evolution(G,step, feature):
     '''
     It takes back information related to the network G feature along its size increasing.
@@ -276,7 +270,8 @@ def Size_evolution(G,step, feature):
     ----------
     G : networkx.classes.graph.Graph
         
-    step : integer
+    step : int
+           It represent the number of edge that will be added at each loop 
         
     feature : degree, closeness_centrality, betweenness_centrality, clustering
 
@@ -923,12 +918,15 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
     while len(Copycat.Degree_dct()[0])>0:
         
         for i in range(len(G.Degree_ratio())-1,0,-1):
-            if i<= len(Copycat.Degree_ratio()):           
-                while Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:            
+            if i< len(Copycat.Degree_ratio()):           
+                while Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:   
+                    
                     fn.Remove_edge_of_degree(i, Copycat) 
                   
         for i in range(1,len(G.Degree_ratio())):
+            if i< len(Copycat.Degree_ratio()):
                 while len(Copycat.Degree_dct()[0])>0 and Copycat.Degree_ratio()[i]< G.Degree_ratio()[i]:  
+                    
                     fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,Copycat,i, Copycat.Degree_dct())
                     
         
