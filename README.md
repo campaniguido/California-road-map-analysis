@@ -73,9 +73,7 @@ The libraries used are: math, matplotlib, networkx, numpy, pandas, pytest, rando
 
 ### California road map  (main.py)
 
-main.py: it contains the code useful to read the file roadnet-ca.txt, deleting some bugs in the dataset,
-                  to make plots/histograms of the main features of the whole/reduced graph and
-                  to visualize the features distribution and their evolution within size increasing of the graph
+The file main.py contains the code useful to read the file roadnet-ca.txt, deleting some bugs in the dataset, to make plots/histograms of the main features of the whole/reduced graph and  to visualize the features distribution and their evolution within size increasing of the graph
                
 
 
