@@ -28,7 +28,7 @@ file=fn.Divide_value(file)
 
 #%% Graph initialization
 
-'''Put here the number of edge you want to consider starting from the first couple'''
+'''Put here the number of edges you want to consider starting from the first couple'''
 number_of_edge=5000
 edges=fn.Edge_list(file, number_of_edge)
 G=fn.SuperGraph(edges)
