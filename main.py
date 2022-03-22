@@ -11,7 +11,7 @@ import pandas as pd
 import numpy as np
 import function as fn
 import matplotlib.cm as cm
-import paramesters as params
+import parameters as params
 
 
 
@@ -47,6 +47,9 @@ community=fn.Unfreeze_into_list(community)
 community_color=fn.Set_community_number(G, community)
 
 
+data={'Degree':Degree[:,1],'Closeness_Centrality':Closeness_Centrality[:,1],'Betweeness_Centrality':Betweeness_Centrality[:,1],'Clustering':Clustering[:,1],'community':list(community_color.values())}
+data=pd.DataFrame(data)
+data.to_csv(r''+params.path_to_save_data + '\data_road.csv')
 
 
 
