@@ -51,7 +51,43 @@ data={'Degree':Degree[:,1],'Closeness_Centrality':Closeness_Centrality[:,1],'Bet
 data=pd.DataFrame(data)
 data.to_csv(r''+params.path_to_save_data + '\data_road.csv')
 
+#%% Main features size-evolution 
+step=int(len(G.edges)/params.n_step_degree)
+degree_size, degree_ratio_size_evolution,degree_mean=fn.Size_evolution(G,step,'degree')
 
+degree_evolution=pd.DataFrame(degree_ratio_size_evolution,columns=list(range(len(G.Degree_ratio()))))
+degree_mean=pd.DataFrame(degree_mean,columns=['mean','std'])
+degree_size=pd.DataFrame(degree_size,columns=['size'])
+
+degree_evolution=pd.concat((degree_mean,degree_size,degree_evolution), axis=1)
+degree_evolution.to_csv(r''+params.path_to_save_data + '\degree_evolution.csv')
+
+
+step=int(len(G.edges)/params.n_step) 
+
+BC_size, BC_time_evolution,BC_mean=fn.Size_evolution(G,step,'betweenness_centrality')
+evolution=pd.DataFrame(BC_time_evolution)
+size=pd.DataFrame(BC_size,columns=['size'])
+mean=pd.DataFrame(BC_mean,columns=['mean','std'])
+BC_evolution=pd.concat((size,mean,evolution),axis=1)
+BC_evolution.to_csv(r''+params.path_to_save_data + '\BC_evolution.csv')
+
+
+Clustering_size, Clustering_time_evolution,Clustering_mean=fn.Size_evolution(G,step,'clustering')  
+evolution=pd.DataFrame(Clustering_time_evolution)
+size=pd.DataFrame(Clustering_size,columns=['size'])
+mean=pd.DataFrame(Clustering_mean,columns=['mean','std'])
+Clustering_evolution=pd.concat((size,mean,evolution),axis=1)
+Clustering_evolution.to_csv(r''+params.path_to_save_data + '\Clustering_evolution.csv')
+
+
+CC_size, CC_time_evolution,CC_mean=fn.Size_evolution(G,step,'closeness_centrality')
+evolution=pd.DataFrame(CC_time_evolution)
+size=pd.DataFrame(CC_size,columns=['size'])
+mean=pd.DataFrame(CC_mean,columns=['mean','std'])
+CC_evolution=pd.concat((size,mean,evolution),axis=1)
+CC_evolution.to_csv(r''+params.path_to_save_data + '\CC_evolution.csv')
+ 
 
 #%% ERG Graph initialization
 
