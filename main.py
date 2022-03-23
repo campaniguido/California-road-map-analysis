@@ -53,6 +53,28 @@ data.to_csv(r''+params.path_to_save_data + '\data_road.csv')
 
 
 
+#%% ERG Graph initialization
+
+edge_probability=2*G.number_of_edges()/((len(G)-1)*(len(G)))
+ERG=nx.fast_gnp_random_graph(len(G),edge_probability, seed=None, directed=False)
+ERG=fn.SuperGraph(ERG)
+ERG.Sorted_graph()
+ERG.Relable_nodes()
+
+#%% main ERG features
+
+Degree_ERG=np.array(sorted(list(ERG.degree)))
+Closeness_Centrality_ERG=np.array(sorted(list((nx.closeness_centrality(ERG)).items())))
+Betweeness_Centrality_ERG=a=np.array(sorted(list((nx.betweenness_centrality(ERG)).items())))
+Clustering_ERG=np.array(sorted(list((nx.clustering(ERG)).items())))
+
+community_ERG=nx.algorithms.community.modularity_max.greedy_modularity_communities(ERG)
+community_ERG=fn.Unfreeze_into_list(community_ERG)
+community_color_ERG=fn.Set_community_number(G, community_ERG)
+
+data_ERG={'Degree':Degree_ERG[:,1],'Closeness_Centrality':Closeness_Centrality_ERG[:,1],'Betweeness_Centrality':Betweeness_Centrality_ERG[:,1],'Clustering':Clustering_ERG[:,1],'community':list(community_color_ERG.values())}
+data_ERG=pd.DataFrame(data_ERG)
+data.to_csv(r''+params.path_to_save_data + '\data_ERG.csv')
 #%% Histograms
 
 color=[cm.CMRmap(0.46),cm.CMRmap(0.08)]
