@@ -18,6 +18,7 @@ import parameters as params
 
 
 
+
 #%% file reading
 
 file_position=params.file_position
@@ -110,23 +111,4 @@ community_color_ERG=fn.Set_community_number(G, community_ERG)
 
 data_ERG={'Degree':Degree_ERG[:,1],'Closeness_Centrality':Closeness_Centrality_ERG[:,1],'Betweeness_Centrality':Betweeness_Centrality_ERG[:,1],'Clustering':Clustering_ERG[:,1],'community':list(community_color_ERG.values())}
 data_ERG=pd.DataFrame(data_ERG)
-data.to_csv(r''+params.path_to_save_data + '\data_ERG.csv')
-#%% Histograms
-
-color=[cm.CMRmap(0.46),cm.CMRmap(0.08)]
-fn.Hist_plot(Degree[:,1],color[0],'Degree distribution',params.save_fig, params.extention)
-fn.Hist_plot(Betweeness_Centrality[:,1],color[0], 'Betweeness_Centrality distribution',params.save_fig, params.extention)
-fn.Hist_plot(Closeness_Centrality[:,1],color[0], 'Closeness_Centrality distribution',params.save_fig, params.extention)
-fn.Hist_plot(Clustering[:,1],color[0], 'Clustering distribution',params.save_fig, params.extention)
-
-#%% Scatterplot
-
-fn.Scatter_plot(list(community_color.values()), 'Community' , Degree[:,1], 'Degree', list(community_color.values()),params.save_fig, params.extention)
-fn.Scatter_plot(list(community_color.values()), 'Community' , Clustering[:,1], 'Clustering', list(community_color.values()),params.save_fig, params.extention)
-fn.Scatter_plot(list(community_color.values()), 'Community' , Closeness_Centrality[:,1], 'Closeness_Centrality', list(community_color.values()),params.save_fig, params.extention)
-fn.Scatter_plot(list(community_color.values()), 'Community' , Betweeness_Centrality[:,1], 'Betweeness_Centrality', list(community_color.values()),params.save_fig, params.extention)
-
-#_______________features vs degree______
-fn.Scatter_plot(Betweeness_Centrality[:,1], 'Betweeness_Centrality' , Degree[:,1], 'Degree', list(community_color.values()),params.save_fig, params.extention)
-fn.Scatter_plot(Closeness_Centrality[:,1], 'Closeness_Centrality' , Degree[:,1], 'Degree', list(community_color.values()),params.save_fig, params.extention)
-fn.Scatter_plot(Betweeness_Centrality[:,1], 'Betweeness_Centrality' , Degree[:,1], 'Degree', list(community_color.values()),params.save_fig, params.extention)
+data_ERG.to_csv(r''+params.path_to_save_data + '\data_ERG.csv')
