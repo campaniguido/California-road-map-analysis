@@ -101,9 +101,9 @@ def test_Relable_nodes_corrispondence():
     assert list(G.neighbors(4))==[3]
     assert list(G.neighbors(5))==[0, 1, 2]
     assert list(G.neighbors(6))==[6]
-    
+ 
 
-            
+     
 #%%1  Divide value
 def Divide_value(file):
     '''It takes an array (n,2) which represents the graph edges. It looks for any case in which
@@ -873,6 +873,7 @@ def Remove_edge_of_degree(degree,G):
 
 #%%19 Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False):
 
+
 def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False):
     '''
     It returns a network in which new links are added to the isolated node of the Copy_map 
@@ -1072,6 +1073,18 @@ def Feature_mean_evolution(feature_size,feature_mean, feature_name, save_fig=Fal
     plt.show()
 #%%23 Feature_cumulative_evolution
 
+def Trunk_array_at_nan(array):
+    new_array=[] #np.zeros([len(array),])
+    for i in range(len(array)):
+        cutter=len(array[i])
+        j=0
+        while j <len(array[i])-1 and cutter==len(array[i]):
+            if math.isnan(array[i,j])==True:
+                cutter=j
+            j+=1
+        new_array.append(list(array[i,:cutter]))
+        #print(new_array[i])
+    return new_array
 
 def Feature_cumulative_evolution(feature, feature_name, save_fig=False, extention='pdf'):
     '''
@@ -1099,7 +1112,12 @@ def Feature_cumulative_evolution(feature, feature_name, save_fig=False, extentio
     None.
 
     '''
-    x=feature
+
+                    
+        
+    
+    x=Trunk_array_at_nan(feature)
+    
     fig, ax = plt.subplots()
     colors = (cm.magma(np.linspace(0, 1, len(x))))
     for i in range(len(x)):
