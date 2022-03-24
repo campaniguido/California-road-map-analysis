@@ -55,11 +55,11 @@ data.to_csv(r''+params.path_to_save_data + '\data_road.csv')
 step=int(len(G.edges)/params.n_step_degree)
 degree_size, degree_ratio_size_evolution,degree_mean=fn.Size_evolution(G,step,'degree')
 
-degree_evolution=pd.DataFrame(degree_ratio_size_evolution,columns=list(range(len(G.Degree_ratio()))))
-degree_mean=pd.DataFrame(degree_mean,columns=['mean','std'])
-degree_size=pd.DataFrame(degree_size,columns=['size'])
+evolution=pd.DataFrame(degree_ratio_size_evolution,columns=list(range(len(G.Degree_ratio()))))
+mean=pd.DataFrame(degree_mean,columns=['mean','std'])
+size=pd.DataFrame(degree_size,columns=['size'])
 
-degree_evolution=pd.concat((degree_mean,degree_size,degree_evolution), axis=1)
+degree_evolution=pd.concat((size,mean,evolution), axis=1)
 degree_evolution.to_csv(r''+params.path_to_save_data + '\degree_evolution.csv')
 
 
@@ -130,35 +130,3 @@ fn.Scatter_plot(list(community_color.values()), 'Community' , Betweeness_Central
 fn.Scatter_plot(Betweeness_Centrality[:,1], 'Betweeness_Centrality' , Degree[:,1], 'Degree', list(community_color.values()),params.save_fig, params.extention)
 fn.Scatter_plot(Closeness_Centrality[:,1], 'Closeness_Centrality' , Degree[:,1], 'Degree', list(community_color.values()),params.save_fig, params.extention)
 fn.Scatter_plot(Betweeness_Centrality[:,1], 'Betweeness_Centrality' , Degree[:,1], 'Degree', list(community_color.values()),params.save_fig, params.extention)
-
-
-
-   
-
-    
-
-        
-#%% Main features size-evolution 
-
-
-step=int(len(G.edges)/params.n_step_degree)
-
-degree_size, degree_ratio_size_evolution,degree_mean=fn.Size_evolution(G,step,'degree')
-fn.Feature_ratio_evolution(degree_size,degree_ratio_size_evolution, 'degree',params.save_fig, params.extention)
-
-
-step=int(len(G.edges)/params.n_step)   
- 
-BC_size, BC_time_evolution,BC_mean=fn.Size_evolution(G,step,'betweenness_centrality')
-fn.Feature_mean_evolution(BC_size,BC_mean, 'Betweenness',params.save_fig, params.extention)
-fn.Feature_cumulative_evolution(BC_time_evolution, 'Betweeness centrality',params.save_fig, params.extention)
-
-Clustering_size, Clustering_time_evolution,Clustering_mean=fn.Size_evolution(G,step,'clustering')  
-fn.Feature_mean_evolution(Clustering_size,Clustering_mean, 'Clustering',params.save_fig, params.extention)
-fn.Feature_cumulative_evolution(Clustering_time_evolution, 'Clustering',params.save_fig, params.extention)
-
-
-CC_size, CC_time_evolution,CC_mean=fn.Size_evolution(G,step,'closeness_centrality')   
-fn.Feature_mean_evolution(CC_size,CC_mean, 'Closeness',params.save_fig, params.extention)
-fn.Feature_cumulative_evolution(CC_time_evolution, 'Closeness centrality',params.save_fig, params.extention)
-
