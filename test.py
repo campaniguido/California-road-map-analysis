@@ -102,15 +102,6 @@ def test_Relable_nodes_no_hole():
     assert nodes[5]==5
     assert nodes[6]==6
 
-def test_Relable_nodes_no_hole_abstract():
-    '''It builds a graph in which the nodes are in a random order and
-       it tests there is no jump in the numbers  labels'''
-    G=fn.SuperGraph()
-    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
-    G.Relable_nodes()
-    nodes=list(G.nodes())
-    for i in range(len(G)):
-        assert nodes[i]==i
         
 def test_Relable_nodes_corrispondence():
     '''It builds a graph in which the nodes are in a random order and
