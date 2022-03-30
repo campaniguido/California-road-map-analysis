@@ -50,24 +50,61 @@ def test_sorted_graph_edges():
 
 
 def test_Relable_nodes_len():
-    '''It tests the len of the graph is conserved also after the application of the function'''
+    '''It builds a graph in which the nodes are in a random order and
+       it tests the len of the graph is conserved also after the application of the function'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     LEN=len(G)
     G.Relable_nodes()
     assert LEN==len(G)
     
+
 def test_Relable_nodes_sorted():
-    '''it tests the ascending order'''
+    '''It builds a graph in which the nodes are in a random order and
+       it tests if the function sorts the nodes in ascending way
+
+    '''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,8],[8,3],[5,4],[8,4],[5,6],[14,14]])
+    G.Relable_nodes()
+    assert list(G.nodes)[0]==0
+    assert list(G.nodes)[1]==1
+    assert list(G.nodes)[2]==2
+    assert list(G.nodes)[3]==3
+    assert list(G.nodes)[4]==4
+    assert list(G.nodes)[5]==5
+    assert list(G.nodes)[6]==6 
+    
+def test_Relable_nodes_sorted_abstract():
+    '''It builds a graph in which the nodes are in a random order and
+       it tests if the function sorts the nodes in ascending way
+
+    '''
     G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     G.Relable_nodes()
     nodes=list(G.nodes())
     for i in range(1,len(G)):
         assert nodes[i-1]<nodes[i]
-
+        
 def test_Relable_nodes_no_hole():
-    '''it tests there is no jump in the numbers labels'''
+    '''It builds a graph in which the nodes are in a random order and
+       it tests there is no jump in the numbers  labels'''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
+    G.Relable_nodes()
+    nodes=list(G.nodes())
+    assert nodes[0]==0
+    assert nodes[1]==1
+    assert nodes[2]==2
+    assert nodes[3]==3
+    assert nodes[4]==4
+    assert nodes[5]==5
+    assert nodes[6]==6
+
+def test_Relable_nodes_no_hole_abstract():
+    '''It builds a graph in which the nodes are in a random order and
+       it tests there is no jump in the numbers  labels'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     G.Relable_nodes()
@@ -76,7 +113,8 @@ def test_Relable_nodes_no_hole():
         assert nodes[i]==i
         
 def test_Relable_nodes_corrispondence():
-    '''it looks for neigbours corrispondence before and after the relable'''
+    '''It builds a graph in which the nodes are in a random order and
+        it looks if changing the name of the labels the neighbours node are still the same '''
     G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     G.Relable_nodes()
