@@ -10,40 +10,41 @@ import numpy as np
 import function as fn
 import networkx as nx
 import pytest
+rn.seed(3)
 
 #%%Ct  test sorted_graph (2)
 def test_sorted_graph_nodes():
-    rn.seed(3)
-    '''it tests the graph nodes are sorted after the application of the function'''
-    edges = []
-    i=0
-    while i<20:
-        a = rn.randint(0, 100)
-        b = rn.randint(0, 100)
-        edges.append([a, b])
-        i+=1
-    G =fn.SuperGraph()
-    G.add_edges_from(edges)
-    TESTER = G
+    '''It builds a graph in which the nodes are in a random order and
+       it tests if the function sorts the nodes in ascending way
+
+    '''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,8],[8,3],[5,4],[8,4],[5,6],[14,14]])
     G.Sorted_graph()
-    assert list(G.nodes()) == sorted(list(TESTER.nodes()))
-    
+    assert list(G.nodes)[0]==1
+    assert list(G.nodes)[1]==3
+    assert list(G.nodes)[2]==4
+    assert list(G.nodes)[3]==5
+    assert list(G.nodes)[4]==6
+    assert list(G.nodes)[5]==8
+    assert list(G.nodes)[6]==14   
+
 def test_sorted_graph_edges():
-    rn.seed(3)
-    '''it tests the graph edgess are sorted after the application of the function'''
-    edges = []
-    for i in range(0, 100):
-        a = rn.randint(0, 100)
-        b = rn.randint(0, 100)
-        edges.append((a, b))
-    G =fn.SuperGraph()
-    G.add_edges_from(edges)
+    
+    '''It builds a graph in which the nodes are in a random order and
+       it tests if the function sorts the edges in ascending way following the first element of the edege
+
+    '''
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,8],[8,3],[5,4],[8,4],[5,6],[14,14]])
     G.Sorted_graph()
-    vecchio = list(G.edges())[0][0]
-    for i in range(1, len(G)):
-        assert list(G.edges())[i][0] <= list(G.edges())[i][1]
-        assert vecchio <= list(G.edges())[i][0]
-        vecchio = list(G.edges())[i][0]
+    assert list(G.edges)[0]==(1,8)
+    assert list(G.edges)[1]==(3,8)
+    assert list(G.edges)[2]==(4,5)
+    assert list(G.edges)[3]==(4,8)
+    assert list(G.edges)[4]==(5,6)
+    assert list(G.edges)[5]==(14,14)
+     
 
 #%%Ct  test_Relable_nodes
 
