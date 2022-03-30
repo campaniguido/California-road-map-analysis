@@ -120,34 +120,59 @@ def test_Relable_nodes_corrispondence():
 #%%Ct  test_Degree_dct (5)
 
 def test_Degree_list_corrispondence():
-    '''It verifies each node has a degree equal to its key'''
+    '''It builds a graph in which the nodes are in a random order and
+       it verifies if  the function Degree_dct() builds a dictionary in which
+       at each degree values is associeted the nodes with that degree value.'''
+       
     G=fn.SuperGraph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
     strenght_dct=G.Degree_dct()
-    for key in strenght_dct:
-        for node in strenght_dct[key]:
-            assert G.degree(node)-2*list(G.neighbors(node)).count(node)==key
+    keys=list(strenght_dct.keys())
+    '''because node 2 it is also connected with its self
+    and the degree function count it as 2 links'''
+    assert G.degree(2)-2==keys[0]
+    assert G.degree(3)==keys[1]
+    assert G.degree(6)==keys[1]
+    assert G.degree(8)==keys[1]
+    assert G.degree(9)==keys[1]
+    assert G.degree(10)==keys[1]
+    assert G.degree(5)==keys[2]
+    assert G.degree(4)==keys[2]
+    assert G.degree(7)==keys[2]
+    assert G.degree(1)==keys[5]
+
 
 def test_Degree_list_elements():
-    '''It looks if the elements of the dictionary values are the same of the of the graph nodes'''
+    '''It builds a graph in which the nodes and links are in a random order
+       The Degree_dct function creates a dictionary and
+       it looks if the values of the dictionary are the same of the of the graph nodes'''
+       
     G=fn.SuperGraph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
     strenght_dct=G.Degree_dct()
     values=[]
     for i in strenght_dct:
-        values+=set(strenght_dct[i])
+        values+=list(strenght_dct[i])
     assert sorted(values)==list(range(1,11))
     
 def test_Degree_list_max_degree():
-    '''It verify the highest key value is equal to the maximum degree'''
+    '''It builds a graph in which the nodes and links are in a random order
+       The Degree_dct function creates a dictionary and 
+       it verify the highest key value is equal to the maximum degree of the graph'''
+       
     G=fn.SuperGraph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
     strenght_dct=G.Degree_dct()
-    assert len(list(strenght_dct.keys()))==max(np.array(list(G.degree))[:,1])+1
+    keys=list(strenght_dct.keys())
+    assert max(keys)==5
     
 def test_Degree_list_selfconnected_nodes():
-    '''It looks that the function does not count as a neighbour the node its self in the case
-    of an selfconnected node'''
+    
+    '''It builds a a graph in wich some of the node are connected
+       only to theirselves or to theriselves and to another node
+       Then it looks if the function Degree_dct does not count as a link
+       the node its self in the case of an selfconnected node'''
+       
     G=fn.SuperGraph()
     G.add_edges_from([[1,3],[2,2],[3,3]])
     strenght_dct=G.Degree_dct()
@@ -155,11 +180,14 @@ def test_Degree_list_selfconnected_nodes():
     assert strenght_dct[1]==[1,3]
     
 def test_empty_high_key():
-    '''it verify the last keys doesn't have 0 length'''
+    '''It builds a graph with at least two different nodes connected together and
+       Then the function Degree_dct generates a dictionary, 
+       it verifies that the len of last key values are grater than zero verify the last keys doesn't have 0 length'''
     G=fn.SuperGraph()
-    G.add_edges_from([[1,1],[2,2],[5,5],[8,8],[9,9],[10,10],[10,10],[7,7],[10,10],[0,1]])
+    G.add_edges_from([[1,1],[2,3],[3,4],[2,4]])
     strenght_dct=G.Degree_dct()
-    assert len(list(strenght_dct.keys()))==2
+    max_key=max(list(strenght_dct.keys()))
+    assert len(strenght_dct[max_key])!=0
     
 #%%Ct   test_Degree_ratio (4)
 def test_Degree_ratio_length():
