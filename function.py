@@ -83,6 +83,7 @@ class SuperGraph(nx.Graph):
 
      
 #%%1  Divide value
+
 def Divide_value(file):
     '''It takes an array (n,2) which represents the graph edges. It looks for any case in which
     two linked nodes are written in the same cell in a string variable and put the two variables
@@ -102,7 +103,7 @@ def Divide_value(file):
 
     Returns
     -------
-    file : np.array((n,2))
+    None.
 
     '''
     file=pd.DataFrame(file)
@@ -111,25 +112,56 @@ def Divide_value(file):
     if file.shape[1] != 2:
         raise Exception('file shape should be with axis=1 equal to 2')
         
-        
-    for k in range(2):
-        for i in range(len(file)):
-            if type(file[i,k])==str:            
-                j=0
-                while j <(len(file[i,k])):
-                    '''the second condition avoids problem in situation like: ['1 ', 3.0]'''
-                    if file[i,k][j]==' ' and j<len(file[i,k])-1:
-                        l=j
-                        'It could be more than one space'
-                        while l<len(file[i,k]) and file[i,k][l]==' ':
-                            l=l+1                            
-                        file[i]=[file[i,k][:j],file[i,k][l:len(file[i,k])]]
-                    j=j+1
-            elif math.isnan(file[i,k])==True and k==0:
-                if type(file[i,k+1])!=str and math.isnan(file[i,k+1]):
-                    file[i]=file[i-1]                       
-    return file
+    for i in range(len(file)):    
+        for k in range(2):
+            if type(file[i,k])==str: 
+                empty_space=[]
+                for char  in range(len(file[i,k])):                    
+                    if file[i,k][char].isdigit()==False:
+                        empty_space.append(char)
+                        if char+1<len(file[i,k]) and file[i,k][char+1]!=' ':
+                            file[i]=[(file[i,k][:empty_space[0]]),(file[i,k][char+1:len(file[i,k])])]
 
+                            break
+
+#%%2 Erase nan line
+def Erase_nan_row(file):
+    '''It takes an array (n,2) which represents the graph edges. It looks for any case in which
+    two linked nodes are written in the same cell in a string variable and put the two variables
+    in the two columns of the same row. It substitutes any full nan row with the previous row
+    
+    
+
+    Parameters
+    ----------
+    file : TYPE
+        DESCRIPTION.
+
+    Raises
+    ------
+    Exception
+        DESCRIPTION.
+
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
+    '''
+    if file.shape[1] != 2:
+        raise Exception('file shape should be with axis=1 equal to 2')
+    
+    corrected_file=[]
+    for i in range(len(file)):
+        if type(file[i,0])!=str:
+            if math.isnan(file[i,0])!=True and math.isnan(file[i,1])!=True:
+             corrected_file.append([int(file[i,0]),int(file[i,1])])  
+        else:
+            corrected_file.append([int(file[i,0]),int(file[i,1])]) 
+            
+    
+    return np.array(corrected_file)
+    
 #%%2  Edge_list
 def Edge_list(file, number_of_edges):
     '''
