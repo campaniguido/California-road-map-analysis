@@ -180,9 +180,9 @@ def test_Degree_list_selfconnected_nodes():
     assert strenght_dct[1]==[1,3]
     
 def test_empty_high_key():
-    '''It builds a graph with at least two different nodes connected together and
-       Then the function Degree_dct generates a dictionary, 
-       it verifies that the len of last key values are grater than zero verify the last keys doesn't have 0 length'''
+    '''It builds a graph with a node connected to its self and three nodes completed connected
+       Then the function Degree_dct generates a dictionary, it verifies that
+       the len of last key values are grater than zero '''
     G=fn.SuperGraph()
     G.add_edges_from([[1,1],[2,3],[3,4],[2,4]])
     strenght_dct=G.Degree_dct()
@@ -191,14 +191,19 @@ def test_empty_high_key():
     
 #%%Ct   test_Degree_ratio (4)
 def test_Degree_ratio_length():
-    '''It tests the length of the graph is conserved also after the application of the function'''
+    '''It builds a graph in which the nodes and links are in a random order
+       It tests the length of the graph is conserved also after the application 
+       of the function Degree_ratio()'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
     degree_ratio=G.Degree_ratio()
     assert len(degree_ratio)==6
     
 def test_Degree_ratio_I_axiom():
-    '''It verifies the probability I axiom'''
+    '''It builds a graph in which the nodes and links are in a random order
+      Then the Degree_ratio() provides a frequency discrete distribution.
+      This distribution must obbeys verifies the probability I° axiom:
+      all the frequency must be equal or grater than zero'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
     degree_ratio=G.Degree_ratio()
@@ -206,24 +211,30 @@ def test_Degree_ratio_I_axiom():
         assert i>=0
         
 def test_Degree_ratio_II_axiom():
-    '''It verifies the probability II axiom'''
+    '''It builds a graph in which the nodes and links are in a random order
+      Then the Degree_ratio() provides a frequency discrete distribution.
+      This distribution must obbeys verifies the probability II° axiom:
+       the sum of all the frequency must be equal to one'''
+       
     G=fn.SuperGraph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
     degree_ratio=G.Degree_ratio()
     assert 0.99999<sum(degree_ratio)<1
     
 def test_Degree_ratio_III_axiom():
-    '''It verifies the probability III axiom'''
-    G=fn.SuperGraph()
-    G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
-    degre_dct=G.Degree_dct()
-    degree_ratio=G.Degree_ratio()
+    '''It builds a graph in which the nodes and links are in a random order
+      Then the Degree_ratio() provides a frequency discrete distribution.
+      This distribution must obbeys verifies the probability III° axiom:
+      The frequency of the union of more indipendent events is equal to the sum
+      the frequency of the events '''
     
-    for i in range(len(G)):
-        j=i+1
-        while j<len(degree_ratio):
-            assert(degree_ratio[i]+degree_ratio[j]==np.array(len(degre_dct[i])+len(degre_dct[j]))/10)
-            j=j+1
+    G=fn.SuperGraph()
+    G.add_edges_from([[0,0],[1,2],[2,3]])
+    degree_ratio=G.Degree_ratio()
+    assert degree_ratio[0]+degree_ratio[1]==3/4
+    assert degree_ratio[0]+degree_ratio[2]==1/2
+    assert degree_ratio[1]+degree_ratio[2]==3/4
+
             
 
 
