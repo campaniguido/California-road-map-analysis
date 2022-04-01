@@ -79,28 +79,6 @@ class SuperGraph(nx.Graph):
         degree_ratio=np.array(degree_ratio)/sum(degree_ratio) 
         return degree_ratio
 
-
-def test_Relable_nodes_no_hole():
-    '''it tests there is no jump in the numbers labels'''
-    G=fn.SuperGraph()
-    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
-    G.Relable_nodes()
-    nodes=list(G.nodes())
-    for i in range(len(G)):
-        assert nodes[i]==i
-        
-def test_Relable_nodes_corrispondence():
-    '''it looks for neigbours corrispondence before and after the relable'''
-    G=fn.SuperGraph()
-    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
-    G.Relable_nodes()
-    assert list(G.neighbors(0))==[5]
-    assert list(G.neighbors(1))==[5]
-    assert list(G.neighbors(2))==[5, 3]
-    assert list(G.neighbors(3))==[2, 4]
-    assert list(G.neighbors(4))==[3]
-    assert list(G.neighbors(5))==[0, 1, 2]
-    assert list(G.neighbors(6))==[6]
  
 
      
@@ -345,12 +323,12 @@ def Dct_dist_link(edges,map_dct):
     for i in edges:
         if edges.count((i[1],i[0])):
             edges.remove(i)
-        dct_dist_link={}
+    dct_dist_link={}
     for i in edges:
         x0=map_dct[i[0]]
         x1=map_dct[i[1]]
         dist=np.linalg.norm(x0-x1)
-        dct_dist_link[i]=dist
+        dct_dist_link[(i)]=dist
     return dct_dist_link
 
 
@@ -938,7 +916,19 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
     Copycat.Relable_nodes()
     
     return Copycat
-
+#%% Trunk_array
+def Trunk_array_at_nan(array):
+    new_array=[] #np.zeros([len(array),])
+    for i in range(len(array)):
+        cutter=len(array[i])
+        j=0
+        while j <len(array[i])-1 and cutter==len(array[i]):
+            if math.isnan(array[i,j])==True:
+                cutter=j
+            j+=1
+        new_array.append(list(array[i,:cutter]))
+        #print(new_array[i])
+    return new_array
 
 
 #%%                         PLOT FUNCTION
@@ -1073,18 +1063,7 @@ def Feature_mean_evolution(feature_size,feature_mean, feature_name, save_fig=Fal
     plt.show()
 #%%23 Feature_cumulative_evolution
 
-def Trunk_array_at_nan(array):
-    new_array=[] #np.zeros([len(array),])
-    for i in range(len(array)):
-        cutter=len(array[i])
-        j=0
-        while j <len(array[i])-1 and cutter==len(array[i]):
-            if math.isnan(array[i,j])==True:
-                cutter=j
-            j+=1
-        new_array.append(list(array[i,:cutter]))
-        #print(new_array[i])
-    return new_array
+
 
 def Feature_cumulative_evolution(feature, feature_name, save_fig=False, extention='pdf'):
     '''
