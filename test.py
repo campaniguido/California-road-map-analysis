@@ -322,22 +322,28 @@ def test_erase_nan_row_no_nan():
 
 
 def test_edge_list_int():
-    '''it tests if all the elements are integers'''
+    '''Given a file of couples of numbers expressed in different ways, 
+       it tests if all the elements composing the Edge_list output are integers'''
+       
     file=[[0,134.0],['45643',' 3456'],[3,4.0]]
-    edges=fn.Edge_list(file,2)
+    edges=fn.Edge_list(file,3)
     for j in range(len(edges)):
         for k in range(2):
             assert type(edges[j][k])==int
                     
 def test_edge_list_length():
-    ''' it looks if the output length is equal of number of edges'''
+    '''Given a file of couples of numbers expressed in different ways, 
+       it looks if the output length of the the function is the one expressed
+       by the variable number of edges'''
+       
     file=[[0,134.0],['45643',' 3456'],[3,4.0]]
-    number_of_edges=2
+    number_of_edges=3
     edges=fn.Edge_list(file,number_of_edges)
     assert len(edges)==number_of_edges
     
 def test_edge_list_shape():
-    '''it tests if the edges shape is n*2'''
+    '''Given a file of couples of numbers expressed in different ways, 
+       it looks if the output of the function has a shape equal to n*2'''
     file=[[0,134.0],['45643',' 3456'],[3,4.0]]
     number_of_edges=2
     edges=fn.Edge_list(file,number_of_edges)
@@ -345,20 +351,33 @@ def test_edge_list_shape():
         assert len(edges[j])==2
 #Negative test
 def test_edge_list_too_long():
-    ''' If the number of edges is> of the length of the file it will raise an exception'''    
+    '''Given a file of couples of numbers expressed in different ways,
+    it tests that the function raise an Exception when the number_of_edges is
+    major than the length of the file'''
     file=[[0,134.0],['45643',' 3456'],[3,4.0]]
     number_of_edges=5
     with pytest.raises(Exception):
         fn.Edge_list(file,number_of_edges)
         
 def test_edge_list_input_shape():
-    ''' If the shape of the file is not n*2 it will raise an exception'''    
+    '''Given a file of couples of numbers expressed in different ways,
+    it tests that the function raise an Exception when the shape of the input
+    is not n*2 '''    
     file=[[0,134.0,88],['45643',' 3456',7],[3,4.0,'33']]
     number_of_edges=5
     with pytest.raises(Exception):
         fn.Edge_list(file,number_of_edges)
 
-
+def test_edge_list_order():
+    '''Given a file of couples of numbers expressed in different ways and in random order,
+    it tests the output has an aschending order in the first element of the couple'''
+    file=[[0,134.0],['45643',' 3456'],[3,4.0],[1,2]]
+    number_of_edges=4
+    edges=fn.Edge_list(file,number_of_edges)
+    assert edges[0]==[0, 134]
+    assert edges[1]==[1, 2]
+    assert edges[2]==[3, 4]
+    assert edges[3]==[45643, 3456]
     
 
 
