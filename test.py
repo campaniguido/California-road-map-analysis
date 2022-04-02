@@ -239,11 +239,21 @@ def test_Degree_ratio_III_axiom():
 
 
 #%%  tests Divide value (5)
-    
-
+  
 def test_divide_value():
-    '''it tests if there is any string variable with a space inside'''
-    file=[['0','134.0'],['45643 3456',np.nan],[np.nan,'34 5'],[np.nan,np.nan],[3,4.0]]
+    '''The dataset file represents couples of numbers, but in the row 1 and 2 
+       the couples of number are not in two different columns. The tests verify that
+       Divide_value puts the two numbers in the proper way, so one number per cel'''
+    file=[['0 ','134.0'],['45643 3456',np.nan],[np.nan,'34 5']]
+    file=fn.Divide_value(file)
+    assert list(file[1])==['45643', '3456']
+    assert list(file[2])==['34', '5']
+
+def test_divide_value_one_space():
+    '''Giving a data set, with dimension (5,2) and with some of the data written as str
+       variable with space (" ") in, it tests if after the application of the function
+        Divide_value no spaces are left.'''
+    file=[['0 ','134.0'],['45643 3456',np.nan],[np.nan,'34 5'],[np.nan,np.nan],[3,4.0]]
     file=fn.Divide_value(file)
     for i in range(2):
         for j in range(len(file)):
@@ -253,8 +263,11 @@ def test_divide_value():
 
                     
 def test_divide_value_more_space():
-    '''it tests if there is any string variable with one or more spaces inside'''
-    file=[[0,134.0],['45643            3456',np.nan],[np.nan,'34 5'],[3,4.0]]
+    '''Giving a data set, with dimension (5,2) and with some of the data written as str
+       variable with more than one space (" ") in, it tests if after the application of the function
+        Divide_value no spaces are left.'''
+    
+    file=[[0,134.0],['45643            3456',np.nan],[np.nan,'34     5'],[3,4.0]]
     file=fn.Divide_value(file)
     for i in range(2):
         for j in range(len(file)):
@@ -264,41 +277,45 @@ def test_divide_value_more_space():
                     assert file[j,i][k]!=' '
                     
 def test_divide_value_nothing_to_divide():
-    '''In this case the space after one should not be considered'''
+    '''In the datasete file the first element file[0,0] ends with a space but there
+    is not other number after the space to put in the next column (file[0,1]), indeed,
+    the next column it is occupied by a number. It is expected that
+    the function Divide_value will conserve the 2.0 value'''
     file=[['1 ', 2.0],['3', '4'],['5', '6']]
     file=fn.Divide_value(file)
     assert file[0,1]==2.0                   
                     
 
 def test_divide_value_shape():
-    '''it tests if the data are in the shape n*2'''
+    '''The dimension of variable file given to the function Divide_value is
+    of the type (n,3) and not (n,2) an Exceotion is eexpected to raise'''
     file=[[0,134.0,4],['45643 3456',np.nan,5],[np.nan,'34 5',7],[3,4.0,8]]
     with pytest.raises(Exception):
         fn.Divide_value(file)
 
 #%%  test Erase_nan_row
 
-def test_erase_nan_row_np_float64():
-    
-    file=[['0','134.0'],['45643',56.7],[np.nan,np.nan],[3,4.0]]
-    file_corrected=fn.Erase_nan_row(file)
-    for i in range(2):
-        for j in range(len(file_corrected)):
-            assert isinstance(file_corrected[j,i], np.float64)
-
                     
-def test_erase_nan_row_no_nan():    
-    file=[['0','134.0'],['45643',56.7],[np.nan,np.nan],[3,4.0]]
-    file_corrected=fn.Erase_nan_row(file)
-    for i in range(2):
-        for j in range(len(file_corrected)):
-            assert math.isnan(file_corrected[j,i])!=True
-
-                    
-def test_erase_nan_row_leght():    
+def test_erase_nan_row_leght():
+    ''' It test if the file len after the application of  Erase_nan_row is corrected"
+    '''
     file=[['0','134.0'],['45643',56.7],[np.nan,np.nan],[3,4.0]]
     file_corrected=fn.Erase_nan_row(file)
     assert len(file_corrected)==3
+    
+    
+def test_erase_nan_row_no_nan(): 
+    '''Given a data set file with multiple rows full filled with nan it verifies the
+    Erase_nan_row gives back the same file but with no nan row '''
+    file=[['0','134.0'],[np.nan,np.nan],['45643',56.7],[np.nan,np.nan],[3,4.0],[np.nan,np.nan]]
+    file_corrected=fn.Erase_nan_row(file)
+    assert list(file_corrected[0])==['0','134.0']
+    assert list(file_corrected[1])==['45643',56.7]
+    assert list(file_corrected[2])==[3,4.0]
+    assert len(file_corrected)==3
+
+                    
+
             
 
 #%%  tests Edge_list (5)

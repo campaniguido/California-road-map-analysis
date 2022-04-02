@@ -94,7 +94,7 @@ def Divide_value(file):
     file : Dict can contain Series, arrays, constants, dataclass or list-like objects.
            If data is a dict, column order follows insertion-order. 
            If a dict contains Series which have an index defined, it is aligned by its index.
-           Its shape mut be (n,2)
+           Its shape must be (n,2)
 
     Raises
     ------
@@ -103,7 +103,9 @@ def Divide_value(file):
 
     Returns
     -------
-    None.
+    TYPE
+        
+        numpy.ndarray ((n,2))
 
     '''
     file=pd.DataFrame(file)
@@ -123,44 +125,50 @@ def Divide_value(file):
                             file[i]=[(file[i,k][:empty_space[0]]),(file[i,k][char+1:len(file[i,k])])]
 
                             break
-
-#%%2 Erase nan line
+    return file
+#%%2 Erase nan row
 def Erase_nan_row(file):
-    '''It takes an array (n,2) which represents the graph edges. It looks for any case in which
-    two linked nodes are written in the same cell in a string variable and put the two variables
-    in the two columns of the same row. It substitutes any full nan row with the previous row
+    '''It takes an array (n,2) which represents the graph edges. It returns a list of list of shape ((n-k,2))
+       erasing all the k full nan row.
     
     
 
     Parameters
     ----------
-    file : TYPE
-        DESCRIPTION.
+    file : Dict can contain Series, arrays, constants, dataclass or list-like objects.
+           If data is a dict, column order follows insertion-order. 
+           If a dict contains Series which have an index defined, it is aligned by its index.
+           Its shape mut be (n,2)
 
     Raises
     ------
     Exception
-        DESCRIPTION.
+        Exception raises if the file shape is not (n,2)
 
     Returns
     -------
     TYPE
-        DESCRIPTION.
+        list ((n-k,2)) with  0<=k<=n
 
     '''
+    file=pd.DataFrame(file)
+    file=np.array(file)
+    
     if file.shape[1] != 2:
         raise Exception('file shape should be with axis=1 equal to 2')
     
     corrected_file=[]
     for i in range(len(file)):
+        
         if type(file[i,0])!=str:
             if math.isnan(file[i,0])!=True and math.isnan(file[i,1])!=True:
-             corrected_file.append([int(file[i,0]),int(file[i,1])])  
+             corrected_file.append([(file[i,0]),(file[i,1])])
+             
         else:
-            corrected_file.append([int(file[i,0]),int(file[i,1])]) 
+            corrected_file.append([(file[i,0]),(file[i,1])]) 
             
     
-    return np.array(corrected_file)
+    return corrected_file
     
 #%%2  Edge_list
 def Edge_list(file, number_of_edges):
