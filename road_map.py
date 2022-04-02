@@ -22,15 +22,15 @@ import parameters as params
 
 file_position=params.file_position
 file=pd.read_table(file_position)
-file=np.array(file)
-file=fn.Divide_value(file)
-edges_info=fn.Erase_nan_row(file)
+file_no_nan_raw=fn.Erase_nan_row(file)
+edges_info=fn.Divide_value(file_no_nan_raw)
+
 
 #%% Graph initialization
 
 
 number_of_edge=params.number_of_edge
-edges=fn.Edge_list(file, number_of_edge)
+edges=fn.Edge_list(edges_info, number_of_edge)
 G=fn.SuperGraph(edges)
 G.Sorted_graph()
 G.Relable_nodes()
