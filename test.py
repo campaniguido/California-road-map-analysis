@@ -386,46 +386,59 @@ def test_edge_list_order():
 #%%  tests Unfreeze_into_list(2)
 
 def test_Unfreeze_into_list_is_a_list_1():
-    '''It verifies the output items are lists'''
+    '''It builds a list of frozenset and tuple as an input for the function,
+     it verifies the output items are all lists'''
     A = frozenset([1, 2, 3, 4])
     B = frozenset([3, 4, 5, 6])
     C = frozenset([5, 6])
     D= (1,2)
     list_=[A,B,C,D]
-    list_=fn.Unfreeze_into_list(list_)
-    for i in range(len(list_)):
-        assert(type(list_[i])==list)
+    list_unfrozen=fn.Unfreeze_into_list(list_)
+    for i in range(len(list_unfrozen)):
+        assert(type(list_unfrozen[i])==list)
 
 def test_Unfreeze_into_list_is_a_list_2():
-    '''it verifies the output items are lists'''
+    '''It builds a dictionary of frozenset and tuple as an input for the function,
+     it verifies the output items are all lists'''
     A = frozenset([1, 2, 3, 4])
     B = frozenset([3, 4, 5, 6])
     C = frozenset([5, 6])
     D= (1,2)
     dct_={0:A,1:B,2:C,3:D}
-    dct_=fn.Unfreeze_into_list(dct_)
-    for i in range(len(dct_)):
-        assert(type(dct_[i])==list)
+    dct_unfrozen=fn.Unfreeze_into_list(dct_)
+    for i in range(len(dct_unfrozen)):
+        assert(type(dct_unfrozen[i])==list)
 
 
 #%%   test_Set_community_number (6)
 
-'''voglio testare che:
-    tutti i nodi abbiano la loro corrispettiva comunità
-    che gli elementi diversi della comunità sono lo stesso numero dei nodi (ha senso sia fare un raise nella funzione sia testarlo in maniera positiva che negativa)
-    il numero di elementi unici dei valori del dizionario sia uguale alla grandezza della community'''
-
-def test_Set_community_number_corrispondence():   
-    '''It verifies the community corrispondence is right'''
-    community=[[1,3,6,9],[5,10],[7],[2,4,8]]
+def test_Set_community_number_corrispondence(): 
+    '''It builds a list of list of elements belonging to the same community,
+    then it builds a graph  using all the elements of the list with random links.
+    It apllies the Set_community_number and verifies the output dictionary of the function
+    match correctly all the nodes of the graph with the community they belong to'''
+    
+    community=[[1,25,6,9],[5,14],[7],[2,4,8]]
     G=nx.Graph()
-    G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
+    G.add_edges_from([[1,25],[2,2],[5,6],[4,8],[9,1],[14,1],[1,5],[4,7],[1,7]])
     community_number=fn.Set_community_number(G, community)
-    for i in list(G.nodes()):
-        assert community[community_number[i]].count(i)==1
+    assert community_number[1]==0
+    assert community_number[25]==0
+    assert community_number[6]==0
+    assert community_number[9]==0
+    assert community_number[5]==1
+    assert community_number[14]==1
+    assert community_number[7]==2
+    assert community_number[2]==3
+    assert community_number[4]==3
+    assert community_number[8]==3
+    
         
 def test_Set_community_number_length():
-    '''It tests the length of the output is the same of the one of the Graph'''
+    '''It builds a list of list of elements belonging to the same community,
+    then it builds a graph  using all the elements of the list with random links.
+    It apllies the Set_community_number and it tests the length of the output is
+    the same of the one of the Graph'''
     community=[[1,3,6,9],[5,10],[7],[2,4,8]]
     G=nx.Graph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -435,15 +448,21 @@ def test_Set_community_number_length():
 
         
 def test_Set_community_number_doubble():
-    '''It tests if the node are in just one community. e.g.:the four is in two different communities'''
+    '''It builds a list of list of elements belonging to the same community,
+    then it builds a graph  using all the elements of the list with random links.
+    It apllies the Set_community_number and it tests if the node are
+    in just one community. e.g.:the four is in two different communities'''
+    
     community=[[1,3,6,9],[5,10],[7,4],[2,4,8]]
     G=nx.Graph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         fn.Set_community_number(G, community)
 
 def test_Set_community_number_missing_number():
-    '''It tests if all the node are in the community variable. e.g.:the eight is missing'''
+    '''It builds a list of list of elements belonging to the same community,
+    then it builds a graph  using all the elements of the list with random links.
+    It apllies the Set_community_number and it tests if all the node are in the community variable. e.g.:the eight is missing'''
     community=[[1,3,6,9],[5,10],[7],[2,4]]
     G=nx.Graph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -451,7 +470,9 @@ def test_Set_community_number_missing_number():
         fn.Set_community_number(G, community)
 
 def test_Set_community_number_extra_number():
-    '''It tests if the community has only the nodes labels of the graph. e.g.:the 999 is not a node number'''
+    '''It builds a list of list of elements belonging to the same community,
+    then it builds a graph  using all the elements of the list with random links.
+    It apllies the Set_community_number and it tests if the community has only the nodes labels of the graph. e.g.:the 999 is not a node number'''
     community=[[1,3,6,9],[5,10],[7],[2,4,8,999]]
     G=nx.Graph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -459,11 +480,13 @@ def test_Set_community_number_extra_number():
         fn.Set_community_number(G, community)
 
 def test_Set_community_number_all_wrong():
-    '''It tests the behaviours for the three previous mistakes'''
+    '''It builds a list of list of elements belonging to the same community,
+    then it builds a graph  using all the elements of the list with random links.
+    It apllies the Set_community_number and it tests tests the behaviours for the three previous mistakes'''
     community=[[1,3,6,4],[5,10],[7],[2,4,999]]
     G=nx.Graph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
-    with pytest.raises(Exception):
+    with pytest.raises(ValueError):
         fn.Set_community_number(G, community)
             
     
