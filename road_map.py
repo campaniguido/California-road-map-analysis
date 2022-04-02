@@ -10,7 +10,6 @@ import networkx as nx
 import pandas as pd
 import numpy as np
 import function as fn
-import matplotlib.cm as cm
 import parameters as params
 
 
@@ -25,6 +24,7 @@ file_position=params.file_position
 file=pd.read_table(file_position)
 file=np.array(file)
 file=fn.Divide_value(file)
+edges_info=fn.Erase_nan_row(file)
 
 #%% Graph initialization
 
