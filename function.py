@@ -468,23 +468,20 @@ def Node_distance_frequency(dct_dist,nstep,step):
 
 #%%9 Link_distance_conditional_probability 
 
-def Link_distance_conditional_probability(distance_link_frequency,step,distance_frequency):
-    '''Given N elements diveded in n bins, the distance_frequency represents the freqeancy of elements in 
-    each n bins while the distance_link_frequency contains the number of elements for each bins with
-    a peculiar characteristic (e.g.:it has a link). The function returns the probability binned distribution 
-    to have the peculiar characteristic in function of the distance_frequency bin.
+def Conditional_probability(important_events_frequency,step, events_frequency):
+    '''Given the binned frequency of an events and the frequency of them which are 'important', it calculates
+    the probability to have an important event if an event is recorded. 
     
 
     Parameters
     ----------
-    dct_dist_link : Support item assignment variable
-        It describes all the distances among nodes linked together
+    distance_link_frequency : indexable
+        It describes the frequency of important events for each bin
         
-    nstep : integer
+    step : width of the bin
         
     distance_frequency : Support item assignment variable
-        It represents the frequency of nodes that are in a distance equal to n*step. Where 0<n<nstep and
-        step=max(dct_dist_link.values())/nstep
+        It represents the frequency of elements for each bins
 
     Raises
     ------
@@ -494,16 +491,16 @@ def Link_distance_conditional_probability(distance_link_frequency,step,distance_
 
     Returns
     -------
-    link_distance_probability : TYPE
-        DESCRIPTION.
+    link_distance_probability : dct
+        the keys are the the bin positions the values are the probabilities
 
     '''     
     link_distance_probability={}
-    for i in range(len(distance_link_frequency)):
-        if distance_frequency[i]!=0:
-            link_distance_probability[(i+1)*step]=(distance_link_frequency[i]/(distance_frequency[i]))
-        elif distance_frequency[i]==0 and distance_link_frequency[i]==0:
-            link_distance_probability[(i+1)*step]=(0)
+    for i in range(len(important_events_frequency)):
+        if events_frequency[i]!=0:
+            link_distance_probability[(i+1)*step]=(important_events_frequency[i]/(events_frequency[i]))
+        elif events_frequency[i]==0 and important_events_frequency[i]==0:
+            link_distance_probability[(i+1)*step]=0
         else:
             print(i)
             raise ZeroDivisionError('There is no couple of nodes with this distance')

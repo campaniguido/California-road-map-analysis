@@ -711,18 +711,27 @@ def test_List_dist_simmetry():
     Then it builds two list of edges of the graph in which the order of the couple of linked nodes
     is switched.
     Finally it applies the function Dct_dist_link to calculate the euclidean distance
-    among nodes for the two symmetric set and it tests the outpu values are the same'''
+    among nodes for the two symmetric set and it tests the output values are the same'''
     G=nx.Graph()
-    G.add_edges_from([[1,2],[1,3],[2,3],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
+    G.add_edges_from([[1,2],[3,4],[1,3],[2,3],[2,4]])
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    edges=list(G.edges())
+    edges=[[1,2],[3,4],[1,3],[2,3],[2,4]]
     segde=[]
     for i in range(len(edges)):
         segde.append((edges[i][1],edges[i][0]))                     
-    G_reverse=nx.Graph(segde)
-    dct_dist_link1=fn.Dct_dist_link(G, map_dct)
-    dct_dist_link2=fn.Dct_dist_link(G_reverse, map_dct)
-    assert list(dct_dist_link2.values())==list(dct_dist_link1.values())
+    G_reverse=nx.Graph()
+    G_reverse.add_nodes_from([4,3,2,1])
+    G_reverse.add_edges_from(segde)
+    dct_dist_link1=fn.Dct_dist(G, map_dct)
+    dct_dist_link2=fn.Dct_dist(G_reverse, map_dct)
+    assert dct_dist_link1[(1,2)]==dct_dist_link2[(2,1)]
+    assert dct_dist_link1[(1,3)]==dct_dist_link2[(3,1)]
+    assert dct_dist_link1[(1,4)]==dct_dist_link2[(4,1)]
+    assert dct_dist_link1[(2,3)]==dct_dist_link2[(3,2)]
+    assert dct_dist_link1[(2,4)]==dct_dist_link2[(4,2)]
+    assert dct_dist_link1[(3,4)]==dct_dist_link2[(4,3)]
+    
+    
     
     
 def test_List_dist_triangular_inequality_unit_test():
@@ -732,9 +741,8 @@ def test_List_dist_triangular_inequality_unit_test():
     inequality for all the possible distances'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[2,3]])
-    edges=list(G.edges())
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    dct_dist=fn.Dct_dist(edges, map_dct)
+    dct_dist=fn.Dct_dist(G, map_dct)
     assert dct_dist[(1,2)]<=dct_dist[(2,3)]+dct_dist[(1,3)]
     assert dct_dist[(1,3)]<=dct_dist[(2,3)]+dct_dist[(1,2)]
     assert dct_dist[(2,3)]<=dct_dist[(1,2)]+dct_dist[(1,3)]
@@ -772,7 +780,8 @@ def test_List_dist_triangular_inequality_abstract():
 
    
 def test_Node_distance_frequency_I_axiom():
-    '''It verifies the probability I axiom'''
+    '''Given a set of distances it builds a discrete distribution of frequency for the distances,
+    exploting the Node_distance_frequency and it verifies each frequency is positive'''
     dct_dist={(1, 2): 0.17826839815610848,
               (1, 3): 0.1621369469779289,
               (1, 4): 0.15016564862477497,
@@ -790,12 +799,14 @@ def test_Node_distance_frequency_I_axiom():
               (5, 6): 1.2459654725200846}
     step=0.026346986731500856
     nstep=50
-    node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)/len(dct_dist)
+    node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
     for i in node_distance_frequency:
         assert i>=0
         
 def test_Node_distance_frequency_II_axiom():
-    '''It verifies the probability II axiom'''
+    '''Given a set of distances it builds a discrete distribution of frequency for the distances,
+        exploting the Node_distance_frequency and it verifies that the normalized sum of each
+        frequency is equal to one'''
     dct_dist={(1, 2): 0.17826839815610848,
               (1, 3): 0.1621369469779289,
               (1, 4): 0.15016564862477497,
@@ -817,7 +828,11 @@ def test_Node_distance_frequency_II_axiom():
     assert 0.99999<sum(node_distance_frequency)<1
     
 def test_Node_distance_frequency_III_axiom():
-    '''It verifies the probability III axiom'''
+    '''Given a set of distances it builds 2 discrete distributions of frequency for the distances,
+        exploting the Node_distance_frequenc. The second distribution has bins two times largerr than the first,
+        so it represents the sum of two group of distances.
+        It verifies that the frequency of couples of distances of the first distribuition 
+        is equal to the frequancy of one event of second.'''
     dct_dist={(1, 2): 0.17826839815610848,
               (1, 3): 0.1621369469779289,
               (1, 4): 0.15016564862477497,
@@ -834,100 +849,42 @@ def test_Node_distance_frequency_III_axiom():
               (4, 6): 1.2582690118458433,
               (5, 6): 1.2459654725200846}
     step=0.026346986731500856
-    nstep=50
+    nstep=14
     node_distance_frequency_1=fn.Node_distance_frequency(dct_dist,nstep,step)/len(dct_dist)
     
-    dct_dist={(1, 2): 0.17826839815610848,
-              (1, 3): 0.1621369469779289,
-              (1, 4): 0.15016564862477497,
-              (1, 5): 0.30311264216355577,
-              (1, 6): 1.1628898382687927,
-              (2, 3): 0.3027628033303571,
-              (2, 4): 0.14940329750489897,
-              (2, 5): 0.1615649741071594,
-              (2, 6): 1.1248380701452185,
-              (3, 4): 0.18437027351662638,
-              (3, 5): 0.367850010102952,
-              (3, 6): 1.3173493365750428,
-              (4, 5): 0.18411463816128404,
-              (4, 6): 1.2582690118458433,
-              (5, 6): 1.2459654725200846}
     step=2*0.026346986731500856
-    nstep=25
+    nstep=7
     node_distance_frequency_2=fn.Node_distance_frequency(dct_dist,nstep,step)/len(dct_dist)
-    for i in range(0,50,2):
+    for i in range(0,14,2):
         assert node_distance_frequency_1[i]+node_distance_frequency_1[i+1]==node_distance_frequency_2[int(i/2)]
 
 
-#%%   test_Link_distance_probability (4)
+#%%   test_Conditional_probability (4)
 
    
-def test_Link_distance_probability_I_axiom():
-    '''It verifies the probability I axiom'''
-    G=fn.SuperGraph()
-    G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
-    edges=list(G.edges())
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    dct_dist=fn.Dct_dist(G,map_dct)
-    dct_dist_link=fn.Dct_dist_link(edges, map_dct)
-    nstep=10
-    step=max(list(dct_dist_link.values()))/nstep
-    node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
-    link_distance_conditional_probability=fn.Link_distance_conditional_probability(dct_dist_link,nstep,node_distance_frequency)
-    link_distance_probability=list(link_distance_conditional_probability.values())*node_distance_frequency
-    for i in link_distance_probability:
-        assert i>=0
+def test_conditional_probability_I_axiom():
+    '''Given the binned frequency of an events and the frequency of them which are 'important', it calculates
+    the probability to have an important event if an event is recorded. Then it verifies that the each elements
+    of the ouput probability is grater or equal to 0 but minor than 1'''
+    events_frequency=[0,0,2,8,24,0,]
+    important_event_frequency=[0,0,1,2,3,0]
+    step=1
+    conditional_probability_dct=fn.Conditional_probability(important_event_frequency,step,events_frequency)
+    conditional_probability=list(conditional_probability_dct.values())
+    for i in conditional_probability:
+        assert 0<=i<=1
         
-def test_Link_distance_probability_II_axiom():
-    '''It verifies the probability II axiom'''
-    G=nx.Graph()
-    G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
-    edges=list(G.edges())
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    dct_dist=fn.Dct_dist(G,map_dct)
-    dct_dist_link=fn.Dct_dist_link(edges, map_dct)
-    nstep=10
-    step=max(list(dct_dist_link.values()))/nstep
-    node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
-    link_distance_conditional_probability=fn.Link_distance_conditional_probability(dct_dist_link,nstep,node_distance_frequency)
-    link_distance_probability=list(link_distance_conditional_probability.values())*node_distance_frequency/len(dct_dist_link)
-    assert 0.999<sum(link_distance_probability)<=1
-    
-def test_Link_distance_probability_III_axiom():
-    '''It verifies the probability III axiom'''
-    G=nx.Graph()
-    G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
-    edges=list(G.edges())
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    dct_dist=fn.Dct_dist(G,map_dct)
-    dct_dist_link=fn.Dct_dist_link(edges, map_dct)
-    nstep=10
-    step=max(list(dct_dist_link.values()))/nstep
-    node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
-    link_distance_conditional_probability=fn.Link_distance_conditional_probability(dct_dist_link,nstep,node_distance_frequency)
-    link_distance_probability=list(link_distance_conditional_probability.values())*node_distance_frequency/len(dct_dist_link)
-        
-    nstep2=5
-    step2=max(list(dct_dist_link.values()))/nstep
-    node_distance_frequency2=fn.Node_distance_frequency(dct_dist,nstep2,step2)
-    link_distance_conditional_probability2=fn.Link_distance_conditional_probability(dct_dist_link,nstep2,node_distance_frequency2)
-    link_distance_probability2=list(link_distance_conditional_probability2.values())*node_distance_frequency2/len(dct_dist_link)
-    assert link_distance_probability[-1]+link_distance_probability[-2]==link_distance_probability2[-1]
 
-def test_Link_distance_probability_maximum_value():
-    '''It verifies the last key of probability dictionary is the maximum link distance'''
-    G=nx.Graph()
-    G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
-    edges=list(G.edges())
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    dct_dist=fn.Dct_dist(G,map_dct)
-    dct_dist_link=fn.Dct_dist_link(edges, map_dct)
-    nstep=10
-    step=max(list(dct_dist_link.values()))/nstep
-    node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
-    link_distance_conditional_probability=fn.Link_distance_conditional_probability(dct_dist_link,nstep,node_distance_frequency)
-    assert list(link_distance_conditional_probability.keys())[-1]==max(list(dct_dist_link.values()))
-    
+def test_Conditional_probability_bin_value():
+    '''Given the binned frequency of an events and the frequency of them which are 'important', it calculates
+    the probability to have an important event if an event is recorded. Then it verifies that the value of each bin of the
+    probability dictionary is corrected.'''
+    events_frequency=[0,0,2,8,24,0,]
+    important_event_frequency=[0,0,1,2,3,0]
+    step=1
+    conditional_probability_dct=fn.Conditional_probability(important_event_frequency,step,events_frequency)
+    bins=list(conditional_probability_dct.keys())
+    assert  bins==[1, 2, 3, 4, 5, 6]
 
 #%%   test_Copymap_linking (2)
 
@@ -944,7 +901,8 @@ def test_Add_edges_from_map_nodes_number():
     nstep=10
     step=max(list(dct_dist_link.values()))/nstep
     node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
-    link_distance_conditional_probability=fn.Link_distance_conditional_probability(dct_dist_link,nstep,node_distance_frequency)
+    node_links_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)
+    link_distance_conditional_probability=fn.Conditional_probability(node_links_frequency,step,node_distance_frequency)
     Copy_map=nx.Graph()
     Copy_map.add_nodes_from(list(G.nodes))
     Copy_map=fn.Add_edges_from_map(Copy_map, map_dct, link_distance_conditional_probability)
@@ -962,7 +920,8 @@ def test_Add_edges_from_map_Bernoulli_trials():
     nstep=10
     step=max(list(dct_dist_link.values()))/nstep
     node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
-    link_distance_conditional_probability=fn.Link_distance_conditional_probability(dct_dist_link,nstep,node_distance_frequency)
+    node_links_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)
+    link_distance_conditional_probability=fn.Conditional_probability(node_links_frequency,step,node_distance_frequency)
     
     
     Copy_map=nx.Graph()
@@ -1251,7 +1210,9 @@ def test_Link_2_ZeroNode_reduction():
     step=max_dist_link/nstep
     dct_dist=fn.Dct_dist(G, map_dct)
     distance_frequency=fn.Node_distance_frequency(dct_dist, nstep, step)
-    prob_distribution=fn.Link_distance_conditional_probability(dct_dist_link, nstep, distance_frequency)
+    node_links_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)
+    prob_distribution=fn.Conditional_probability(node_links_frequency,step,distance_frequency)
+    
     
     max_dist_link=max(dct_dist_link.values())
     degree_dct=G.Degree_dct()
@@ -1279,7 +1240,8 @@ def test_Link_2_ZeroNode_increment():
     step=max_dist_link/nstep
     dct_dist=fn.Dct_dist(G, map_dct)
     distance_frequency=fn.Node_distance_frequency(dct_dist, nstep, step)
-    prob_distribution=fn.prob_distribution=fn.Link_distance_conditional_probability(dct_dist_link, nstep, distance_frequency)
+    node_links_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)
+    prob_distribution=fn.Conditional_probability(node_links_frequency,step,distance_frequency)
     
     
     degree_dct=G.Degree_dct()
@@ -1307,7 +1269,8 @@ def test_Link_2_ZeroNode_constant_degree_ratio():
     step=max_dist_link/nstep
     dct_dist=fn.Dct_dist(G, map_dct)
     distance_frequency=fn.Node_distance_frequency(dct_dist, nstep, step)
-    prob_distribution=fn.prob_distribution=fn.Link_distance_conditional_probability(dct_dist_link, nstep, distance_frequency)
+    node_links_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)
+    prob_distribution=fn.Conditional_probability(node_links_frequency,step,distance_frequency)
     
     
     degree_dct=G.Degree_dct()
@@ -1364,7 +1327,10 @@ def test_Copymap_degree_correction():
     step=max(dct_dist_link.values())/nstep
 
     distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
-    distance_linking_probability=fn.Link_distance_conditional_probability(dct_dist_link,nstep,distance_frequency)
+    node_links_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)
+    distance_linking_probability=fn.Conditional_probability(node_links_frequency,step,distance_frequency)
+    
+    
 
 
     ERG=nx.fast_gnp_random_graph(len(G),edge_probability, seed=None, directed=False)
