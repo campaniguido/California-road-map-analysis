@@ -581,7 +581,7 @@ def test_size_evolution_size_degree_constant_len():
 
     
 
-#%%   test_List_dist_link (4)
+#%%   test_List_dist_link (5)
 
     
 def test_List_dist_link_length():
@@ -633,7 +633,7 @@ def test_List_dist_link_simmetry():
 
 
 def test_List_dist_link_triangular_inequality_unit_test():
-    '''It builds an undirect nx.Graph object with 6 nodes linking them randomly.
+    '''It builds a nx.Graph object with 3 nodes completed connected.
     Then it build a topografical map of the nodes and applies the function Dct_dist_link
     to calculate the euclidean distance among linked nodes. Finally it test the triangular 
     inequality for all the possible path'''
@@ -647,7 +647,7 @@ def test_List_dist_link_triangular_inequality_unit_test():
     assert dct_dist_link[(2,3)]<=dct_dist_link[(1,2)]+dct_dist_link[(1,3)]
                 
 def test_List_dist_link_triangular_inequality_abstract_test():
-    '''It builds an undirect nx.Graph object with 6 nodes linking them randomly.
+    '''It builds a nx.Graph object with 6 nodes linking them randomly.
     Then it build a topografical map of the nodes and applies the function Dct_dist_link
     to calculate the euclidean distance among linked nodes. Finally it test the triangular 
     inequality for all the possible path'''
@@ -679,27 +679,72 @@ def test_List_dist_link_triangular_inequality_abstract_test():
   
 #%%   test_Dct_dist (3)
 def test_List_dist_length():
-    '''it verify in the dictionary are not present symmetric object (e.g.: (1,2), (2,1))
-    and it doesn't remove autoedges (e.g.: (1,1))
+    '''It builds an undirect nx.Graph object with 4 nodes linking them randomly and reapiting some
+        edges reversing the couple order of some of them (e.g.: (1,2), (2,1)) or creating some 
+        autolink edges (e.g.: (1,1)). Then it build a topografical map of the nodes
+        and applies the function Dct_dist to calculate the euclidean distance among nodes.
+        Finally it verifies in the keys of th ouput distance dictionary are not present symmetric object (e.g.: (1,2), (2,1))
+        nor autoedges (e.g.: (1,1), but only and all the distances among the nodes)
     '''
     edges=[(1,2),(3,1),(1,1),(1,2),(2,1), (1,4)]    
     G=nx.Graph()
     G.add_edges_from(edges)
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    list_dist=fn.Dct_dist(G, map_dct)
-    assert len(list_dist)==6
+    dct_dist=fn.Dct_dist(G, map_dct)
+    assert list(dct_dist.keys())==[(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)]
 
 def test_List_dist_non_negativity():
-    '''It tests distances are not negative'''
+    '''It builds an undirect nx.Graph object with 6 nodes linking them randomly.
+       Then it build a topografical map of the nodes and applies the function Dct_dist_link
+       to calculate the euclidean distance among nodes.
+       Finally it verifies if the values the ouput distance dictionary are posives'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     dct_dist_link=fn.Dct_dist(G, map_dct)
     for i in list(dct_dist_link.values()):
         assert i>=0
+        
+def test_List_dist_simmetry():
+    '''It builds an undirect nx.Graph object with 3 nodes completed connected.
+    Then it build a topografical map of the nodes.
+    Then it builds two list of edges of the graph in which the order of the couple of linked nodes
+    is switched.
+    Finally it applies the function Dct_dist_link to calculate the euclidean distance
+    among nodes for the two symmetric set and it tests the outpu values are the same'''
+    G=nx.Graph()
+    G.add_edges_from([[1,2],[1,3],[2,3],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
+    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    edges=list(G.edges())
+    segde=[]
+    for i in range(len(edges)):
+        segde.append((edges[i][1],edges[i][0]))                     
+    G_reverse=nx.Graph(segde)
+    dct_dist_link1=fn.Dct_dist_link(G, map_dct)
+    dct_dist_link2=fn.Dct_dist_link(G_reverse, map_dct)
+    assert list(dct_dist_link2.values())==list(dct_dist_link1.values())
     
-def test_List_dist_triangular_inequality():
-    '''It tests triangular inequality'''
+    
+def test_List_dist_triangular_inequality_unit_test():
+    '''It builds a nx.Graph object with 3 nodes linking them randomly.
+    Then it build a topografical map of the nodes and applies the function Dct_dist_link
+    to calculate the euclidean distance among linked nodes. Finally it test the triangular 
+    inequality for all the possible distances'''
+    G=nx.Graph()
+    G.add_edges_from([[1,2],[1,3],[2,3]])
+    edges=list(G.edges())
+    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    dct_dist=fn.Dct_dist(edges, map_dct)
+    assert dct_dist[(1,2)]<=dct_dist[(2,3)]+dct_dist[(1,3)]
+    assert dct_dist[(1,3)]<=dct_dist[(2,3)]+dct_dist[(1,2)]
+    assert dct_dist[(2,3)]<=dct_dist[(1,2)]+dct_dist[(1,3)]
+    
+    
+def test_List_dist_triangular_inequality_abstract():
+    '''It builds a nx.Graph object with 6 nodes linking them randomly.
+    Then it build a topografical map of the nodes and applies the function Dct_dist_link
+    to calculate the euclidean distance among linked nodes. Finally it test the triangular 
+    inequality for all the possible distances'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     edges=list(G.edges())
