@@ -490,24 +490,66 @@ def test_Set_community_number_all_wrong():
         fn.Set_community_number(G, community)
             
     
+#%%   test_fill_with_zeros (3)
 
+def test_fill_with_zeros_length_conservation():
+    '''It builds a list of list and it verifies that after the application of Fill_with_zeros
+    the length is the same
+    '''
+    
+    a=[[1,2],[3,5,6,7],[4,5,6]]
+    fn.Fill_with_zeros(a)
+    assert len(a)==3
+    
+def test_fill_with_zeros_length_variation():
+    '''It builds a list of list and it verifies that after the application of Fill_with_zeros
+    the length of each elements is the same of the longest one
+    '''
+    
+    a=[[1,2],[3,5,6,7],[4,5,6]]
+    fn.Fill_with_zeros(a)
+    assert len(a[0])==4
+    assert len(a[1])==4 
+    assert len(a[2])==4
+    
+def test_fill_with_zeros_output():
+    '''It builds a list of list and it verifies that after the application of Fill_with_zeros
+    the zeros are put in the right place.
+    '''
+    
+    a=[[1,2],[3,5,6,7],[4,5,6]]
+    fn.Fill_with_zeros(a)
+    assert (a[0])==[1, 2, 0, 0]
+    assert (a[1])==[3, 5, 6, 7]
+    assert (a[2])==[4, 5, 6, 0]
+    
+    
 #%%   test_size_evolution (3)
 def test_size_evolution_size():
-    '''It tests the len of each output'''
+    '''It builds a Graph linking randomly 7 nodes, it applies the Size_evolution function and
+    it verifies the three output length it is equal to the number of step of the process.
+    the test is done for both the two kind of features of the function'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     step=1
     nstep=int(len(G.edges)/step)
     feature='degree'
-    size, value_size_evolution,value_size_evolution_mean=fn.Size_evolution(G, step, feature)
-    assert len(size)==nstep and len(value_size_evolution)==nstep and len(value_size_evolution_mean)==nstep
+    size, evolution,evolution_mean=fn.Size_evolution(G, step, feature)
+    assert len(size)==nstep
+    assert len(evolution)==nstep 
+    assert len(evolution_mean)==nstep
     
     feature='betweenness_centrality'
     size, value_size_evolution,value_size_evolution_mean=fn.Size_evolution(G, step, feature)
-    assert len(size)==nstep and len(value_size_evolution)==nstep and len(value_size_evolution_mean)==nstep
-
+    assert len(size)==nstep
+    assert len(evolution)==nstep 
+    assert len(evolution_mean)==nstep
+    
+    
 def test_size_evolution_size_increasing_size():
-    '''It tests the output 'size' increases at each step'''
+    '''It builds a Graph linking randomly 7 nodes, it applies the Size_evolution function and
+    it verifies the elements of the output 'size' increases at each step
+    the test is done for both the two kind of features of the function'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     step=1
@@ -523,22 +565,31 @@ def test_size_evolution_size_increasing_size():
         assert size[i]<size[i+1]
 
 def test_size_evolution_size_degree_constant_len():
-    '''It tests, for the degree feature, the lenght of the value_size_evolution it is always the same'''
+    '''It builds a Graph linking randomly 7 nodes, it applies the Size_evolution function and
+    it verifies the elements 'distribution_evolution'  are of the same lenght'''
     G=fn.SuperGraph()
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     step=1
-    nstep=int(len(G.edges)/step)
     feature='degree'
-    value_size_evolution=fn.Size_evolution(G, step, feature)[1]
-    for i in range(nstep):
-        assert len(value_size_evolution[i])==4
+    distribution_evolution=fn.Size_evolution(G, step, feature)[1]
+    assert len(distribution_evolution[0])==4
+    assert len(distribution_evolution[1])==4
+    assert len(distribution_evolution[2])==4
+    assert len(distribution_evolution[3])==4
+    assert len(distribution_evolution[4])==4
+    assert len(distribution_evolution[5])==4
+
     
 
 #%%   test_List_dist_link (4)
 
     
 def test_List_dist_link_length():
-    '''it verifies in the dictionary are not present symmetric object (e.g.: (1,2), (2,1))
+    '''It builds an undirect nx.Graph object with 3 nodes linking them randomly and reapiting some
+    edges reversing the couple order of some of them (e.g.: (1,2), (2,1))
+    or creating some autolink edges (e.g.: (1,1)). Then it build a topografical map of the nodes
+    and applies the function Dct_dist_link to calculate the euclidean distance among linked nodes.
+    Finally it verifies in the keys of th ouput distance dictionary are not present symmetric object (e.g.: (1,2), (2,1))
     and it removes autoedges (e.g.: (1,1))
     '''
     edges=[(1,2),(3,1),(1,1),(1,2),(2,1)]    
@@ -546,10 +597,13 @@ def test_List_dist_link_length():
     G.add_edges_from(edges)
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     dct_dist_link=fn.Dct_dist_link(edges, map_dct)
-    assert len(dct_dist_link)==2
+    assert list(dct_dist_link.keys())==[(3, 1), (1, 2)]
 
 def test_List_dist_link_non_negativity():
-    '''It tests distances are not negative'''
+    '''It builds an undirect nx.Graph object with 6 nodes linking them randomly.
+    Then it build a topografical map of the nodes and applies the function Dct_dist_link
+    to calculate the euclidean distance among linked nodes.
+    Finally it verifies if the values the ouput distance dictionary are posives'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     edges=list(G.edges())
@@ -559,20 +613,44 @@ def test_List_dist_link_non_negativity():
         assert i>=0
         
 def test_List_dist_link_simmetry():
-    '''It tests link distance symmetry'''
+    '''It builds an undirect nx.Graph object with 3 nodes completed connected.
+    Then it build a topografical map of the nodes.
+    Then it builds two list of edges of the graph in which the order of the couple of linked nodes
+    is switched.
+    Finally it applies the function Dct_dist_link to calculate the euclidean distance
+    among linked nodes for the two symmetric set and it tests the outpu values are the same'''
     G=nx.Graph()
-    G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
+    G.add_edges_from([[1,2],[1,3],[2,3],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
+    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     edges=list(G.edges())
     segde=[]
     for i in range(len(edges)):
         segde.append((edges[i][1],edges[i][0]))                     
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    
     dct_dist_link1=fn.Dct_dist_link(edges, map_dct)
     dct_dist_link2=fn.Dct_dist_link(segde, map_dct)
     assert list(dct_dist_link2.values())==list(dct_dist_link1.values())
-    
-def test_List_dist_link_triangular_inequality():
-    '''It tests triangular inequality'''
+
+
+def test_List_dist_link_triangular_inequality_unit_test():
+    '''It builds an undirect nx.Graph object with 6 nodes linking them randomly.
+    Then it build a topografical map of the nodes and applies the function Dct_dist_link
+    to calculate the euclidean distance among linked nodes. Finally it test the triangular 
+    inequality for all the possible path'''
+    G=nx.Graph()
+    G.add_edges_from([[1,2],[1,3],[2,3]])
+    edges=list(G.edges())
+    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    dct_dist_link=fn.Dct_dist_link(edges, map_dct)
+    assert dct_dist_link[(1,2)]<=dct_dist_link[(2,3)]+dct_dist_link[(1,3)]
+    assert dct_dist_link[(1,3)]<=dct_dist_link[(2,3)]+dct_dist_link[(1,2)]
+    assert dct_dist_link[(2,3)]<=dct_dist_link[(1,2)]+dct_dist_link[(1,3)]
+                
+def test_List_dist_link_triangular_inequality_abstract_test():
+    '''It builds an undirect nx.Graph object with 6 nodes linking them randomly.
+    Then it build a topografical map of the nodes and applies the function Dct_dist_link
+    to calculate the euclidean distance among linked nodes. Finally it test the triangular 
+    inequality for all the possible path'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     edges=list(G.edges())
@@ -594,8 +672,7 @@ def test_List_dist_link_triangular_inequality():
                                 dist2+=dct_dist_link[(all_simple_paths[i][j],all_simple_paths[i][j+1])]
                             else:
                                 dist2+=dct_dist_link[(all_simple_paths[i][j+1],all_simple_paths[i][j])]
-                assert dist<dist2
-                        
+                assert dist<dist2                   
             
             
             
