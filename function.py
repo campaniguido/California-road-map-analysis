@@ -273,9 +273,9 @@ def Set_community_number(G, community):
     return community_number
 
                         
-#%%6  fill the holes
+#%%6  Fill_with_zeros
 
-def fill_with_zeros(list_):
+def Fill_with_zeros(list_):
     '''Given a list of list it makes all the list elements of the same length of the last one filling
      the first element of the list with zeros
     
@@ -299,11 +299,16 @@ def fill_with_zeros(list_):
             
 
     '''
+    length=[]
     for i in range(len(list_)):
-        while len(list_[i])<len(list_[-1]):
+        length.append(len(list_[i]))
+    max_len=max(length)
+    
+    for i in range(len(list_)):
+        while len(list_[i])<max_len:
             list_[i].append(0)
             
-#%%Size evolution
+#%%7  Size evolution
 def Size_evolution(G,step, feature):
     '''
     It takes back information related to the network G feature along its size increasing.
@@ -346,17 +351,13 @@ def Size_evolution(G,step, feature):
     if feature=='degree':
         for i in range(n_step):      
             G=fn.SuperGraph(edges[:(i+1)*step])
-            G.Relable_nodes()
-            
+            G.Relable_nodes()            
             value_size=np.array(list((getattr(nx, feature)(G))))[:,1]
             evolution_mean.append([np.mean(value_size),np.std(value_size)])
             distribution_evolution.append(list(G.Degree_ratio()))            
-            size.append(len(G))                  
-    
-        fn.fill_with_zeros(distribution_evolution)       
-
-        return size, distribution_evolution,evolution_mean
-    
+            size.append(len(G))   
+        fn.Fill_with_zeros(distribution_evolution)   
+        
     else:
         for i in range(n_step):
             G=fn.SuperGraph(edges[:(i+1)*step])
@@ -367,9 +368,9 @@ def Size_evolution(G,step, feature):
             distribution_evolution.append(value_size)
             size.append(len(G))
             
-        return size, distribution_evolution,evolution_mean
+    return size, distribution_evolution,evolution_mean
 
-#%%6 Dct_dist_link 
+#%%8 Dct_dist_link 
 def Dct_dist_link(edges,map_dct):
     '''It calculates all the distances of the nodes linked together whose position is described by
     the dictionary map
@@ -377,9 +378,9 @@ def Dct_dist_link(edges,map_dct):
 
     Parameters
     ----------
-    edges : Support item assignment variable
+    edges : indexable variable
         It represents all the links of the network
-    map_dct : Support item assignment variable
+    map_dct : indexable variable
         It describes the position of the nodes
 
     Returns
@@ -400,7 +401,7 @@ def Dct_dist_link(edges,map_dct):
 
 
 
-#%%7 Dct_dist 
+#%%9 Dct_dist 
 def Dct_dist(G,map_dct):
     '''
     It returns all the distance among the nodes, even the not linked one. 
@@ -434,7 +435,7 @@ def Dct_dist(G,map_dct):
     return dct_dist
 
 
-#%%8 Node_distance_frequency 
+#%%10 Node_distance_frequency 
 def Node_distance_frequency(dct_dist,nstep,step):
     '''It returns a binned not normalized nodes distance distribution. 
     It puts all the elements>nstep*step in the last bin 
@@ -460,6 +461,7 @@ def Node_distance_frequency(dct_dist,nstep,step):
         for i in range (nstep):
             if dct_dist[key]>i*step and dct_dist[key]<(i+1)*step:
                 n[i]=n[i]+1
+    'in order to consider also elements > step*nstep'            
     n[nstep-1]=n[nstep-1]+len(dct_dist)-sum(n)
     node_distance_frequency=np.array(n)
     return node_distance_frequency  
@@ -494,13 +496,10 @@ def Link_distance_conditional_probability(dct_dist_link,nstep,distance_frequency
         DESCRIPTION.
 
     '''
-    step=max(dct_dist_link.values())/nstep
-    n_link=[0]*nstep
-    for key in (dct_dist_link):
-        for i in range (nstep):
-            if dct_dist_link[key]>i*step and dct_dist_link[key]<=(i+1)*step:
-                n_link[i]=n_link[i]+1
-        distance_link_frequency=np.array(n_link)
+    step=max(dct_dist_link.values())/nstep        
+    distance_link_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)    
+    
+        
     link_distance_probability={}
     for i in range(len(distance_link_frequency)):
         if distance_frequency[i]!=0:
