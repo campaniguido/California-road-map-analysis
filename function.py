@@ -468,9 +468,11 @@ def Node_distance_frequency(dct_dist,nstep,step):
 
 #%%9 Link_distance_conditional_probability 
 
-def Link_distance_conditional_probability(dct_dist_link,nstep,distance_frequency):
-    '''
-    It returns the probability density binned function of having a link at a fixed disstance 
+def Link_distance_conditional_probability(distance_link_frequency,step,distance_frequency):
+    '''Given N elements diveded in n bins, the distance_frequency represents the freqeancy of elements in 
+    each n bins while the distance_link_frequency contains the number of elements for each bins with
+    a peculiar characteristic (e.g.:it has a link). The function returns the probability binned distribution 
+    to have the peculiar characteristic in function of the distance_frequency bin.
     
 
     Parameters
@@ -495,11 +497,7 @@ def Link_distance_conditional_probability(dct_dist_link,nstep,distance_frequency
     link_distance_probability : TYPE
         DESCRIPTION.
 
-    '''
-    step=max(dct_dist_link.values())/nstep        
-    distance_link_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)    
-    
-        
+    '''     
     link_distance_probability={}
     for i in range(len(distance_link_frequency)):
         if distance_frequency[i]!=0:
