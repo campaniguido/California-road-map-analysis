@@ -170,7 +170,7 @@ def Erase_nan_row(file):
     
     return corrected_file
     
-#%%2  Edge_list
+#%%3  Edge_list
 def Edge_list(file, number_of_edges):
     '''
     It takes a file of couples of number and return a list of a desired lenght(number_of_edge) of couple 
@@ -209,7 +209,7 @@ def Edge_list(file, number_of_edges):
     return edges
 
     
-#%%3  Unfreeze_into_list
+#%%4  Unfreeze_into_list
 def Unfreeze_into_list(comunity):
     '''It takes a (support item assignment) variable of n elements and transform each element in a list
     of variables
@@ -230,7 +230,7 @@ def Unfreeze_into_list(comunity):
         comunity[i]=list(comunity[i])
     return comunity
 
-#%%4  Set_comunity
+#%%5  Set_comunity
 
 def Set_community_number(G, community):
     '''It assigns to each node to the graph a community number. Node with the same number
@@ -273,7 +273,37 @@ def Set_community_number(G, community):
     return community_number
 
                         
-#%%5  Size evolution
+#%%6  fill the holes
+
+def fill_with_zeros(list_):
+    '''Given a list of list it makes all the list elements of the same length of the last one filling
+     the first element of the list with zeros
+    
+
+    Parameters
+    ----------
+    list_ : list of list
+        list.
+
+    Returns
+    -------
+    None.
+    
+    example:
+    input:
+    >list_=[[1,1],[3,3,3],[4,4,4,4]]
+    >fill_the_holes(list_)
+    >list_
+    output:
+    [[ 1, 1, 0], [3, 3, 3, 0], [4, 4, 4, 4]]
+            
+
+    '''
+    for i in range(len(list_)):
+        while len(list_[i])<len(list_[-1]):
+            list_[i].append(0)
+            
+#%%Size evolution
 def Size_evolution(G,step, feature):
     '''
     It takes back information related to the network G feature along its size increasing.
@@ -308,9 +338,9 @@ def Size_evolution(G,step, feature):
         
 
     '''
-    value_size_evolution=[]
+    distribution_evolution=[]
     n_step=int(len(G.edges)/step)
-    value_size_evolution_mean=[]
+    evolution_mean=[]
     edges=list(G.edges())
     size=[]
     if feature=='degree':
@@ -318,29 +348,26 @@ def Size_evolution(G,step, feature):
             G=fn.SuperGraph(edges[:(i+1)*step])
             G.Relable_nodes()
             
-            value_size_evolution.append(G.Degree_ratio())
             value_size=np.array(list((getattr(nx, feature)(G))))[:,1]
-            value_size_evolution_mean.append([np.mean(value_size),np.std(value_size)])
-            size.append(len(G))  
-        
-        for i in range(len(value_size_evolution)):
-            while len(value_size_evolution[i])<len(value_size_evolution[-1]):
-                value_size_evolution[i]=np.append(value_size_evolution[i],0)
-        value_size_evolution_mean=np.array(value_size_evolution_mean)
-        value_size_evolution=np.array(value_size_evolution)
-        size=np.array(size)
-        return size, value_size_evolution,value_size_evolution_mean
+            evolution_mean.append([np.mean(value_size),np.std(value_size)])
+            distribution_evolution.append(list(G.Degree_ratio()))            
+            size.append(len(G))                  
+    
+        fn.fill_with_zeros(distribution_evolution)       
+
+        return size, distribution_evolution,evolution_mean
+    
     else:
         for i in range(n_step):
             G=fn.SuperGraph(edges[:(i+1)*step])
             G.Sorted_graph()
-            G.Relable_nodes()
+            G.Relable_nodes()            
             value_size=np.array(list((getattr(nx, feature)(G)).items()))[:,1]
-            value_size_evolution_mean.append([np.mean(value_size),np.std(value_size)])
-            value_size_evolution.append(value_size)
+            evolution_mean.append([np.mean(value_size),np.std(value_size)])
+            distribution_evolution.append(value_size)
             size.append(len(G))
-        value_size_evolution_mean=np.array(value_size_evolution_mean)
-        return size, value_size_evolution,value_size_evolution_mean
+            
+        return size, distribution_evolution,evolution_mean
 
 #%%6 Dct_dist_link 
 def Dct_dist_link(edges,map_dct):
