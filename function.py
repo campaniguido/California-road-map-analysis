@@ -14,9 +14,8 @@ import function as fn
 import matplotlib.pyplot as plt
 import math
 import matplotlib.cm as cm
-#%%seed
 
-rn.seed(3)
+#%%seed
 
 #%% CLASS SuperGraph
 
@@ -466,7 +465,7 @@ def Node_distance_frequency(dct_dist,nstep,step):
     node_distance_frequency=np.array(n)
     return node_distance_frequency  
 
-#%%9 Link_distance_conditional_probability 
+#%%11 Conditional_probability 
 
 def Conditional_probability(important_events_frequency,step, events_frequency):
     '''Given the binned frequency of an events and the frequency of them which are 'important', it calculates
@@ -510,11 +509,11 @@ def Conditional_probability(important_events_frequency,step, events_frequency):
 
 
 #%%10 Add_edges_from_map(G,map_dct,distance_linking_probability)                           
-def Add_edges_from_map(G,map_dct,distance_linking_probability):
+def Add_edges_from_map(G,dct_dist,dist_link_prob):
     '''
-    It creates links among nodes of graph. 
-    It exploits the nodes positions informations conteined in the map dictionary, map_dct,
-    and the conditional distribution probability to make a link in function of the distance.
+    It creates links among nodes of the graph G. 
+    It exploits the nodes distances informations conteined in the distances dictionary, dct_dist,
+    and the probability to make a link in function of the distance.
     
 
     Parameters
@@ -524,36 +523,31 @@ def Add_edges_from_map(G,map_dct,distance_linking_probability):
     map_dct : Support item assignment variable
         It describes the position of all the nodes
         
-    distance_linking_probability : Support item assignment variable
+    distance_linking_probability : dct
         It describe the probability to have a link among two nodes at a given distance
     
 
     Returns
     -------
-    G : networkx.classes.graph.Graph
-        it returns the old graph but with the additon of the new links
+    None
 
     '''
-    rn.seed(3)
-    i=0
-    step=list(distance_linking_probability.keys())[0]
-    nodes=list(G.nodes())
-    while i<len(G):
-        j=i+1
-        #j=0
-        while j<len(nodes):        
-            x0=map_dct[nodes[i]]
-            x1=map_dct[nodes[j]]
-            dist=np.linalg.norm(x0-x1)
-            if dist<=max(distance_linking_probability.keys()):
-                for k in range(len(distance_linking_probability)):
-                    if dist>k*step and dist<(k+1)*step:                    
-                        uniform=rn.uniform(0,1)
-                        if uniform<= list(distance_linking_probability.values())[k]:
-                            G.add_edge(nodes[i],nodes[j])
-            j=j+1
-        i=i+1  
-    return G
+
+    step=list(dist_link_prob.keys())[0]
+    nstep=len(dist_link_prob)
+    max_distance=max(dist_link_prob.keys())
+    link_probabilities=list(dist_link_prob.values())
+    
+    for i in dct_dist:       
+        dist=dct_dist[i]
+        if dist<=max_distance:
+            for k in range(nstep):
+                if dist>k*step and dist<=(k+1)*step:                    
+                    uniform=rn.uniform(0,1)
+                    if uniform<= link_probabilities[k]:
+                        
+                        G.add_edge(i[0],i[1])  
+
 
 
 

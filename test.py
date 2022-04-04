@@ -10,7 +10,7 @@ import numpy as np
 import function as fn
 import networkx as nx
 import pytest
-rn.seed(3)
+
 
 #%%Ct  test sorted_graph (2)
 def test_sorted_graph_nodes():
@@ -651,6 +651,7 @@ def test_List_dist_link_triangular_inequality_abstract_test():
     Then it build a topografical map of the nodes and applies the function Dct_dist_link
     to calculate the euclidean distance among linked nodes. Finally it test the triangular 
     inequality for all the possible path'''
+    
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     edges=list(G.edges())
@@ -886,63 +887,83 @@ def test_Conditional_probability_bin_value():
     bins=list(conditional_probability_dct.keys())
     assert  bins==[1, 2, 3, 4, 5, 6]
 
-#%%   test_Copymap_linking (2)
+#%%   test_Copymap_linking (3)
 
 
 def test_Add_edges_from_map_nodes_number():
-    '''It tests if the nodes number is conserved'''
+    '''Given a graph with random links, a dictionary of the distances among nodes and the conditional probabilities to have
+    a links in function of the distance,it builds a new graph with same nodes of the old one
+    and adds edges exploiting the function Add_edges_from_map.
+    Finally it tests the number of nodes is the same of the old one
+    '''
       
     G=nx.Graph()
-    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
-    edges=list(G.edges())
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    dct_dist=fn.Dct_dist(G,map_dct)
-    dct_dist_link=fn.Dct_dist_link(edges, map_dct)
-    nstep=10
-    step=max(list(dct_dist_link.values()))/nstep
-    node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
-    node_links_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)
-    link_distance_conditional_probability=fn.Conditional_probability(node_links_frequency,step,node_distance_frequency)
+    G.add_edges_from([[0,2],[0,1]])
+    dct_dist={(0,1): 1,
+              (0,2): 1,
+              (1,2): 3}
+    probability={1: 0.9, 2: 0.5, 3: 0.1}
     Copy_map=nx.Graph()
     Copy_map.add_nodes_from(list(G.nodes))
-    Copy_map=fn.Add_edges_from_map(Copy_map, map_dct, link_distance_conditional_probability)
+    fn.Add_edges_from_map(Copy_map, dct_dist,probability)
     assert list(Copy_map.nodes())==list(G.nodes)
     
-def test_Add_edges_from_map_Bernoulli_trials():
-    
+def test_Add_edges_from_map_completed():
+    '''Given a graph with 4 nodes randomly connected, a dictionary of the distances among nodes and the conditional probabilities to have
+    a links in function of the distance equal to one for all the possible distance,it builds
+    the graph Copy_map exploiting the function Add_edges from_map.
+    Finally it tests that the new graph Copy_map is fully conected
+    '''
       
     G=nx.Graph()
-    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
-    edges=list(G.edges())
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    dct_dist=fn.Dct_dist(G,map_dct)
-    dct_dist_link=fn.Dct_dist_link(edges, map_dct)
-    nstep=10
-    step=max(list(dct_dist_link.values()))/nstep
-    node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
-    node_links_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)
-    link_distance_conditional_probability=fn.Conditional_probability(node_links_frequency,step,node_distance_frequency)
-    
-    
-    Copy_map=nx.Graph()
+    G.add_edges_from([[0,1],[1,2],[2,3],[1,3]])
+    dct_dist={(0,1): 1,
+              (0,2): 2,
+              (0,3): 3,
+              (1,2): 1,
+              (1,3): 2,
+              (2,3): 1}
+        
+    probability_distribution={1: 1, 2: 1, 3: 1}
+    Copy_map=fn.SuperGraph()
     Copy_map.add_nodes_from(list(G.nodes))
-    Copy_map=fn.Add_edges_from_map(Copy_map, map_dct, link_distance_conditional_probability)
+    fn.Add_edges_from_map(Copy_map, dct_dist,probability_distribution)
+    assert list(Copy_map.edges)==[(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]
+
+def test_Add_edges_from_map_Bernulli_trials():
+    '''Given a graph with 3 nodes randomly connected, a dictionary of the distances among nodes and the conditional probabilities to have
+    a links in function of the distance,it builds 1000 the graph Copy_map exploiting 
+    the function Add_edges from_map. It test that the average number of link in function of the distance
+    follows the conditonal probabilities.
+    '''
+      
+    G=nx.Graph()
+    G.add_edges_from([[0,1],[1,2]])
+    dct_dist={(0,1): 1,
+              (0,2): 2,
+              (1,2): 1}
+        
+    link_prob={1: 0.4, 2: 0.8}
+    prob_link1=0
+    prob_link2=0
+    trials=1000
     
-    dct_dist_link_copymap=fn.Dct_dist_link(list(Copy_map.edges()), map_dct)
+    for i in range(trials):
+        Copy_map=fn.SuperGraph()
+        Copy_map.add_nodes_from(list(G.nodes))
+        fn.Add_edges_from_map(Copy_map, dct_dist,link_prob)
+        edges=list(Copy_map.edges)
+        prob_link1+=(edges.count((0,1))+edges.count((1,2)))/2
+        prob_link2+=edges.count((0,2))
+        
+    prob_link1=prob_link1/trials
+    prob_link2=prob_link2/trials
     
-    for i in range(nstep):
-        p=link_distance_conditional_probability[(i+1)*step]
-        LG=0
-        for value in list(dct_dist.values()) :
-            if  i*step<value<(i+1)*step:
-                LG+=1
-        LCopymap=0
-        for value in list(dct_dist_link_copymap.values()) :
-            if  i*step<value<(i+1)*step:
-                LCopymap+=1
-              
-        assert LG*p-3*(p*(1-p)*LG)**0.5<=LCopymap<=LG*p+3*(p*(1-p)*LG)**0.5
-    
+    'using the binomial variance and the central limit theorem'
+    std1=(0.4*0.6/trials**0.5)**0.5
+    std2=(0.8*0.2/trials**0.5)**0.5
+    assert     0.4-3*std1<prob_link1<0.4+3*std1
+    assert     0.8-3*std2<prob_link2<0.8+3*std2
 
         
 #%% test_Break_strongest_nodes (2)
