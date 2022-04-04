@@ -36,7 +36,7 @@ step=max(dct_dist_link.values())/paramsC.nstep
 distance_frequency=fn.Node_distance_frequency(dct_dist,paramsC.nstep,step)       
 distance_link_frequency=fn.Node_distance_frequency(dct_dist_link,paramsC.nstep,step) 
 
-distance_linking_probability=fn.Conditional_probability(distance_link_frequency,paramsC.nstep,distance_frequency)
+distance_linking_probability=fn.Conditional_probability(distance_link_frequency,step,distance_frequency)
 Copy_map=fn.SuperGraph()
 Copy_map.add_nodes_from(list(G.nodes))
 fn.Add_edges_from_map(Copy_map, dct_dist, distance_linking_probability)
