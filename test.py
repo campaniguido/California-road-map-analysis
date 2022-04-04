@@ -244,6 +244,7 @@ def test_divide_value():
     '''The dataset file represents couples of numbers, but in the row 1 and 2 
        the couples of number are not in two different columns. The tests verify that
        Divide_value puts the two numbers in the proper way, so one number per cel'''
+       
     file=[['0 ','134.0'],['45643 3456',np.nan],[np.nan,'34 5']]
     file=fn.Divide_value(file)
     assert list(file[1])==['45643', '3456']
@@ -253,6 +254,7 @@ def test_divide_value_one_space():
     '''Giving a data set, with dimension (5,2) and with some of the data written as str
        variable with space (" ") in, it tests if after the application of the function
         Divide_value no spaces are left.'''
+        
     file=[['0 ','134.0'],['45643 3456',np.nan],[np.nan,'34 5'],[np.nan,np.nan],[3,4.0]]
     file=fn.Divide_value(file)
     for i in range(2):
@@ -966,10 +968,12 @@ def test_Add_edges_from_map_Bernulli_trials():
     assert     0.8-3*std2<prob_link2<0.8+3*std2
 
         
-#%% test_Break_strongest_nodes (2)
+#%%   test_Break_strongest_nodes (2)
 
 def test_Break_strongest_nodes_size():
-    '''it tests len of the graph is kept constant'''
+    '''It build a graph which has edges with no particular order and whose max degree
+    is equal to five. It cuts edges until the max degree is two. Finally it test the number
+    of nodes is conserve in the process'''
     
     edges=[(1,2), (3,1), (1,1), (1,2), (2,1), (1,4), (1,5), (5,4), (5,3), (1,6), (6,2), (5,2)]    
     G=fn.SuperGraph()
@@ -980,7 +984,9 @@ def test_Break_strongest_nodes_size():
     assert len_after==len_before
     
 def test_Break_strongest_nodes_maximum_value():
-    '''it verify the nodes with the highest degree is under the threshold'''
+    '''It build a graph which has edges with no particular order and whose max degree
+    is equal to five. It cuts edges until the max degree is two. 
+    Finally it verify the nodes with the highest degree is under the threshold'''
     
     edges=[(1,2), (3,1),(1,1), (1,1), (1,2), (2,1), (1,4), (1,5), (5,4), (5,3), (1,6), (6,2), (5,2)]    
     G=fn.SuperGraph()
@@ -990,13 +996,17 @@ def test_Break_strongest_nodes_maximum_value():
     assert max(deg.keys())<=2
     
 def test_Break_strongest_nodes_untouchable_edges():
-    '''it verify the edges which are not involved in the function are conserved'''
+    '''It build a graph which has edges with no particular order and whose max degree
+    is equal to three. It cuts edges until the max degree is two. So it removes one of
+    the links of the node two.
+    Finally it verify the edges which are not involved in the function are conserved,
+    So the neighbours of node 4 '''
     
-    edges=[(1,1), (1,2), (2,1), (3,4), (1,5),(6,7), (5,2), (2,7),(10,11)]    
+    edges=[(1,1), (1,2), (2,1), (3,4), (1,5), (5,2), (2,7),(4,6)]    
     G=fn.SuperGraph()
     G.add_edges_from(edges)
-    fn.Break_strongest_nodes(G,3)
-    assert list(G.neighbors(4))==[3]
+    fn.Break_strongest_nodes(G,2)
+    assert list(G.neighbors(4))==[3,6]
 
 
 #%% test_Find_mode (1)

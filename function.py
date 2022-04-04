@@ -474,7 +474,7 @@ def Conditional_probability(important_events_frequency,step, events_frequency):
 
     Parameters
     ----------
-    distance_link_frequency : indexable
+    important_events_frequency : indexable
         It describes the frequency of important events for each bin
         
     step : width of the bin
@@ -495,20 +495,20 @@ def Conditional_probability(important_events_frequency,step, events_frequency):
 
     '''     
     link_distance_probability={}
+    
     for i in range(len(important_events_frequency)):
         if events_frequency[i]!=0:
             link_distance_probability[(i+1)*step]=(important_events_frequency[i]/(events_frequency[i]))
         elif events_frequency[i]==0 and important_events_frequency[i]==0:
             link_distance_probability[(i+1)*step]=0
         else:
-            print(i)
             raise ZeroDivisionError('There is no couple of nodes with this distance')
             
     return link_distance_probability
     
 
 
-#%%10 Add_edges_from_map(G,map_dct,distance_linking_probability)                           
+#%%12 Add_edges_from_map(G,map_dct,distance_linking_probability)                           
 def Add_edges_from_map(G,dct_dist,dist_link_prob):
     '''
     It creates links among nodes of the graph G. 
@@ -551,7 +551,7 @@ def Add_edges_from_map(G,dct_dist,dist_link_prob):
 
 
 
-#%%11 Break_strong_nodes
+#%%13 Break_strong_nodes
 
 def Break_strongest_nodes(G, threshold):
     '''
@@ -576,7 +576,7 @@ def Break_strongest_nodes(G, threshold):
 
     
     dct_degree=G.Degree_dct()
-    while threshold<max(np.array(list(G.degree))[:,1]):
+    while threshold<max(dct_degree):
         source=rn.choice(list(dct_degree.values())[len(dct_degree)-1])
         node=rn.choice(list(G.neighbors(source)))
         G.remove_edge(source,node)
@@ -942,7 +942,7 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
         It returns the graph with the degree ratio corrected
     '''
     
-    rn.seed(3)
+
     Copycat=fn.SuperGraph(Copy_map)
     
     fn.Break_strongest_nodes(Copycat, max(np.array(list(G.degree()))[:,1]))
@@ -953,7 +953,7 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
         
         for i in range(len(G.Degree_ratio())-1,0,-1):
             if i< len(Copycat.Degree_ratio()):           
-                while Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:   
+                while Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:
                     
                     fn.Remove_edge_of_degree(i, Copycat) 
                   
