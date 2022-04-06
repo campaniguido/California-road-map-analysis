@@ -646,22 +646,19 @@ def Equalize_strong_nodes(G_strong, G_weak):
     if max_weak<max_strong:       
         fn.Break_strongest_nodes(G_strong, max_weak) 
     i=max_weak    
-    while i>threshold:
-        
+    for i in range(max_weak,threshold,-1):      
         
         while len(G_strong.Degree_ratio())>=len(G_weak.Degree_ratio()) and (G_strong.Degree_ratio()[i])>(G_weak.Degree_ratio()[i]):
             source=rn.choice(G_strong.Degree_dct()[i])
             node=rn.choice(list(G_strong.neighbors(source)))
             G_strong.remove_edge(source,node)              
-            
-                       
-        i=i-1
+
             
 
 #%%14 Max_prob_target
 
     
-def Max_prob_target (source,strenght_dct,degree,map_dct,distance_linking_probability,max_dist,G):
+def Max_prob_target (source,degree,map_dct,distance_linking_probability,max_dist,G):
     '''
     It finds the best linking target for a surce node of the graph G. The target,
     if it is possible, has the degree chosen in the input, it's not a source's neighbour, 
@@ -673,8 +670,6 @@ def Max_prob_target (source,strenght_dct,degree,map_dct,distance_linking_probabi
     source : integer
         It represents the node label of the source.
         
-    strenght_dct :  Support item assignment variable
-        each items is the group of nodes with the same degree
         
     degree : integer
         It represents the desired degree of the target
@@ -702,8 +697,9 @@ def Max_prob_target (source,strenght_dct,degree,map_dct,distance_linking_probabi
     x0=map_dct[source]
     max_prob=-1
     target=-5
-
     step=max_dist/len(distance_linking_probability)
+    strenght_dct=G.Degree_dct()
+    
     for i in strenght_dct[degree]:
         x1=map_dct[i]
         dist=np.linalg.norm(x0-x1)
@@ -719,7 +715,7 @@ def Max_prob_target (source,strenght_dct,degree,map_dct,distance_linking_probabi
     '''In the case there was no nodes with the right conditions to link to'''
     if target==-5:
 
-        target=fn.Min_distance_target(source, strenght_dct,degree, map_dct, list(G.neighbors(source)))
+        target=fn.Min_distance_target(source,G.Degree_dct() ,degree, map_dct, list(G.neighbors(source)))
     return target
   
     
@@ -872,7 +868,7 @@ def Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_
     if len(degree_dct[0])!=0:
         source=rn.choice(degree_dct[0])
         for i in range(n_links):                      
-            target=fn.Max_prob_target(source,degree_dct,i,map_dct,prob_distribution,max_dist_link,G)
+            target=fn.Max_prob_target(source,i,map_dct,prob_distribution,max_dist_link,G)
             G.add_edge(source, target)
             degree_dct=G.Degree_dct()
 

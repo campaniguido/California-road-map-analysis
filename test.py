@@ -1011,16 +1011,18 @@ def test_Break_strongest_nodes_untouchable_edges():
 
 #%% test_Find_mode (1)
 def test_Find_mode():
-    '''the value calculated in the mode is the max'''
+    '''Given a list of values it tests that function Find_mode discriminatethe the
+    position of the list with the maximum value.'''
     a=[-1,-5,-0.1,-3,]
-    assert a[fn.Find_mode(a)]==max(a)
+    assert a[fn.Find_mode(a)]==-0.1
     
 
             
 #%% test_Equalize_strong_nodes (2)
 
 def test_Equalize_strong_nodes_size():
-    '''it tests length of the first graph is kept constant'''
+    '''It applies the function Equalize strong nodes to two graphs and 
+    it tests length of the first graph is kept constant'''
     
     edges=[(1,2), (3,1), (6,3), (4,2), (2,3), (1,4), (1,5), (5,4), (5,3), (1,6), (5,3), (5,2), (5,6), (7,1)]    
     G_strong=fn.SuperGraph()
@@ -1034,97 +1036,88 @@ def test_Equalize_strong_nodes_size():
     assert len_after==len_before
     
 def test_Equalize_strong_nodes_maximum_value():
-    '''it verify if the  degree ratio of highest node of the first graph is lower than the second one'''
+    '''It builds two graphs, the first (strong) has a maximum degree equal to 6 and the second (weak) equal to 4.
+    The mode of the second graph is 3. It tests that after the application of the
+    function Equalize strong nodes the ratio of the node of the strong graph with degree
+    major than 3 it is equal or minor the ratio of the weak graph'''
     
-    edges=[(1,2), (3,1), (6,3), (4,2), (2,3), (1,4), (1,5), (5,4), (5,3), (1,6), (5,3), (5,2), (5,6), (7,1)]    
+    edges=[(1,2), (3,1), (6,3), (4,0), (4,2), (2,3), (1,4), (1,5), (5,4), (5,3), (1,6), (5,3), (5,2), (5,6), (7,1)]    
     G_strong=fn.SuperGraph()
     G_strong.add_edges_from(edges)
-    edges=[(1,2), (5,7), (1,1), (1,2), (2,1), (3,4), (4,5), (2,4), (5,6), (1,6), (1,2), (6,2), (5,6), (7,6)]
+    edges=[(0,1),(4,0),(1,2), (5,7), (1,2), (3,4), (4,5), (2,4), (5,6), (1,6), (6,2), (5,6), (7,6)]
     G_weak=fn.SuperGraph()
     G_weak.add_edges_from(edges)
-    fn.Equalize_strong_nodes(G_strong, G_weak) 
-    dct_degree_strong=G_strong.Degree_dct()
-    degree_ratio_strong=G_strong.Degree_ratio()
-    degree_ratio_weak=G_weak.Degree_ratio()
-    mode=fn.Find_mode(degree_ratio_weak)
-    i=max(dct_degree_strong.keys())
-    while i>mode:
-        assert degree_ratio_strong[i]<=degree_ratio_weak[i]
-        i=i-1
+    fn.Equalize_strong_nodes(G_strong, G_weak)
+    assert len(G_strong.Degree_dct())<=len(G_weak.Degree_dct())
+    assert (G_strong.Degree_ratio()[4])<=(G_weak.Degree_ratio()[4])
+
+
 
 
 #%% test_Max_prob_target (3)
 
 def test_Max_prob_target_degree():
-    ''''It verifies the degree of the target is the one given'''
-    edge_probability=0.4
-    n_node=100
-    G=fn.SuperGraph(nx.fast_gnp_random_graph(n_node,edge_probability, seed=None, directed=False))
+    '''Given a graph with 5 nodes, their positions and the probability to have a link in function of the distance,
+    It  exploits the function Max_prob_target to link the node '4' with a node with degree three.
+    Finally it verifies the degree of the target is the one given'''
     
-    G.Relable_nodes()
+    edges=[(0,2),(1,2),(2,3),(4,0)]
+    G=fn.SuperGraph()
+    G.add_edges_from(edges)    
+    map_dct={0: np.array([0, 0]),
+             1: np.array([1, 0]),
+             2: np.array([2, 0]),
+             3: np.array([3, 0]),
+             4: np.array([4, 0]) }    
     
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    source=0
-    strenght_dct=G.Degree_dct()
-    degree=edge_probability*n_node
     dct_dist_link=fn.Dct_dist_link(list(G.edges()), map_dct)
     max_dist=max(dct_dist_link.values())
-    step=max_dist/10    
-    prob_distribution={}
-    for i in range(10):
-        prob_distribution[step*(i+1)]=0.4        
-    target=fn.Max_prob_target (source,strenght_dct,degree,map_dct,prob_distribution,max_dist,G)
+    degree=3  
+    source=4
+    prob_distribution={1: 0.4, 2: 0.4, 3: 0.4, 4: 0.4}      
+    target=fn.Max_prob_target (source,degree,map_dct,prob_distribution,max_dist,G)
     assert len(list(G.neighbors(target)))==degree
 
 def test_Max_prob_target_not_its_self():
-    '''It verifies the taget is not the source'''
+    '''Given a graph with 5 nodes, their positions and the probability to have a link in function of the distance,
+    It  exploits the function Max_prob_target to link the node '0' with a node with degree 3 .
+    Finally it verifies the target is not the source'''
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0),(4,4)]
     G=fn.SuperGraph()
     G.add_edges_from(edges)
-    G.Relable_nodes()
-    map_dct={0: np.array([ 0, 0]),
-         1: np.array([-1, -1]),
-         2: np.array([-0.5, -0.2]),
-         3: np.array([1, 2]),
-         4: np.array([5, 5])}
+    map_dct={0: np.array([0, 0]),
+             1: np.array([1, 0]),
+             2: np.array([2, 0]),
+             3: np.array([3, 0]),
+             4: np.array([4, 0]) } 
     
     
     source=0
-    strenght_dct=G.Degree_dct()
     degree=3
     dct_dist_link=fn.Dct_dist_link(list(G.edges()), map_dct)
     max_dist=max(dct_dist_link.values())
-
-    step=max_dist/10    
-    prob_distribution={}
-    for i in range(10):
-        prob_distribution[step*(i+1)]=0.4  
-    for i in range(100):
-        assert source!=fn.Max_prob_target (source,strenght_dct,degree,map_dct,prob_distribution,max_dist,G)
+    prob_distribution={1: 0.4, 2: 0.4, 3: 0.4, 4: 0.4}    
+    assert source!=fn.Max_prob_target (source,degree,map_dct,prob_distribution,max_dist,G)
     
 def test_Max_prob_target_is_not_its_neighbors():
-    '''it verifies the target is not a source's neighbors'''
+    '''Given a graph with 5 nodes, their positions and the probability to have a link in function of the distance,
+    It  exploits the function Max_prob_target to link the node '0' with a node with degree 3 .
+    Finally it  verifies the target is not a source's neighbors'''
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0),(4,4)]
     G=fn.SuperGraph()
     G.add_edges_from(edges)
-    G.Relable_nodes()
-    map_dct={0: np.array([ 0, 0]),
-         1: np.array([-1, -1]),
-         2: np.array([-0.5, -0.2]),
-         3: np.array([1, 2]),
-         4: np.array([5, 5])}
+    map_dct={0: np.array([0, 0]),
+             1: np.array([1, 0]),
+             2: np.array([2, 0]),
+             3: np.array([3, 0]),
+             4: np.array([4, 0]) } 
     source=0
-    strenght_dct=G.Degree_dct()
     degree=2
     dct_dist_link=fn.Dct_dist_link(list(G.edges()), map_dct)
     max_dist=max(dct_dist_link.values())
-
-    step=max_dist/10    
-    prob_distribution={}
-    for i in range(10):
-        prob_distribution[step*(i+1)]=0.4  
-    for i in range(100):
-        assert source!=fn.Max_prob_target (source,strenght_dct,degree,map_dct,prob_distribution,max_dist,G)
+    prob_distribution={1: 0.4, 2: 1, 3: 0.4, 4: 0.4}   
+    neighbors_0=list(G.neighbors(0))
+    assert neighbors_0!=fn.Max_prob_target (source,degree,map_dct,prob_distribution,max_dist,G)
 
 
 #%% test_Min_distance_target (5)
