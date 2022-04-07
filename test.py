@@ -649,6 +649,8 @@ def test_List_dist_link_triangular_inequality_unit_test():
     assert dct_dist_link[(2,3)]<=dct_dist_link[(1,2)]+dct_dist_link[(1,3)]
                 
 def test_List_dist_link_triangular_inequality_abstract_test():
+    '''It is the abstract version of th unit test'''
+    
     '''It builds a nx.Graph object with 6 nodes linking them randomly.
     Then it build a topografical map of the nodes and applies the function Dct_dist_link
     to calculate the euclidean distance among linked nodes. Finally it test the triangular 
@@ -785,21 +787,21 @@ def test_List_dist_triangular_inequality_abstract():
 def test_Node_distance_frequency_I_axiom():
     '''Given a set of distances it builds a discrete distribution of frequency for the distances,
     exploting the Node_distance_frequency and it verifies each frequency is positive'''
-    dct_dist={(1, 2): 0.17826839815610848,
-              (1, 3): 0.1621369469779289,
-              (1, 4): 0.15016564862477497,
-              (1, 5): 0.30311264216355577,
-              (1, 6): 1.1628898382687927,
-              (2, 3): 0.3027628033303571,
-              (2, 4): 0.14940329750489897,
-              (2, 5): 0.1615649741071594,
-              (2, 6): 1.1248380701452185,
-              (3, 4): 0.18437027351662638,
-              (3, 5): 0.367850010102952,
-              (3, 6): 1.3173493365750428,
-              (4, 5): 0.18411463816128404,
-              (4, 6): 1.2582690118458433,
-              (5, 6): 1.2459654725200846}
+    dct_dist={(1, 2): 0.178,
+              (1, 3): 0.162,
+              (1, 4): 0.150,
+              (1, 5): 0.303,
+              (1, 6): 1.162,
+              (2, 3): 0.302,
+              (2, 4): 0.149,
+              (2, 5): 0.161,
+              (2, 6): 1.124,
+              (3, 4): 0.184,
+              (3, 5): 0.367,
+              (3, 6): 1.317,
+              (4, 5): 0.184,
+              (4, 6): 1.258,
+              (5, 6): 1.245}
     step=0.026346986731500856
     nstep=50
     node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
@@ -810,21 +812,21 @@ def test_Node_distance_frequency_II_axiom():
     '''Given a set of distances it builds a discrete distribution of frequency for the distances,
         exploting the Node_distance_frequency and it verifies that the normalized sum of each
         frequency is equal to one'''
-    dct_dist={(1, 2): 0.17826839815610848,
-              (1, 3): 0.1621369469779289,
-              (1, 4): 0.15016564862477497,
-              (1, 5): 0.30311264216355577,
-              (1, 6): 1.1628898382687927,
-              (2, 3): 0.3027628033303571,
-              (2, 4): 0.14940329750489897,
-              (2, 5): 0.1615649741071594,
-              (2, 6): 1.1248380701452185,
-              (3, 4): 0.18437027351662638,
-              (3, 5): 0.367850010102952,
-              (3, 6): 1.3173493365750428,
-              (4, 5): 0.18411463816128404,
-              (4, 6): 1.2582690118458433,
-              (5, 6): 1.2459654725200846}
+    dct_dist={(1, 2): 0.178,
+              (1, 3): 0.162,
+              (1, 4): 0.150,
+              (1, 5): 0.303,
+              (1, 6): 1.162,
+              (2, 3): 0.302,
+              (2, 4): 0.149,
+              (2, 5): 0.161,
+              (2, 6): 1.124,
+              (3, 4): 0.184,
+              (3, 5): 0.367,
+              (3, 6): 1.317,
+              (4, 5): 0.184,
+              (4, 6): 1.258,
+              (5, 6): 1.245}
     step=0.026346986731500856
     nstep=50
     node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)/len(dct_dist)
@@ -836,21 +838,21 @@ def test_Node_distance_frequency_III_axiom():
         so it represents the sum of two group of distances.
         It verifies that the frequency of couples of distances of the first distribuition 
         is equal to the frequancy of one event of second.'''
-    dct_dist={(1, 2): 0.17826839815610848,
-              (1, 3): 0.1621369469779289,
-              (1, 4): 0.15016564862477497,
-              (1, 5): 0.30311264216355577,
-              (1, 6): 1.1628898382687927,
-              (2, 3): 0.3027628033303571,
-              (2, 4): 0.14940329750489897,
-              (2, 5): 0.1615649741071594,
-              (2, 6): 1.1248380701452185,
-              (3, 4): 0.18437027351662638,
-              (3, 5): 0.367850010102952,
-              (3, 6): 1.3173493365750428,
-              (4, 5): 0.18411463816128404,
-              (4, 6): 1.2582690118458433,
-              (5, 6): 1.2459654725200846}
+    dct_dist={(1, 2): 0.178,
+              (1, 3): 0.162,
+              (1, 4): 0.150,
+              (1, 5): 0.303,
+              (1, 6): 1.162,
+              (2, 3): 0.302,
+              (2, 4): 0.149,
+              (2, 5): 0.161,
+              (2, 6): 1.124,
+              (3, 4): 0.184,
+              (3, 5): 0.367,
+              (3, 6): 1.317,
+              (4, 5): 0.184,
+              (4, 6): 1.258,
+              (5, 6): 1.245}
     step=0.026346986731500856
     nstep=14
     node_distance_frequency_1=fn.Node_distance_frequency(dct_dist,nstep,step)/len(dct_dist)
@@ -1235,7 +1237,9 @@ def test_Random_target_is_not_its_self():
 #%%  test_Merge_small_component (2)
 
 def test_Merge_small_component():
-    '''It verifies all the components are bigger than the threshold'''
+    '''It builds a graph with only one component of dimension three and three smaller components.
+    It tests if after the apllication of the Merge function all the components 
+    are bigger than the 3, the threshold'''
     edges=[(1,2), (3,4), (6,7), (7,5), (8,8)]    
     G=fn.SuperGraph()
     G.add_edges_from(edges)
@@ -1245,8 +1249,10 @@ def test_Merge_small_component():
         assert len(i)>=3
         
 def test_Merge_small_component_Exception():
-    '''It test if raises an exception for empty list'''
-    edges=[(1,2), (3,4), (6,7), (7,5), (8,8)]    
+    '''It builds a graph with four small components.
+    It tries to merge with nodes looking for a target node with degree equal to zero, but there
+    are no left so it verifies the function raise an Exception'''
+    edges=[(1,2), (3,4), (6,7), (0,5)]    
     G=fn.SuperGraph()
     G.add_edges_from(edges)
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
