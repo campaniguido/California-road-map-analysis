@@ -1120,10 +1120,12 @@ def test_Max_prob_target_is_not_its_neighbors():
     assert neighbors_0!=fn.Max_prob_target (source,degree,map_dct,prob_distribution,max_dist,G)
 
 
-#%% test_Min_distance_target (5)
+#%% test min_dis_distance_target (5)
 
 def test_Min_distance_target_is_the_nearest():
-    '''It tests the target is the nearest node which is not itself or one of its neighbor'''
+    '''Given a graph with 10 nodes, linked with no particular order and a map of their postion.
+    It links the node 0 to the nearest one with degree equal to three,
+    which is not 0 or one of  its neighbors'''
     edges=[(0, 1), (0, 3), (0, 6), (0, 8), (0, 9), (1, 2), (1, 4), (1, 9), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 5), (4, 8), (5, 7), (6, 8), (7, 9)]
     G=fn.SuperGraph()
     G.add_edges_from(edges)
@@ -1140,15 +1142,16 @@ def test_Min_distance_target_is_the_nearest():
              9: np.array([1, 1])}
     
     source=0
-    degree_dct=G.Degree_dct()
-    neighbour_0=list(G.neighbors(0))
-    target=fn.Min_distance_target (source,degree_dct,3,map_dct,neighbour_0)
+    target=fn.Min_distance_target (source,3,map_dct,G)
     
     assert target==2
     
-def test_Min_distance_target_is_not_its_self():
-    '''It tests the target is not its self'''
-    edges=[(0,1),(0,2),(0,3),(1,2),(0,0),(4,4)]
+def test_Min_distance_target_is_not_its_neighbors():
+    
+    '''Given a graph with 5 nodes and a map of their postion.
+    It tries to links the node 0 to the nearest one with degree equal to 1, but all
+    the nearest nodes with degree 1 are neighbors so it tests the target is 4'''
+    edges=[(0,1),(0,2),(0,3),(4,4)]
     G=fn.SuperGraph()
     G.add_edges_from(edges)
     G.Relable_nodes()
@@ -1158,35 +1161,31 @@ def test_Min_distance_target_is_not_its_self():
          3: np.array([1, 2]),
          4: np.array([5, 5])}
     source=0
-    degree_dct=G.Degree_dct()
-    neighbour_0=list(G.neighbors(0))
-    for i in range(100):
-        assert source!=fn.Min_distance_target (source,degree_dct,3,map_dct,neighbour_0)
+    assert 4==fn.Min_distance_target (source,1,map_dct,G)
         
-def test_Min_distance_target_is_not_its_neighbors():
-    '''It test the target is not one of its neighbors'''
-    edges=[(0,1),(0,2),(1,3),(1,2),(0,0)]
+def test_Min_distance_target_is_not_its_self():
+    '''Given a graph with 5 nodes, and a map of their postion.
+    It tries to links the node 0 to the nearest one with degree equal to 3 but the only node
+    with degree 3 is itself so it tests the target is 4'''
+    edges=[(0,1),(0,2),(1,3),(0,3),(1,4)]
     G=fn.SuperGraph()
     G.add_edges_from(edges)
     G.Relable_nodes()
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     source=0
-    degree_dct=G.Degree_dct()
-    neighbour_0=list(G.neighbors(0))
-    for i in range(100):
-        assert 2!=fn.Min_distance_target (source,degree_dct,2,map_dct,neighbour_0)
+    assert 4==fn.Min_distance_target (source,1,map_dct,G)
         
 def test_Min_distance_target_degree_corrispodence():
-    '''It tests the target degree is the one chosen'''
+    '''Given a graph with 5 nodes, and a map of their postion.
+    It tries to links the node 0 to the nearest one with degree equal to 3.
+    Finally it tests the degree of the tagat'''
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0),(4,1),(4,2),(4,3)]
     G=fn.SuperGraph()
     G.add_edges_from(edges)
     G.Relable_nodes()
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     source=0
-    degree_dct=G.Degree_dct()
-    neighbour_0=list(G.neighbors(0))
-    target=fn.Min_distance_target (source,degree_dct,3,map_dct,neighbour_0)
+    target=fn.Min_distance_target (source,3,map_dct,G)
     assert len(list(G.neighbors(target)))==3
     
  
@@ -1366,8 +1365,8 @@ def test_Copymap_degree_correction():
     ERG=fn.Copymap_degree_correction(ERG,G,ERG_map_dct,max_dist_link,distance_linking_probability,Merge=False)
     
     for i in range(len(ERG.Degree_ratio())):
-        print(G.Degree_ratio()[i]-2*(G.Degree_ratio()[i])**0.5,'<=',ERG.Degree_ratio()[i],'<=',G.Degree_ratio()[i]+2*(G.Degree_ratio()[i])**0.5)
-        assert (G.Degree_ratio()[i]-2*(G.Degree_ratio()[i])**0.5<=ERG.Degree_ratio()[i]<=G.Degree_ratio()[i]+2*(G.Degree_ratio()[i])**0.5)
+        print(G.Degree_ratio()[i]-3*(G.Degree_ratio()[i]+0.001)**0.5,'<=',ERG.Degree_ratio()[i],'<=',G.Degree_ratio()[i]+3*(G.Degree_ratio()[i]+0.01)**0.5)
+        assert (G.Degree_ratio()[i]-3*(G.Degree_ratio()[i]+0.001)**0.5<=ERG.Degree_ratio()[i]<=G.Degree_ratio()[i]+3*(G.Degree_ratio()[i]+0.01)**0.5)
     
                
  

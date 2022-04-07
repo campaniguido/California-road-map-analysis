@@ -715,7 +715,7 @@ def Max_prob_target (source,degree,map_dct,distance_linking_probability,max_dist
     '''In the case there was no nodes with the right conditions to link to'''
     if target==-5:
 
-        target=fn.Min_distance_target(source,G.Degree_dct() ,degree, map_dct, list(G.neighbors(source)))
+        target=fn.Min_distance_target(source,degree, map_dct,G)
     return target
   
     
@@ -723,7 +723,7 @@ def Max_prob_target (source,degree,map_dct,distance_linking_probability,max_dist
 
 #%%15 Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_list)
 
-def Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_list):
+def Min_distance_target (source,degree,map_dct,G):
     '''
     Given a distance map of the nodes, From a starting vertice (the source) of the graph it returns the nearest node 
     with a given degree and which is not already linked to the source. If it is impossible a random one is chosen  
@@ -757,28 +757,51 @@ def Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_lis
     min_=999
     target=-5
     'to avoids to start an endless while loop'
+    source_neighbour_list=list(G.neighbors(source))
     assert len(source_neighbour_list)!=len(map_dct)
     
-    for i in strenght_dct[degree]:
-        
+    for i in (G.Degree_dct())[degree]:        
         x1=map_dct[i]
-        dist=np.linalg.norm(x0-x1)
-        
-        if dist!=0 and source_neighbour_list.count(i)!=1:
-            
-            if dist<min_:
-                
+        dist=np.linalg.norm(x0-x1)        
+        if dist!=0 and source_neighbour_list.count(i)!=1:            
+            if dist<min_:                
                 min_=dist
-                target=i
+                print(target)
+                target=i          
     while target<0:
-        'In order to find a target to link with even if it has a different degree in respect to the one chosen'
-        list_target=rn.choice(list(strenght_dct.values()))
-        if len(list_target)!=0:
-            target_prova=rn.choice(list_target)
-            if target_prova!=source and source_neighbour_list.count(target_prova)!=1:
-                target=target_prova
+        '''In order to find a target to link with even if it has a different degree 
+        in respect to the one chosen'''
+        target=fn.Random_target(G, source)    
         
     return target
+#%% Random target
+
+def Random_target(G,source):
+    '''
+    
+
+    Parameters
+    ----------
+    G : TYPE
+        DESCRIPTION.
+    source : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    target : TYPE
+        DESCRIPTION.
+
+    '''
+    target=-5
+    while target<0:
+        target_prova=rn.choice(list(G.nodes()))
+        source_neighbour_list=list(G.neighbors(source))
+        if target_prova!=source and source_neighbour_list.count(target_prova)!=1:
+            target=target_prova
+    return target
+    
+
 
 
     
@@ -822,7 +845,7 @@ def Merge_small_component(G, deg,map_dct,threshold):
             if len(list_nodes)==0:
                 raise Exception('the node list with the degree chosen is empty')
                 
-            target=Min_distance_target(source,G.Degree_dct(),deg,map_dct,list(G.neighbors(source)))
+            target=Min_distance_target(source,deg,map_dct,G)
             G.add_edge(source,target)
             
         i=i+1
