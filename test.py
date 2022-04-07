@@ -1129,7 +1129,7 @@ def test_Min_distance_target_is_the_nearest():
     edges=[(0, 1), (0, 3), (0, 6), (0, 8), (0, 9), (1, 2), (1, 4), (1, 9), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 5), (4, 8), (5, 7), (6, 8), (7, 9)]
     G=fn.SuperGraph()
     G.add_edges_from(edges)
-    G.Relable_nodes()
+    
     map_dct={0: np.array([ 0, 0]),
              1: np.array([-1, -1]),
              2: np.array([-0.5, -0.2]),
@@ -1154,7 +1154,7 @@ def test_Min_distance_target_is_not_its_neighbors():
     edges=[(0,1),(0,2),(0,3),(4,4)]
     G=fn.SuperGraph()
     G.add_edges_from(edges)
-    G.Relable_nodes()
+    
     map_dct={0: np.array([ 0, 0]),
          1: np.array([-1, -1]),
          2: np.array([-0.5, -0.2]),
@@ -1170,8 +1170,12 @@ def test_Min_distance_target_is_not_its_self():
     edges=[(0,1),(0,2),(1,3),(0,3),(1,4)]
     G=fn.SuperGraph()
     G.add_edges_from(edges)
-    G.Relable_nodes()
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    
+    map_dct={0: np.array([ 0, 0]),
+             1: np.array([-1, -1]),
+             2: np.array([-0.5, -0.2]),
+             3: np.array([1, 2]),
+             4: np.array([5, 5])}
     source=0
     assert 4==fn.Min_distance_target (source,1,map_dct,G)
         
@@ -1182,13 +1186,52 @@ def test_Min_distance_target_degree_corrispodence():
     edges=[(0,1),(0,2),(0,3),(1,2),(0,0),(4,1),(4,2),(4,3)]
     G=fn.SuperGraph()
     G.add_edges_from(edges)
-    G.Relable_nodes()
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+
+    map_dct={0: np.array([ 0, 0]),
+             1: np.array([-1, -1]),
+             2: np.array([-0.5, -0.2]),
+             3: np.array([1, 2]),
+             4: np.array([5, 5])}
     source=0
     target=fn.Min_distance_target (source,3,map_dct,G)
     assert len(list(G.neighbors(target)))==3
     
- 
+#%%  test Random target
+
+def test_random_target():
+    '''Given a graph with 10 nodes, linked with no particular order.
+    It links the node 0 to a random node, it tests that after tha application
+    of the function the target is a node of the graph'''
+    edges=[(0, 1), (0, 3), (0, 6), (0, 8), (0, 9), (1, 2), (1, 4), (1, 9), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 5), (4, 8), (5, 7), (6, 8), (7, 9)]
+    G=fn.SuperGraph()
+    G.add_edges_from(edges)   
+    source=0
+    target=fn.Random_target(G, source)
+    
+    assert list(G.nodes()).count(target)==1
+    
+def test_Random_target_is_not_its_neighbors():
+    
+    '''Given a graph with 5 nodes.
+    It tries to links the node 0 to a random target, all
+    the nodes but the 4° are neighbors so it tests the target is the 4° '''
+    edges=[(0,1),(0,2),(0,3),(4,4)]
+    G=fn.SuperGraph()
+    G.add_edges_from(edges)
+    source=0
+    assert 4==fn.Random_target(G, source)
+        
+def test_Random_target_is_not_its_self():
+    '''Given a graph with 2 nodes, and a map of their postion.
+    It tries to links the node 0 to a random target, but there is only another node
+    so it tests the target is 4'''
+    
+    edges=[(0,0),(4,4)]
+    G=fn.SuperGraph()
+    G.add_edges_from(edges)  
+    source=0
+    assert 4==fn.Random_target(G, source)
+        
 #%%  test_Merge_small_component (2)
 
 def test_Merge_small_component():
