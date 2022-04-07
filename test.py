@@ -1265,94 +1265,81 @@ def test_Merge_small_component_Exception():
     
 
 def test_Link_2_ZeroNode_reduction():
-    rn.seed(3)
-    '''It verifies the right decreasing of  '0' degree ratio'''
-    edges=[(0, 3), (0, 2), (0, 8), (0, 9), (1, 2), (1, 4), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 8), (2, 8), (8, 9)]
-    
+    '''Given a graoh with seven nodes, and two of them are isolated, it applies
+    Link_2_ZeroNode  connected the the isolated node with two links to the rest of the graph
+    it verifies the right decreasing of  '0' degree ratio
+    due to the application of the function '''
+    edges=[(0,2),(1,2),(2,3),(4,0),(5,5),(6,6)]
     G=fn.SuperGraph()
-    G.add_nodes_from(list(range(10)))
-    G.add_edges_from(edges)
-    G.Relable_nodes()
+    G.add_edges_from(edges)    
+    map_dct={0: np.array([0, 0]),
+             1: np.array([1, 0]),
+             2: np.array([2, 0]),
+             3: np.array([3, 0]),
+             4: np.array([4, 0]),
+             5: np.array([5, 0]),
+             6: np.array([6, 0])}    
     
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    
-    dct_dist_link=fn.Dct_dist_link(edges, map_dct)
-    max_dist_link=max(dct_dist_link.values())
-    nstep=10
-    step=max_dist_link/nstep
-    dct_dist=fn.Dct_dist(G, map_dct)
-    distance_frequency=fn.Node_distance_frequency(dct_dist, nstep, step)
-    node_links_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)
-    prob_distribution=fn.Conditional_probability(node_links_frequency,step,distance_frequency)
-    
-    
-    max_dist_link=max(dct_dist_link.values())
-    degree_dct=G.Degree_dct()
-    degree_ratio_0_before=G.Degree_ratio()[0]
-    n_links=4
-    fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G, n_links , degree_dct)
-    degree_dct=G.Degree_dct()
+    prob_distribution={1: 0.4, 2: 0.4, 3: 0.4, 4: 0.4}  
+    max_dist_link=4
+    n_links=2
+    fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G, n_links , G.Degree_dct())
     degree_ratio_0_after=G.Degree_ratio()[0]
-    assert degree_ratio_0_before==degree_ratio_0_after+2/10
+    assert 0==degree_ratio_0_after
 
 def test_Link_2_ZeroNode_increment():
-    '''It verifies the right incrasing of  target degree ratio'''
-    edges=[(0, 3), (0, 2), (0, 8), (0, 9), (1, 2), (1, 4), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 8), (2, 8), (8, 9)]
+    '''Given a graoh with seven nodes, and two two of them are isolated, it applies
+    Link_2_ZeroNode  connected the the isolated node with two links to the rest of the graph
+    Finally it verifies the right increasing of  '2' degree ratio
+    due to the application of the function '''
     
+    edges=[(0,2),(1,2),(2,3),(4,0),(5,5),(6,6)]
     G=fn.SuperGraph()
-    G.add_nodes_from(list(range(10)))
-    G.add_edges_from(edges)
-    G.Relable_nodes()
+    G.add_edges_from(edges)    
+    map_dct={0: np.array([0, 0]),
+             1: np.array([1, 0]),
+             2: np.array([2, 0]),
+             3: np.array([3, 0]),
+             4: np.array([4, 0]),
+             5: np.array([5, 0]),
+             6: np.array([6, 0])}    
     
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    
-    dct_dist_link=fn.Dct_dist_link(edges, map_dct)
-    max_dist_link=max(dct_dist_link.values())
-    nstep=10
-    step=max_dist_link/nstep
-    dct_dist=fn.Dct_dist(G, map_dct)
-    distance_frequency=fn.Node_distance_frequency(dct_dist, nstep, step)
-    node_links_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)
-    prob_distribution=fn.Conditional_probability(node_links_frequency,step,distance_frequency)
-    
-    
-    degree_dct=G.Degree_dct()
-    degree_ratio_4_before=G.Degree_ratio()[4]
-    n_links=4
-    fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G, n_links , degree_dct)
-    degree_dct=G.Degree_dct()
-    degree_ratio_4_after=G.Degree_ratio()[4]
-    assert degree_ratio_4_before==degree_ratio_4_after-2/10
+    prob_distribution={1: 0.4, 2: 0.4, 3: 0.4, 4: 0.4}  
+    max_dist_link=4
+    n_links=2
+    fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G, n_links , G.Degree_dct())
+    degree_ratio_2_after=G.Degree_ratio()[2]
+    assert 3/7==degree_ratio_2_after
+
 
 def test_Link_2_ZeroNode_constant_degree_ratio():
-    '''It tests that the degree ratio between the source and the target degree do not change'''
-    edges=[(0, 3), (0, 2), (0, 8), (0, 9), (1, 2), (1, 4), (2, 3), (2, 4), (3, 4), (3, 5), (3, 9), (4, 8), (2, 8), (8, 9)]
+    '''Given a graoh with seven nodes, and two two of them are isolated,it applies
+    Link_2_ZeroNode  connected the the isolated node with three links to the rest of the graph 
+    Finally it verifies that the degree ratio of 1 and to remains constant after
+    the application of the function '''
     
+    
+    edges=[(0,2),(1,2),(2,3),(4,0),(5,5),(6,6)]
     G=fn.SuperGraph()
-    G.add_nodes_from(list(range(10)))
-    G.add_edges_from(edges)
-    G.Relable_nodes()
+    G.add_edges_from(edges)    
+    map_dct={0: np.array([0, 0]),
+             1: np.array([1, 0]),
+             2: np.array([2, 0]),
+             3: np.array([3, 0]),
+             4: np.array([4, 0]),
+             5: np.array([5, 0]),
+             6: np.array([6, 0])}    
     
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    prob_distribution={1: 0.4, 2: 0.4, 3: 0.4, 4: 0.4}  
+    max_dist_link=4
+    n_links=3
+    fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G, n_links , G.Degree_dct())
+    degree_ratio_2_after=G.Degree_ratio()[2]
+    degree_ratio_1_after=G.Degree_ratio()[1]
     
-    dct_dist_link=fn.Dct_dist_link(edges, map_dct)
-    max_dist_link=max(dct_dist_link.values())
-    nstep=10
-    step=max_dist_link/nstep
-    dct_dist=fn.Dct_dist(G, map_dct)
-    distance_frequency=fn.Node_distance_frequency(dct_dist, nstep, step)
-    node_links_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)
-    prob_distribution=fn.Conditional_probability(node_links_frequency,step,distance_frequency)
-    
-    
-    degree_dct=G.Degree_dct()
-    degree_ratio_before=G.Degree_ratio()
-    n_links=4
-    fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G, n_links , degree_dct)
-    degree_dct=G.Degree_dct()
-    degree_ratio_after=G.Degree_ratio()
-    for i in range (1,4):
-        assert degree_ratio_before[i]==degree_ratio_after[i]
+    assert 1/7==degree_ratio_2_after
+    assert 3/7==degree_ratio_1_after
+
 
 
 
