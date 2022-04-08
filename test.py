@@ -1346,7 +1346,9 @@ def test_Link_2_ZeroNode_constant_degree_ratio():
 #%% test_Remove_edge_of_degree
 
 def test_Remove_edge_of_degree_local():
-    '''It verifies the ratio that had been changed it is right '''
+    '''Given a graph with 7 nodes and links with no particular order,
+    it removes an edge with a node of a given degree (six), exploting fn.Remove_edge_of_degree.
+    It verifies the ratio that had been changed it is right '''
     edges=[(1,2), (3,1), (1,1), (1,2), (2,1), (1,4), (1,5), (5,4), (5,3), (1,6), (6,2), (5,2), (1,7)]    
     G=fn.SuperGraph()
     G.add_edges_from(edges)
@@ -1354,7 +1356,9 @@ def test_Remove_edge_of_degree_local():
     assert list(G.Degree_ratio())[5]==1/7
     
 def test_Remove_edge_of_degree_total():
-    ''' It verifies the ratio of all the degree are right after the application of the function'''
+    '''Given a graph with 7 nodes and links with no particular order,
+    it removes an edge with a node of a given degree (four) exploting fn.Remove_edge_of_degree
+    It verifies the ratio of all the degree are right after the application of the function'''
     edges=[(1,2), (3,1), (1,1), (1,2), (1,4), (5,4), (5,3), (1,6), (6,7), (5,2)]    
     G=fn.SuperGraph()
     G.add_edges_from(edges)
@@ -1362,7 +1366,9 @@ def test_Remove_edge_of_degree_total():
     assert list(G.Degree_ratio())==[0, 2/7, 3/7, 2/7]
 
 def test_Remove_edge_of_degree_len():
-    '''It tests the length of the Graph does not change'''
+    '''Given a graph with 7 nodes and links with no particular order,
+    it removes an edge with a node of a given degree (four) exploting fn.Remove_edge_of_degree
+    It tests the length of the Graph does not change'''
     edges=[(1,2), (3,1), (1,1), (1,2), (1,4), (5,4), (5,3), (1,6), (6,2), (5,2)]    
     G=fn.SuperGraph()
     G.add_edges_from(edges)
