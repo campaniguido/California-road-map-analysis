@@ -32,7 +32,7 @@ edges=list(G.edges())
 
 #%%COPYCAT network. First step: linking following the distance attachment rule
 
-map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+map_dct=nx.spring_layout(G, dim=2, seed=seed)
 dct_dist_link=fn.Dct_dist_link(edges,map_dct)
 dct_dist=fn.Dct_dist(G=G, map_dct=map_dct)
 step=max(dct_dist_link.values())/paramsC.nstep

@@ -978,11 +978,10 @@ def Equalizer_top_down(G,Copycat):
     '''
     for i in range(len(G.Degree_ratio())-1,0,-1):
         if i< len(Copycat.Degree_ratio()):
-
+            
             while len(Copycat.Degree_ratio())>=i and Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:
 
                 fn.Remove_edge_of_degree(i, Copycat) 
-
 #%%21 Equalizer_down_top
 def Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link):
     '''

@@ -10,6 +10,8 @@ import function as fn
 import networkx as nx
 import pytest
 
+seed=3
+
 
 #%%Ct  test sorted_graph (2)
 def test_sorted_graph_nodes():
@@ -596,7 +598,7 @@ def test_List_dist_link_length():
     edges=[(1,2),(3,1),(1,1),(1,2),(2,1)]    
     G=nx.Graph()
     G.add_edges_from(edges)
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     dct_dist_link=fn.Dct_dist_link(edges, map_dct)
     assert list(dct_dist_link.keys())==[(3, 1), (1, 2)]
 
@@ -608,7 +610,7 @@ def test_List_dist_link_non_negativity():
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     edges=list(G.edges())
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     dct_dist_link=fn.Dct_dist_link(edges, map_dct)
     for i in list(dct_dist_link.values()):
         assert i>=0
@@ -622,7 +624,7 @@ def test_List_dist_link_simmetry():
     among linked nodes for the two symmetric set and it tests the outpu values are the same'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[2,3],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     edges=list(G.edges())
     segde=[]
     for i in range(len(edges)):
@@ -641,7 +643,7 @@ def test_List_dist_link_triangular_inequality_unit_test():
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[2,3]])
     edges=list(G.edges())
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     dct_dist_link=fn.Dct_dist_link(edges, map_dct)
     assert dct_dist_link[(1,2)]<=dct_dist_link[(2,3)]+dct_dist_link[(1,3)]
     assert dct_dist_link[(1,3)]<=dct_dist_link[(2,3)]+dct_dist_link[(1,2)]
@@ -658,7 +660,7 @@ def test_List_dist_link_triangular_inequality_abstract_test():
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     edges=list(G.edges())
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     dct_dist_link=fn.Dct_dist_link(edges, map_dct)
     a=list(G.nodes())
     for node in list(G.nodes()) :
@@ -693,7 +695,7 @@ def test_List_dist_length():
     edges=[(1,2),(3,1),(1,1),(1,2),(2,1), (1,4)]    
     G=nx.Graph()
     G.add_edges_from(edges)
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     dct_dist=fn.Dct_dist(G, map_dct)
     assert list(dct_dist.keys())==[(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)]
 
@@ -704,7 +706,7 @@ def test_List_dist_non_negativity():
        Finally it verifies if the values the ouput distance dictionary are posives'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     dct_dist_link=fn.Dct_dist(G, map_dct)
     for i in list(dct_dist_link.values()):
         assert i>=0
@@ -718,7 +720,7 @@ def test_List_dist_simmetry():
     among nodes for the two symmetric set and it tests the output values are the same'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[3,4],[1,3],[2,3],[2,4]])
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     edges=[[1,2],[3,4],[1,3],[2,3],[2,4]]
     segde=[]
     for i in range(len(edges)):
@@ -745,7 +747,7 @@ def test_List_dist_triangular_inequality_unit_test():
     inequality for all the possible distances'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[2,3]])
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     dct_dist=fn.Dct_dist(G, map_dct)
     assert dct_dist[(1,2)]<=dct_dist[(2,3)]+dct_dist[(1,3)]
     assert dct_dist[(1,3)]<=dct_dist[(2,3)]+dct_dist[(1,2)]
@@ -760,7 +762,7 @@ def test_List_dist_triangular_inequality_abstract():
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     edges=list(G.edges())
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     dct_dist=fn.Dct_dist(G, map_dct)
     a=list(G.nodes())
     for node in list(G.nodes()) :
@@ -1242,7 +1244,7 @@ def test_Merge_small_component():
     edges=[(1,2), (3,4), (6,7), (7,5), (8,8)]    
     G=fn.SuperGraph()
     G.add_edges_from(edges)
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     fn.Merge_small_component(G, 1,map_dct,threshold=3)
     for i in list(nx.connected_components(G)):
         assert len(i)>=3
@@ -1452,7 +1454,7 @@ def test_Equalizer_down_top():
     edges_copy=[(0,1),(2,3),(4,5),(6,7)]
     G=fn.SuperGraph(edges_G)
     Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
-    map_dct=nx.spring_layout(Copycat, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     prob_distribution={0.2:0.5, 0.4:0.5, 0.6:0.5, 0.8:0.5, 1:0.5,
                     1.2:0.5, 1.4:0.5, 1.6:0.5, 1.8:0.5, 2:0.5,}
     dct_dist_link=fn.Dct_dist_link(list(Copycat.edges()), map_dct)
@@ -1472,7 +1474,7 @@ def test_Equalizer_down_top_edge_presence():
     edges_copy=[(0,0),(1,2),(2,3),(3,4)]
     G=fn.SuperGraph(edges_G)    
     Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
-    map_dct=nx.spring_layout(Copycat, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     prob_distribution={0.2:0.5, 0.4:0.5, 0.6:0.5, 0.8:0.5, 1:0.5,
                     1.2:0.5, 1.4:0.5, 1.6:0.5, 1.8:0.5, 2:0.5,}
     dct_dist_link=fn.Dct_dist_link(list(Copycat.edges()), map_dct)
@@ -1493,7 +1495,7 @@ def test_Equalizer_down_top_right_ratio():
     edges_copy=[(0,0),(1,1),(2,3),(3,4),(3,5),(6,6),(7,7),(8,8),(9,9)]
     G=fn.SuperGraph(edges_G)    
     Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
-    map_dct=nx.spring_layout(Copycat, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     prob_distribution={0.2:0.5, 0.4:0.5, 0.6:0.5, 0.8:0.5, 1:0.5,
                     1.2:0.5, 1.4:0.5, 1.6:0.5, 1.8:0.5, 2:0.5,}
     dct_dist_link=fn.Dct_dist_link(list(Copycat.edges()), map_dct)
@@ -1516,7 +1518,7 @@ def test_Copymap_degree_correction():
     link_dist_prob={0.2:0.5, 0.4:0.5, 0.6:0.5, 0.8:0.5, 1:0.5,
                     1.2:0.5, 1.4:0.5, 1.6:0.5, 1.8:0.5, 2:0.5,}
     
-    map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    map_dct=nx.spring_layout(G, dim=2, seed=seed)
     dct_dist_link=fn.Dct_dist_link(list(G.edges),map_dct)
     new_graph=fn.SuperGraph()
     new_graph.add_nodes_from(G.nodes())
@@ -1532,7 +1534,7 @@ def test_Copymap_degree_correction():
     for i in range(len(Copycat.Degree_ratio())):
         print(G.Degree_ratio()[i]-3*(G.Degree_ratio()[i]+0.001)**0.5,'<=',Copycat.Degree_ratio()[i],'<=',G.Degree_ratio()[i]+3*(G.Degree_ratio()[i]+0.01)**0.5)
         assert (G.Degree_ratio()[i]-3*(G.Degree_ratio()[i]+0.001)**0.5<=Copycat.Degree_ratio()[i]<=G.Degree_ratio()[i]+3*(G.Degree_ratio()[i]+0.01)**0.5)
-    
+#%% 
                
 def test_trunk_array_at_nan_len():
     '''Given a np array 4*4, the Trunk_array_at_nan trunk each row at the first nan value.
@@ -1544,8 +1546,9 @@ def test_trunk_array_at_nan_len():
     
 def test_trunk_array_at_nan_no_nan():
     '''Given a np array 4*4, the Trunk_array_at_nan trunk each row at the first nan value.
-    a list of lists is expected whose rows have all the values before the nan value'
+    a list of lists is expected whose rows have all the values before the nan value'''
     a=np.array(([0,1,np.nan,np.nan],[1,np.nan,0,0]))
+    
     A=fn.Trunk_array_at_nan(a)
     assert (A[0])==[0.0, 1.0]
     assert (A[1])==[1.0]
