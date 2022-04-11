@@ -11,12 +11,17 @@ import pandas as pd
 import numpy as np
 import function as fn
 import parameters as params
+import random as rn
 
 
 
 
 
 
+#%%seed
+
+seed=params.seed
+rn.seed(seed)
 
 #%% file reading
 
@@ -43,8 +48,8 @@ Closeness_Centrality=np.array(list((nx.closeness_centrality(G)).items()))
 Betweeness_Centrality=np.array(list((nx.betweenness_centrality(G)).items()))
 Clustering=np.array(list((nx.clustering(G)).items()))
 
-community=nx.algorithms.community.modularity_max.greedy_modularity_communities(G)
-community=fn.Unfreeze_into_list(community)
+community_frozen=nx.algorithms.community.modularity_max.greedy_modularity_communities(G)
+community=fn.Unfreeze_into_list(community_frozen)
 community_color=fn.Set_community_number(G, community)
 
 

@@ -9,7 +9,7 @@ import os
 file_position='https://raw.githubusercontent.com/campaniguido/Software_and_Computing/main/roadnet-ca.txt'
 number_of_edge=5000
 path_to_save_data=os.getcwd()
-
+seed=3
 
 
 

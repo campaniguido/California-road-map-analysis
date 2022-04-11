@@ -14,7 +14,6 @@ import function as fn
 import math
 
 
-#%%seed
 
 #%% CLASS SuperGraph
 
@@ -603,7 +602,7 @@ def Break_strongest_nodes(G, threshold):
     None.
 
     '''
-    rn.seed(3)
+    
 
     
     dct_degree=G.Degree_dct()
@@ -667,7 +666,7 @@ def Equalize_strong_nodes(G_strong, G_weak):
     None.
 
     '''
-    rn.seed(3)
+    
     dct_degree_weak=G_weak.Degree_dct()
     degree_ratio_weak=G_weak.Degree_ratio()    
     threshold=fn.Find_mode(degree_ratio_weak)
@@ -783,7 +782,7 @@ def Min_distance_target (source,degree,map_dct,G):
         It is the label of node chosen for the linkage
 
     '''
-    rn.seed(3)
+    
     x0=map_dct[source]
     min_=999
     target=-5
@@ -865,7 +864,7 @@ def Merge_small_component(G, deg,map_dct,threshold):
     None.
 
     '''
-    rn.seed(3)
+    
     all_components=list(nx.connected_components(G))
     for i in range(len(all_components)):
     

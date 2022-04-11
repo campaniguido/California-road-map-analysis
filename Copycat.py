@@ -2,10 +2,13 @@ import networkx as nx
 import numpy as np
 import function as fn
 import pandas as pd
-import matplotlib.cm as cm
 import parameters_Copycat as paramsC
+import random as rn
 
+#%%seed
 
+seed=paramsC.seed
+rn.seed(seed)
 #%% file reading
 
 file_position=paramsC.file_position
@@ -56,8 +59,8 @@ Closeness_Centrality_Copycat=np.array(list((nx.closeness_centrality(Copycat)).it
 Betweeness_Centrality_Copycat=np.array(list((nx.betweenness_centrality(Copycat)).items()))
 Clustering_Copycat=np.array(list((nx.clustering(Copycat)).items()))
 
-community_Copycat=nx.algorithms.community.modularity_max.greedy_modularity_communities(Copycat)
-community_Copycat=fn.Unfreeze_into_list(community_Copycat)
+community_Copycat_frozen=nx.algorithms.community.modularity_max.greedy_modularity_communities(Copycat)
+community_Copycat=fn.Unfreeze_into_list(community_Copycat_frozen)
 community_color_Copycat=fn.Set_community_number(Copycat, community_Copycat)
 
 
