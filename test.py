@@ -4,8 +4,7 @@ Created on Tue Mar  8 16:05:25 2022
 
 @author: Guido
 """
-import math
-import random as rn
+
 import numpy as np
 import function as fn
 import networkx as nx
@@ -1352,7 +1351,9 @@ def test_Remove_edge_of_degree_local():
     edges=[(1,2), (3,1), (1,1), (1,2), (2,1), (1,4), (1,5), (5,4), (5,3), (1,6), (6,2), (5,2), (1,7)]    
     G=fn.SuperGraph()
     G.add_edges_from(edges)
+    print(G.Degree_dct())
     fn.Remove_edge_of_degree(6,G)
+    print(G.Degree_dct())
     assert list(G.Degree_ratio())[5]==1/7
     
 def test_Remove_edge_of_degree_total():
@@ -1363,7 +1364,12 @@ def test_Remove_edge_of_degree_total():
     G=fn.SuperGraph()
     G.add_edges_from(edges)
     fn.Remove_edge_of_degree(4,G)
-    assert list(G.Degree_ratio())==[0, 2/7, 3/7, 2/7]
+    
+    assert (G.Degree_ratio()[0])==0
+    assert (G.Degree_ratio()[1])==(2/7)
+    assert round(G.Degree_ratio()[2],4)==round(3/7,4)
+    assert round(G.Degree_ratio()[3],4)==round(2/7,4)
+    assert len(G.Degree_ratio())==4
 
 def test_Remove_edge_of_degree_len():
     '''Given a graph with 7 nodes and links with no particular order,
@@ -1375,40 +1381,157 @@ def test_Remove_edge_of_degree_len():
     fn.Remove_edge_of_degree(4,G)
     assert len(G)==6
  
+#%% test_Equalizer_top_down(G,Copycat)
 
-#%%Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False)
+def test_Equalizer_top_down_len():
+    '''
+    Given two graph, G and Copycat, it applies the function fn.Equalizer_top_down,
+    that removes some of the edges of Copycat. It verifies the number of nodes
+    in the two graph do not changes.
+
+    '''
+    edges_G=[(0,1),(2,3),(4,5),(6,7)]
+    G=fn.SuperGraph(edges_G)
+    edges_copy=[(0,1),(0,2),(1,2),(1,5),(2,3),(4,5),(6,7),(8,9)]
+    Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
+    fn.Equalizer_top_down(G,Copycat)
+    assert len(Copycat)==10
+    assert len(G)==8
+    
+def test_Equalizer_top_down_no_edge():
+    '''
+    Given two graph, G and Copycat, it applies the function fn.Equalizer_top_down,
+    that removes some of the edges of Copycat in order to make the degree 
+    ratio distribution of the graph Copycat lower or equal to the one og G.
+    It expecteded that some of the edges of the Copycat node with degree 
+    equal to two disappear.
+
+    '''
+    edges_G=[(0,0),(1,2),(2,3),(3,4),(3,5)]
+    'it has only one node with degree two'
+    G=fn.SuperGraph(edges_G)
+    'it has two nodes with degree equal to two'
+    edges_copy=[(0,0),(0,1),(1,2),(2,3),(3,4),(3,5)]
+    Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
+    fn.Equalizer_top_down(G,Copycat)
+    assert list(Copycat.edges()).count((0,1))==0 or list(Copycat.edges()).count((1,2))==0 or list(Copycat.edges()).count((2,3))==0
+    
+def test_Equalizer_top_down_right_ratio():
+    '''Given two graph, G and Copycat, it applies the function fn.Equalizer_top_down,
+    that removes some of the edges of Copycat in order to make each degree 
+    ratio of the graph Copycat lower or equal to the one of G.
+    Finally it tests if the ineauqlity of the degree ratios is the one expected
+    '''
+    edges_G=[(0,0),(1,2),(2,3),(3,4),(3,5)]
+    G=fn.SuperGraph(edges_G)
+    edges_copy=[(0,0),(0,1),(0,6),(2,4),(1,2),(2,3),(3,4),(3,5),(0,5)]
+    Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
+    fn.Equalizer_top_down(G,Copycat)
+    
+    if len(Copycat.Degree_ratio())>=2:
+        assert Copycat.Degree_ratio()[1]<=G.Degree_ratio()[1]
+    if len(Copycat.Degree_ratio())>=3:
+        assert Copycat.Degree_ratio()[2]<=G.Degree_ratio()[2]    
+    if len(Copycat.Degree_ratio())>=4:
+        assert Copycat.Degree_ratio()[3]<=G.Degree_ratio()[3]
+
+
+#%% test_Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link):
+
+'''numero nodi
+    non ci sia più quell'edge (so quale tolgo)
+    i ratio siano adeguati
+'''
+def test_Equalizer_down_top():
+    
+    '''Given two graph, G and Copycat, it applies the function Equalizer_down_top,
+    that adds some of the edges of Copycat. It verifies the number of nodes
+    in the two graph do not changes.'''
+    
+    edges_G=[(0,1),(0,2),(1,2),(1,5),(2,3),(4,5),(6,7),(8,9)]
+    edges_copy=[(0,1),(2,3),(4,5),(6,7)]
+    G=fn.SuperGraph(edges_G)
+    Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
+    map_dct=nx.spring_layout(Copycat, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    prob_distribution={0.2:0.5, 0.4:0.5, 0.6:0.5, 0.8:0.5, 1:0.5,
+                    1.2:0.5, 1.4:0.5, 1.6:0.5, 1.8:0.5, 2:0.5,}
+    dct_dist_link=fn.Dct_dist_link(list(Copycat.edges()), map_dct)
+    max_dist_link=max(dct_dist_link.values())
+    fn.Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link)
+    assert len(Copycat)==8
+    assert len(G)==10
+    
+def test_Equalizer_down_top_edge_presence():
+    
+    '''Given two graph, G and Copycat, it applies the function Equalizer_down_top,
+    that adds some of the edges of Copycat in order to make each degree 
+    ratio of the graph Copycat major or equal to the one of G.
+    It expecteded that an edge betwwen 0 and 1 or 0 and 4 will appear.'''
+    
+    edges_G=[(0,0),(0,1),(1,2),(2,3),(3,4)]
+    edges_copy=[(0,0),(1,2),(2,3),(3,4)]
+    G=fn.SuperGraph(edges_G)    
+    Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
+    map_dct=nx.spring_layout(Copycat, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    prob_distribution={0.2:0.5, 0.4:0.5, 0.6:0.5, 0.8:0.5, 1:0.5,
+                    1.2:0.5, 1.4:0.5, 1.6:0.5, 1.8:0.5, 2:0.5,}
+    dct_dist_link=fn.Dct_dist_link(list(Copycat.edges()), map_dct)
+    max_dist_link=max(dct_dist_link.values())
+    fn.Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link)
+    assert list(Copycat.edges()).count((0,1))==1  or list(Copycat.edges()).count((0,4))==1
+    
+
+def test_Equalizer_down_top_right_ratio():
+    
+    '''Given two graph, G and Copycat, it applies the function Equalizer_down_top,
+    that adds some of the edges of Copycat in order to make each degree 
+    ratio of the graph Copycat major or equal to the one of G.
+    Finally it tests if the ineauqlity of the degree ratios is the one expected
+    '''
+    
+    edges_G=[(0,0),(0,1),(0,6),(2,4),(2,3),(4,4),(3,5),(0,5),(8,7),(9,9)]
+    edges_copy=[(0,0),(1,1),(2,3),(3,4),(3,5),(6,6),(7,7),(8,8),(9,9)]
+    G=fn.SuperGraph(edges_G)    
+    Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
+    map_dct=nx.spring_layout(Copycat, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+    prob_distribution={0.2:0.5, 0.4:0.5, 0.6:0.5, 0.8:0.5, 1:0.5,
+                    1.2:0.5, 1.4:0.5, 1.6:0.5, 1.8:0.5, 2:0.5,}
+    dct_dist_link=fn.Dct_dist_link(list(Copycat.edges()), map_dct)
+    max_dist_link=max(dct_dist_link.values())
+    fn.Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link)
+   
+    if len(Copycat.Degree_ratio())>=2:
+        assert Copycat.Degree_ratio()[1]>=G.Degree_ratio()[1]
+    if len(Copycat.Degree_ratio())>=3:
+        assert Copycat.Degree_ratio()[2]>=G.Degree_ratio()[2]    
+    if len(Copycat.Degree_ratio())>=4:
+        assert Copycat.Degree_ratio()[3]>=G.Degree_ratio()[3]
+
+#%% test_Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False)
 
 def test_Copymap_degree_correction():
     '''It test the final network has a degree distribution compatible with the distribution of the reference network'''
     
     G=fn.SuperGraph(nx.newman_watts_strogatz_graph(300, 3, p=0.4, seed=3))
-    edge_probability=2*G.number_of_edges()/((len(G)-1)*(len(G)))
+    link_dist_prob={0.2:0.5, 0.4:0.5, 0.6:0.5, 0.8:0.5, 1:0.5,
+                    1.2:0.5, 1.4:0.5, 1.6:0.5, 1.8:0.5, 2:0.5,}
     
     map_dct=nx.spring_layout(G, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
     dct_dist_link=fn.Dct_dist_link(list(G.edges),map_dct)
-    dct_dist=fn.Dct_dist(G=G, map_dct=map_dct)
-    nstep=50
+    new_graph=fn.SuperGraph()
+    new_graph.add_nodes_from(G.nodes())
+    max_dist_link=max(dct_dist_link.values())
     
-    step=max(dct_dist_link.values())/nstep
-
-    distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
-    node_links_frequency=fn.Node_distance_frequency(dct_dist_link,nstep,step)
-    distance_linking_probability=fn.Conditional_probability(node_links_frequency,step,distance_frequency)
+    edge_probability=2*G.number_of_edges()/((len(G)-1)*(len(G)))
+    ERG=fn.SuperGraph(nx.fast_gnp_random_graph(len(G),edge_probability, seed=None, directed=False))
+    ERG.Sorted_graph()
+    ERG.Relable_nodes()
     
+    Copycat=fn.Copymap_degree_correction(ERG,G,map_dct,max_dist_link,link_dist_prob,Merge=False)
     
-
-
-    ERG=nx.fast_gnp_random_graph(len(G),edge_probability, seed=None, directed=False)
-    ERG=fn.SuperGraph(ERG)
-    ERG_map_dct=nx.spring_layout(ERG, k=None, pos=None, fixed=None, iterations=50, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-    ERG_dct_dist_link=fn.Dct_dist_link(list(ERG.edges),map_dct)
-    max_dist_link=max(ERG_dct_dist_link.values())
-    
-    ERG=fn.Copymap_degree_correction(ERG,G,ERG_map_dct,max_dist_link,distance_linking_probability,Merge=False)
-    
-    for i in range(len(ERG.Degree_ratio())):
-        print(G.Degree_ratio()[i]-3*(G.Degree_ratio()[i]+0.001)**0.5,'<=',ERG.Degree_ratio()[i],'<=',G.Degree_ratio()[i]+3*(G.Degree_ratio()[i]+0.01)**0.5)
-        assert (G.Degree_ratio()[i]-3*(G.Degree_ratio()[i]+0.001)**0.5<=ERG.Degree_ratio()[i]<=G.Degree_ratio()[i]+3*(G.Degree_ratio()[i]+0.01)**0.5)
+    for i in range(len(Copycat.Degree_ratio())):
+        print(G.Degree_ratio()[i]-3*(G.Degree_ratio()[i]+0.001)**0.5,'<=',Copycat.Degree_ratio()[i],'<=',G.Degree_ratio()[i]+3*(G.Degree_ratio()[i]+0.01)**0.5)
+        assert (G.Degree_ratio()[i]-3*(G.Degree_ratio()[i]+0.001)**0.5<=Copycat.Degree_ratio()[i]<=G.Degree_ratio()[i]+3*(G.Degree_ratio()[i]+0.01)**0.5)
     
                
  

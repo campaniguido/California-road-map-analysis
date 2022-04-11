@@ -57,6 +57,7 @@ class SuperGraph(nx.Graph):
         for key in range(int(max(np.array(list(self.degree))[:,1])+1)):
             degree_dct[key]=[]
         for i in list(self.nodes()):
+            'to delete him self from the neighbors'
             degree=len(list(self.neighbors(i)))-list(self.neighbors(i)).count(i) 
             for key in degree_dct:
                 if degree==key:
@@ -424,13 +425,15 @@ def Dct_dist(G,map_dct):
     dct_dist={}
     list_nodes=list(G.nodes())
     for i in range(len(list_nodes)):
-        j=i+1
-        while j < (len(G)):
+
+        for j  in range(i+1, len(G)):
+            
             x0=map_dct[list_nodes[i]]
             x1=map_dct[list_nodes[j]]
             dist=np.linalg.norm(x0-x1)
             dct_dist[(list_nodes[i],list_nodes[j])]=(dist)
-            j=j+1
+            
+            
     return dct_dist
 
 
@@ -766,31 +769,31 @@ def Min_distance_target (source,degree,map_dct,G):
         if dist!=0 and source_neighbour_list.count(i)!=1:            
             if dist<min_:                
                 min_=dist
-                print(target)
-                target=i          
-    while target<0:
+                target=i
+                
+    if target<0:
         '''In order to find a target to link with even if it has a different degree 
         in respect to the one chosen'''
         target=fn.Random_target(G, source)    
         
     return target
-#%% Random target
+#%%16 Random target
 
 def Random_target(G,source):
     '''
-    
+    It links the source to a random node of the graph
 
     Parameters
     ----------
-    G : TYPE
-        DESCRIPTION.
-    source : TYPE
-        DESCRIPTION.
+    G : function.SuperGraph
+        It represents a graph
+    source : int
+        it represent the source of the link.
 
     Returns
     -------
-    target : TYPE
-        DESCRIPTION.
+    target : int
+        it represent the target of the link
 
     '''
     target=-5
@@ -805,7 +808,7 @@ def Random_target(G,source):
 
 
     
-#%%16 Merge_small_component
+#%%17 Merge_small_component
 def Merge_small_component(G, deg,map_dct,threshold):
     '''
     It merge all the graph component smaller than a given threshold, by linking a random node of
@@ -835,28 +838,27 @@ def Merge_small_component(G, deg,map_dct,threshold):
 
     '''
     rn.seed(3)
-    i=0
     all_components=list(nx.connected_components(G))
-    while i < len(all_components):
+    for i in range(len(all_components)):
     
         if len(list(all_components)[i])<threshold:
             source=rn.choice(list(all_components[i]))
             list_nodes=G.Degree_dct()[deg]
+            
             if len(list_nodes)==0:
                 raise Exception('the node list with the degree chosen is empty')
                 
             target=Min_distance_target(source,deg,map_dct,G)
             G.add_edge(source,target)
-            
-        i=i+1
+        
         
 
     
-#%%17 Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_dct)
+#%%18 Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_dct)
 def Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_dct):
     '''
     It takes an isolated node of the graph and it creates n links (n=n_links) with n different nodes.
-    For each degree group, from 0 to the degree n-1, node will be chosen as a target till reaching n targets.
+    For each degree group, from 0 to the degree n-1,one node will be chosen as a target till n targets will be reached.
     At the end of the process the number of nodes with degree equal to n increase of 2 
     and the number of isolated nodes decrease of two. 
     The degree ratio of the other values remains constant. The attachment rule of the links follow the
@@ -896,7 +898,7 @@ def Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_
             degree_dct=G.Degree_dct()
 
 
-#%%18 Remove_edge_of_degree 
+#%%19 Remove_edge_of_degree 
 def Remove_edge_of_degree(degree,G):
     '''
     It removes a link of a node with a given degree
@@ -915,15 +917,83 @@ def Remove_edge_of_degree(degree,G):
         None.
 
     ''' 
-    rn.seed(3)
+    
     degree_dct=G.Degree_dct()
     source=rn.choice(degree_dct[degree])
-    node=rn.choice(list(G.neighbors(source)))
-    G.remove_edge(source,node)            
+    node=source
+    while node==source:
+        node=rn.choice(list(G.neighbors(source)))
     
+    G.remove_edge(source,node)   
+            
+    
+#%%20 Equalizer_top_down
 
+def Equalizer_top_down(G,Copycat):
+    '''
+    It makes each degree ratio of the network Copycat equal or lower than
+    the corresponding degree ratio of network G. It starts from the higer
+    degree and if it needed it removes edges exploiting the fn.Remove_edge_of_degree
+    The process end when the ratios have the right values, the ratio for the degree 
+    0 cannot be corrected.
+    
+    Parameters
+    ----------
+    G : fn.SuperGraph
+        Model graph
+    Copycat : fn.SuperGraph
+        Graph to modify
 
-#%%19 Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False):
+    Returns
+    -------
+    None.
+
+    '''
+    for i in range(len(G.Degree_ratio())-1,0,-1):
+        if i< len(Copycat.Degree_ratio()):
+
+            while len(Copycat.Degree_ratio())>=i and Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:
+
+                fn.Remove_edge_of_degree(i, Copycat) 
+
+#%%21 Equalizer_down_top
+def Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link):
+    '''
+    It makes each degree ratio of the network Copycat equal or bigger than
+    the corresponding degree ratio of network G. If a degree ratio is lower
+    then what expected it links an isolated node exploiting the function 
+    fn.Link_2_ZeroNode, in order to increas the equied degree ratio.
+    The process end when no isolated nodes are left or the ratios have the 
+    right values
+
+    Parameters
+    ----------
+    G : fn.SuperGraph
+        Model graph
+    Copycat : fn.SuperGraph
+        Graph to modify
+    map_dct : dct
+        It described the topological positions of the nodes
+        
+    prob_distribution : dct
+                The probability to have a link among two nodes
+                at a fixed distance
+        
+    max_dist_link : int
+            The greatest distance among two linked nodes
+
+    Returns
+    -------
+    None.
+
+    '''
+    
+    for i in range(1,len(G.Degree_ratio())):
+        if i< len(Copycat.Degree_ratio()):
+            while len(Copycat.Degree_dct()[0])>0 and Copycat.Degree_ratio()[i]< G.Degree_ratio()[i]:  
+                fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,Copycat,i, Copycat.Degree_dct())
+
+#%%22 Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False):
 
 
 def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False):
@@ -949,7 +1019,7 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
         
     prob_distribution : Support item assignment variable
         It represents a binned density function distribution related to the distance, each bin distance 
-        entry is the ptobability to have a link at tthat distance
+        entry is the probability to have a link at that distance
         
     Merge : bool, optional
         If True at the end of the process the function merge the small components.
@@ -962,26 +1032,13 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
     '''
     
 
-    Copycat=fn.SuperGraph(Copy_map)
-    
-    fn.Break_strongest_nodes(Copycat, max(np.array(list(G.degree()))[:,1]))
-    
+    Copycat=fn.SuperGraph(Copy_map)    
+    fn.Break_strongest_nodes(Copycat, max(np.array(list(G.degree()))[:,1]))    
     fn.Equalize_strong_nodes(Copycat, G)
     
     while len(Copycat.Degree_dct()[0])>0:
-        
-        for i in range(len(G.Degree_ratio())-1,0,-1):
-            if i< len(Copycat.Degree_ratio()):           
-                while Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:
-                    
-                    fn.Remove_edge_of_degree(i, Copycat) 
-                  
-        for i in range(1,len(G.Degree_ratio())):
-            if i< len(Copycat.Degree_ratio()):
-                while len(Copycat.Degree_dct()[0])>0 and Copycat.Degree_ratio()[i]< G.Degree_ratio()[i]:  
-                    
-                    fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,Copycat,i, Copycat.Degree_dct())
-                    
+        Equalizer_top_down(G,Copycat)                  
+        Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link)       
         
     if Merge==True:
          Merge_small_component(Copycat,deg=1, map_dct=map_dct, threshold=3)
@@ -992,6 +1049,23 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
     return Copycat
 #%% Trunk_array
 def Trunk_array_at_nan(array):
+    '''
+    It takes an array n*m dimensional, it reads each row
+    and when it finds a nan value it copies all the value of the road 
+    till the nan value, excluded, into a list. At the end of the process 
+    it will return a list of lists without all the nan values
+
+    Parameters
+    ----------
+    array : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    new_array : TYPE
+        DESCRIPTION.
+
+    '''
     new_array=[] #np.zeros([len(array),])
     for i in range(len(array)):
         cutter=len(array[i])
@@ -1001,7 +1075,7 @@ def Trunk_array_at_nan(array):
                 cutter=j
             j+=1
         new_array.append(list(array[i,:cutter]))
-        #print(new_array[i])
+        
     return new_array
 
 
