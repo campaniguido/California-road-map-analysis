@@ -239,13 +239,13 @@ def Edge_list(file, number_of_edges):
     
 #%%4  Unfreeze_into_list
 def Unfreeze_into_list(comunity):
-    '''It takes a (support item assignment) variable of n elements and transform each element in a list
+    '''It takes an indexable variable of n elements and transform each element in a list
     of variables
     
 
     Parameters
     ----------
-    comunity : Support item assignment variable
+    comunity : indexable variable
          
 
     Returns
@@ -272,7 +272,7 @@ def Set_community_number(G, community):
     ----------
     G : networkx.classes.graph.Graph
         
-    comunity : Support item assignment variable. Each item contain a group of nodes.
+    comunity : indexable variable. Each item contain a group of nodes.
                The union of all the group has to be the ensamble of nodes
         
 
@@ -440,7 +440,7 @@ def Dct_dist(G,map_dct):
     ----------
     G : networkx.classes.graph.Graph
         
-    map_dct : Support item assignment variable
+    map_dct : indexable variable
         It describes the position of the nodes
 
     Returns
@@ -473,7 +473,7 @@ def Node_distance_frequency(dct_dist,nstep,step):
 
     Parameters
     ----------
-    dct_dist : Support item assignment variable
+    dct_dist : indexable variable
         It describes all the distances among nodes
     nstep : integer
         
@@ -510,7 +510,7 @@ def Conditional_probability(important_events_frequency,step, events_frequency):
         
     step : width of the bin
         
-    distance_frequency : Support item assignment variable
+    distance_frequency : indexable variable
         It represents the frequency of elements for each bins
 
     Raises
@@ -551,7 +551,7 @@ def Add_edges_from_map(G,dct_dist,dist_link_prob):
     ----------
     G: networkx.classes.graph.Graph
         
-    map_dct : Support item assignment variable
+    map_dct : indexable variable
         It describes the position of all the nodes
         
     distance_linking_probability : dct
@@ -621,7 +621,7 @@ def Find_mode(pdf):
 
     Parameters
     ----------
-    pdf : Support item assignment variable
+    pdf : indexable variable
         DESCRIPTION.
 
     Raises
@@ -705,10 +705,10 @@ def Max_prob_target (source,degree,map_dct,distance_linking_probability,max_dist
     degree : integer
         It represents the desired degree of the target
         
-    map_dct : Support item assignment variable
+    map_dct : indexable variable
         Each item represents the spatial position of a node of the graph
         
-    distance_linking_probability :Support item assignment variable
+    distance_linking_probability :indexable variable
         It represents a binned density function distribution related to the distance, each bin distance 
         entry is the ptobability to have a link at tthat distance
         
@@ -765,13 +765,13 @@ def Min_distance_target (source,degree,map_dct,G):
     source : integer
         It represents the node label of the source.
         
-    strenght_dct :  Support item assignment variable
+    strenght_dct :  indexable variable
         each items is a group of nodes with the same degree
         
     degree : integer
         It represents the desired degree of the target        
         
-    map_dct : Support item assignment variable
+    map_dct : indexable variable
         Each item represents the spatial position of a node of the graph
         
     source_neighbour_list : list
@@ -849,7 +849,7 @@ def Merge_small_component(G, deg,map_dct,threshold):
     deg : degree of the target node
         DESCRIPTION.
         
-    map_dct : Support item assignment variable
+    map_dct : indexable variable
         Each item represents the spatial position of a node of the graph
         
     threshold : integer
@@ -894,10 +894,10 @@ def Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_
 
     Parameters
     ----------
-    map_dct : Support item assignment variable
+    map_dct : indexable variable
         Each item represents the spatial position of a node of the graph
         
-    prob_distribution : Support item assignment variable
+    prob_distribution : indexable variable
         It represents a binned density function distribution related to the distance, each bin distance 
         entry is the ptobability to have a link at tthat distance
         
@@ -910,7 +910,7 @@ def Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_
     n_links : integer
             number of links to create
         
-    degree_dct : Support item assignment variable
+    degree_dct : indexable variable
         each items is the group of nodes with the same degree
 
     Returns
@@ -1038,14 +1038,14 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
     G : function.SuperGraph
         Model Graph
         
-    map_dct : Support item assignment variable
+    map_dct : indexable variable
         Each item represents the spatial position of a node of the graph         
     
     max_dist : integer
         It is the ditance threshold among the source and the others nodes. Node distances above it
         will not take into account
         
-    prob_distribution : Support item assignment variable
+    prob_distribution : indexable variable
         It represents a binned density function distribution related to the distance, each bin distance 
         entry is the probability to have a link at that distance
         
