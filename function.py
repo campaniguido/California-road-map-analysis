@@ -22,7 +22,16 @@ class SuperGraph(nx.Graph):
     
         
     def Sorted_graph(self):
-        '''It orders nodes list and edges list of the SuperGraph
+        '''
+        It orders nodes list and edges list of the SuperGraph. 
+        Nodes are sorted in ascending way, 
+        edges are sorting in ascending way following the first element of the couple
+        
+
+        Returns
+        -------
+        None.
+
 
         '''
         G_sorted =SuperGraph()
@@ -35,7 +44,11 @@ class SuperGraph(nx.Graph):
     def Relable_nodes(self):
         '''It orders nodes list and edges list of the SuperGraph and it renames the nodes
         in order to remove any jump in the labels (e.g.: G((5,4),(4,0)->G((0,1),(1,2)) )
-
+        
+                                                   
+        Returns
+        -------
+        None.
         '''
         nodes=sorted(list(self.nodes()))    
         edges=list(self.edges())
@@ -48,9 +61,18 @@ class SuperGraph(nx.Graph):
         self.add_edges_from(list(H.edges()))
             
     def Degree_dct(self):
+
         '''It returns a dictionary. The keys are the degree of the SuperGraph from 0 to the maximum.
         The values are all and only the nodes with the key degree.
-        It doesn't take into account as a link a self connected node'''
+        It doesn't take into account as a link a self connected node
+                
+        Returns
+        -------
+        degree_dct : dct
+            The keys are the degree of the SuperGraph,the values are all and only the nodes with the key degree
+            
+        '''
+
         
         degree_dct={}
         for key in range(int(max(np.array(list(self.degree))[:,1])+1)):
@@ -70,7 +92,14 @@ class SuperGraph(nx.Graph):
         return degree_dct
     
     def Degree_ratio(self):
-        '''It returns a np.array of the denity distribution of the nodes degree'''
+
+        '''It returns a np.array of the normalized frequency of the nodes degree
+        
+        Returns
+        -------
+        degree_ratio : np.array
+
+        '''
         degree_dct=self.Degree_dct()
         degree_ratio=[]
         for key in (degree_dct):
