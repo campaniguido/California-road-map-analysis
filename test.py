@@ -1534,4 +1534,19 @@ def test_Copymap_degree_correction():
         assert (G.Degree_ratio()[i]-3*(G.Degree_ratio()[i]+0.001)**0.5<=Copycat.Degree_ratio()[i]<=G.Degree_ratio()[i]+3*(G.Degree_ratio()[i]+0.01)**0.5)
     
                
- 
+def test_trunk_array_at_nan_len():
+    '''Given a np array 4*4, the Trunk_array_at_nan trunk each row at the first nan value.
+    a list of lists is expected whose rows have different len'''
+    a=np.array(([0,1,np.nan,np.nan],[1,np.nan,0,0]))
+    A=fn.Trunk_array_at_nan(a)
+    assert len(A[0])==2
+    assert len(A[1])==1
+    
+def test_trunk_array_at_nan_no_nan():
+    '''Given a np array 4*4, the Trunk_array_at_nan trunk each row at the first nan value.
+    a list of lists is expected whose rows have all the values before the nan value'
+    a=np.array(([0,1,np.nan,np.nan],[1,np.nan,0,0]))
+    A=fn.Trunk_array_at_nan(a)
+    assert (A[0])==[0.0, 1.0]
+    assert (A[1])==[1.0]
+    

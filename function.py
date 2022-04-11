@@ -1050,19 +1050,19 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
 #%% Trunk_array
 def Trunk_array_at_nan(array):
     '''
-    It takes an array n*m dimensional, it reads each row
+    It takes an array n*m dimensional (m>1) , it reads each row
     and when it finds a nan value it copies all the value of the road 
     till the nan value, excluded, into a list. At the end of the process 
-    it will return a list of lists without all the nan values
+    it will return a list of lists
 
     Parameters
     ----------
-    array : TYPE
+    array :np.array n*m dimensional (m>1)
         DESCRIPTION.
 
     Returns
     -------
-    new_array : TYPE
+    new_array : list of lists
         DESCRIPTION.
 
     '''
