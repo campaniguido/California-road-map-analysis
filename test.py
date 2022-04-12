@@ -95,6 +95,7 @@ def test_Relable_nodes_no_hole():
     G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[14,14]])
     G.Relable_nodes()
     nodes=list(G.nodes())
+    
     assert nodes[0]==0
     assert nodes[1]==1
     assert nodes[2]==2
@@ -397,8 +398,10 @@ def test_Unfreeze_into_list_is_a_list_1():
     D= (1,2)
     list_=[A,B,C,D]
     list_unfrozen=fn.Unfreeze_into_list(list_)
-    for i in range(len(list_unfrozen)):
-        assert(type(list_unfrozen[i])==list)
+    
+    assert(type(list_unfrozen[0])==list)
+    assert(type(list_unfrozen[1])==list)
+    assert(type(list_unfrozen[2])==list)
 
 def test_Unfreeze_into_list_is_a_list_2():
     '''It builds a dictionary of frozenset and tuple as an input for the function,
@@ -409,8 +412,9 @@ def test_Unfreeze_into_list_is_a_list_2():
     D= (1,2)
     dct_={0:A,1:B,2:C,3:D}
     dct_unfrozen=fn.Unfreeze_into_list(dct_)
-    for i in range(len(dct_unfrozen)):
-        assert(type(dct_unfrozen[i])==list)
+    assert(type(dct_unfrozen[0])==list)
+    assert(type(dct_unfrozen[1])==list)
+    assert(type(dct_unfrozen[2])==list)
 
 
 #%%   test_Set_community_number (6)
@@ -648,38 +652,7 @@ def test_List_dist_link_triangular_inequality_unit_test():
     assert dct_dist_link[(1,2)]<=dct_dist_link[(2,3)]+dct_dist_link[(1,3)]
     assert dct_dist_link[(1,3)]<=dct_dist_link[(2,3)]+dct_dist_link[(1,2)]
     assert dct_dist_link[(2,3)]<=dct_dist_link[(1,2)]+dct_dist_link[(1,3)]
-                
-def test_List_dist_link_triangular_inequality_abstract_test():
-    '''It is the abstract version of th unit test'''
-    
-    '''It builds a nx.Graph object with 6 nodes linking them randomly.
-    Then it build a topografical map of the nodes and applies the function Dct_dist_link
-    to calculate the euclidean distance among linked nodes. Finally it test the triangular 
-    inequality for all the possible path'''
-    
-    G=nx.Graph()
-    G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
-    edges=list(G.edges())
-    map_dct=nx.spring_layout(G, dim=2, seed=seed)
-    dct_dist_link=fn.Dct_dist_link(edges, map_dct)
-    a=list(G.nodes())
-    for node in list(G.nodes()) :
 
-        a.remove(node)
-        for next_node in a:
-            all_simple_paths=sorted(list(nx.all_simple_paths(G,node,next_node)),key=len)
-            if len(all_simple_paths)>0:
-                if len(all_simple_paths[0])==2 and len(all_simple_paths)>1:
-                    dist=dct_dist_link[(all_simple_paths[0][0],all_simple_paths[0][1])]
-                    for i in range(1,len(all_simple_paths)):
-                        dist2=0
-                        for j in range(len(all_simple_paths[i])-1):
-                            if edges.count((all_simple_paths[i][j],all_simple_paths[i][j+1]))==1:
-                                dist2+=dct_dist_link[(all_simple_paths[i][j],all_simple_paths[i][j+1])]
-                            else:
-                                dist2+=dct_dist_link[(all_simple_paths[i][j+1],all_simple_paths[i][j])]
-                assert dist<dist2                   
-            
             
             
   
@@ -722,14 +695,16 @@ def test_List_dist_simmetry():
     G.add_edges_from([[1,2],[3,4],[1,3],[2,3],[2,4]])
     map_dct=nx.spring_layout(G, dim=2, seed=seed)
     edges=[[1,2],[3,4],[1,3],[2,3],[2,4]]
-    segde=[]
+    edges_reverse=[]
     for i in range(len(edges)):
-        segde.append((edges[i][1],edges[i][0]))                     
+        edges_reverse.append((edges[i][1],edges[i][0]))   
+                  
     G_reverse=nx.Graph()
     G_reverse.add_nodes_from([4,3,2,1])
-    G_reverse.add_edges_from(segde)
+    G_reverse.add_edges_from(edges_reverse)
     dct_dist_link1=fn.Dct_dist(G, map_dct)
     dct_dist_link2=fn.Dct_dist(G_reverse, map_dct)
+    
     assert dct_dist_link1[(1,2)]==dct_dist_link2[(2,1)]
     assert dct_dist_link1[(1,3)]==dct_dist_link2[(3,1)]
     assert dct_dist_link1[(1,4)]==dct_dist_link2[(4,1)]
