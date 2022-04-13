@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import function as fn
 
-def Hist_plot(distribution, color, title, save_fig=False, extention='pdf'):
+def Hist_plot(distribution, color, title, path=None, save_fig=False, extention='pdf'):
     '''
     It shows the distribution histogram of an input set of data, it provides labels for the axis and  the graph.
     It can also save the plot.
@@ -36,12 +37,12 @@ def Hist_plot(distribution, color, title, save_fig=False, extention='pdf'):
     plt.ylabel("Frequency")
     plt.title(title)
     if save_fig==True:
-        plt.savefig(title+'.'+extention, dpi=100)
+        plt.savefig(path+'\\'+title+'.'+extention, dpi=100)
     plt.show()
 
 #%%21 Scatter_plot
 
-def Scatter_plot(distribution1, name_distribution1, distribution2, name_distribution2, color, save_fig=False, extention='pdf'):
+def Scatter_plot(distribution1, name_distribution1, distribution2, name_distribution2, color,path=None, save_fig=False, extention='pdf'):
     '''
     It shows the the scatter plot of two set of input data, it provides labels for the axis and the graph.
     It can also save the plot.
@@ -86,12 +87,12 @@ def Scatter_plot(distribution1, name_distribution1, distribution2, name_distribu
     plt.ylabel(name_distribution2)
     plt.title(name_distribution1+ ' vs '+  name_distribution2)
     if save_fig==True:
-        plt.savefig(name_distribution1+ ' vs '+  name_distribution2 +"."+ extention, dpi=100)
+        plt.savefig(path+'\\'+name_distribution1+ ' vs '+  name_distribution2 +"."+ extention, dpi=100)
     plt.show()
        
 #%%22 Feature_mean_evolution
 
-def Feature_mean_evolution(feature_size,feature_mean, feature_name, save_fig=False, extention='pdf'):
+def Feature_mean_evolution(feature_size,feature_mean, feature_name,path=None, save_fig=False, extention='pdf'):
     '''
     It shows the the scatter plot of a set of input data,  it provides labels for the axis and the graph.
     It can also save the plot.
@@ -127,13 +128,13 @@ def Feature_mean_evolution(feature_size,feature_mean, feature_name, save_fig=Fal
     plt.ylabel(feature_name)
     plt.title("Mean"+feature_name)
     if save_fig==True:
-        plt.savefig("Mean"+feature_name+"."+ extention, dpi=100)
+        plt.savefig(path+'\\'+"Mean"+feature_name+"."+ extention, dpi=100)
     plt.show()
 #%%23 Feature_cumulative_evolution
 
 
 
-def Feature_cumulative_evolution(feature, feature_name, save_fig=False, extention='pdf'):
+def Feature_cumulative_evolution(feature, feature_name,path=None, save_fig=False, extention='pdf'):
     '''
     It shows the cumulative distribution(normalized on the number of data) of n distributions of input data,
     it provides labels for the axis and the graph.
@@ -163,7 +164,7 @@ def Feature_cumulative_evolution(feature, feature_name, save_fig=False, extentio
                     
         
     
-    x=Trunk_array_at_nan(feature)
+    x=fn.Trunk_array_at_nan(feature)
     
     fig, ax = plt.subplots()
     colors = (cm.magma(np.linspace(0, 1, len(x))))
@@ -177,14 +178,14 @@ def Feature_cumulative_evolution(feature, feature_name, save_fig=False, extentio
     ax.legend(title="# nodes",prop={'size': 10})
     ax.set_title('Cumulative distributions of '+  feature_name)
     if save_fig==True:
-        plt.savefig(feature_name+"cumulative-convergence""."+ extention, dpi=100)
+        plt.savefig(path+'\\'+feature_name+"cumulative-convergence""."+ extention, dpi=100)
     plt.show()
 
 #%%24 Feature_ratio_evolution
 
 
 
-def Feature_ratio_evolution(feature_position,feature_ratio, feature_name, save_fig=False, extention='pdf'):
+def Feature_ratio_evolution(feature_position,feature_ratio, feature_name,path=None, save_fig=False, extention='pdf'):
     '''
     It plot a scatter plot: at each position it scatter a vector of n point corrisponding to the n values of,
     of each element of the feature ratio.
@@ -228,6 +229,6 @@ def Feature_ratio_evolution(feature_position,feature_ratio, feature_name, save_f
     plt.ylabel("ratio of each " + feature_name)
     plt.title("ratio of each " + feature_name + " for increasing size")
     if save_fig==True:
-        plt.savefig("ratio of each"+ feature_name +"."+ extention, dpi=100)
+        plt.savefig(path+'\\'+"ratio of each"+ feature_name +"."+ extention, dpi=100)
     plt.show()
 

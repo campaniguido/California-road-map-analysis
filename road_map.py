@@ -15,6 +15,8 @@ import random as rn
 
 
 
+#%% New directory creation
+fn.Directory_creation(params.name_simulation)
 
 
 

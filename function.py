@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 import function as fn
 import math
-
+import os
 
 
 #%% CLASS SuperGraph
@@ -574,8 +574,7 @@ def Add_edges_from_map(G,dct_dist,dist_link_prob):
             for k in range(nstep):
                 if dist>k*step and dist<=(k+1)*step:                    
                     uniform=rn.uniform(0,1)
-                    if uniform<= link_probabilities[k]:
-                        
+                    if uniform<= link_probabilities[k]:                        
                         G.add_edge(i[0],i[1])  
 
 
@@ -667,18 +666,19 @@ def Equalize_strong_nodes(G_strong, G_weak):
 
     '''
     
-    dct_degree_weak=G_weak.Degree_dct()
+    
     degree_ratio_weak=G_weak.Degree_ratio()    
     threshold=fn.Find_mode(degree_ratio_weak)
-    max_weak=max(dct_degree_weak.keys())
+    max_weak=max(np.array(list(G_strong.degree))[:,1])
     max_strong=max(np.array(list(G_strong.degree))[:,1])
     
     if max_weak<max_strong:       
         fn.Break_strongest_nodes(G_strong, max_weak) 
     i=max_weak    
+    
     for i in range(max_weak,threshold,-1):      
         
-        while len(G_strong.Degree_ratio())>=len(G_weak.Degree_ratio()) and (G_strong.Degree_ratio()[i])>(G_weak.Degree_ratio()[i]):
+        while len(G_strong.Degree_ratio())>=max_weak and (G_strong.Degree_ratio()[i])>(G_weak.Degree_ratio()[i]):
             source=rn.choice(G_strong.Degree_dct()[i])
             node=rn.choice(list(G_strong.neighbors(source)))
             G_strong.remove_edge(source,node)              
@@ -733,12 +733,12 @@ def Max_prob_target (source,degree,map_dct,distance_linking_probability,max_dist
     for i in strenght_dct[degree]:
         x1=map_dct[i]
         dist=np.linalg.norm(x0-x1)
+        
         if dist<max_dist:
             for k in range(len(distance_linking_probability)):
                 if dist>k*step and dist<(k+1)*step:
                     prob=list(distance_linking_probability.values())[k]
                     if prob>max_prob and i!=source and list(G.neighbors(source)).count(i)!=1:
-                        
                         max_prob=prob
                         target=i                    
 
@@ -747,8 +747,7 @@ def Max_prob_target (source,degree,map_dct,distance_linking_probability,max_dist
 
         target=fn.Min_distance_target(source,degree, map_dct,G)
     return target
-  
-    
+
 
 
 #%%15 Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_list)
@@ -977,11 +976,10 @@ def Equalizer_top_down(G,Copycat):
 
     '''
     for i in range(len(G.Degree_ratio())-1,0,-1):
-        if i< len(Copycat.Degree_ratio()):
-            
+        if i< len(Copycat.Degree_ratio()):            
             while len(Copycat.Degree_ratio())>=i and Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:
-
                 fn.Remove_edge_of_degree(i, Copycat) 
+
 #%%21 Equalizer_down_top
 def Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link):
     '''
@@ -1104,3 +1102,15 @@ def Trunk_array_at_nan(array):
         
     return new_array
 
+def Directory_creation(name):
+    name_simulation='\\'+name
+    path = os.getcwd()+name_simulation
+    # Check whether the specified path exists or not
+    isExist = os.path.exists(path+name_simulation)
+
+    if not isExist:  
+      # Create a new directory because it does not exist 
+      os.makedirs(path)
+      
+    else:
+        raise Exception('This directory name has already taken')
