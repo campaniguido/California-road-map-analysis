@@ -6,10 +6,11 @@ Created on Mon Mar 21 22:00:48 2022
 """
 import os
 
-name_simulation='road_5020'
+
 
 file_position='https://raw.githubusercontent.com/campaniguido/Software_and_Computing/main/roadnet-ca.txt'
 number_of_edge=5020
+name_simulation='road_'+str(number_of_edge)
 path_to_save_data=os.getcwd()+'\\'+name_simulation
 seed=3
 
