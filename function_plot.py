@@ -38,7 +38,8 @@ def Hist_plot(distribution, color, title, path=None, save_fig=False, extention='
     plt.title(title)
     if save_fig==True:
         plt.savefig(path+'\\'+title+'.'+extention, dpi=100)
-    plt.show()
+    else:
+        plt.show()
 
 #%%21 Scatter_plot
 
@@ -88,7 +89,8 @@ def Scatter_plot(distribution1, name_distribution1, distribution2, name_distribu
     plt.title(name_distribution1+ ' vs '+  name_distribution2)
     if save_fig==True:
         plt.savefig(path+'\\'+name_distribution1+ ' vs '+  name_distribution2 +"."+ extention, dpi=100)
-    plt.show()
+    else:
+        plt.show()
        
 #%%22 Feature_mean_evolution
 
@@ -129,7 +131,8 @@ def Feature_mean_evolution(feature_size,feature_mean, feature_name,path=None, sa
     plt.title("Mean"+feature_name)
     if save_fig==True:
         plt.savefig(path+'\\'+"Mean"+feature_name+"."+ extention, dpi=100)
-    plt.show()
+    else:
+        plt.show()
 #%%23 Feature_cumulative_evolution
 
 
@@ -179,7 +182,8 @@ def Feature_cumulative_evolution(feature, feature_name,path=None, save_fig=False
     ax.set_title('Cumulative distributions of '+  feature_name)
     if save_fig==True:
         plt.savefig(path+'\\'+feature_name+"cumulative-convergence""."+ extention, dpi=100)
-    plt.show()
+    else:
+        plt.show()
 
 #%%24 Feature_ratio_evolution
 
@@ -230,5 +234,6 @@ def Feature_ratio_evolution(feature_position,feature_ratio, feature_name,path=No
     plt.title("ratio of each " + feature_name + " for increasing size")
     if save_fig==True:
         plt.savefig(path+'\\'+"ratio of each"+ feature_name +"."+ extention, dpi=100)
-    plt.show()
+    else:
+        plt.show()
 
