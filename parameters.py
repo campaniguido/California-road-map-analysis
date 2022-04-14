@@ -15,7 +15,7 @@ seed=3
 
 
 file_to_plot=os.getcwd()+'\\'+name_simulation
-save_fig=True
+save_fig=False
 extention='png'
 n_step_degree=50
 n_step=10

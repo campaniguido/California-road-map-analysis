@@ -5,6 +5,8 @@ import pandas as pd
 import parameters_Copycat as paramsC
 import random as rn
 
+#%% New directory creation
+fn.Directory_creation(paramsC.name_simulation)
 #%%seed
 
 seed=paramsC.seed

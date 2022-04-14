@@ -39,7 +39,9 @@ def Hist_plot(distribution, color, title, path=None, save_fig=False, extention='
     if save_fig==True:
         plt.savefig(path+'\\'+title+'.'+extention, dpi=100)
     else:
-        plt.show()
+       plt.show()
+          
+    plt.close()
 
 #%%21 Scatter_plot
 
