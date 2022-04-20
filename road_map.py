@@ -15,8 +15,6 @@ import random as rn
 
 
 
-#%% New directory creation
-fn.Directory_creation(params.name_simulation)
 
 
 
@@ -24,6 +22,9 @@ fn.Directory_creation(params.name_simulation)
 
 seed=params.seed
 rn.seed(seed)
+
+#%% New directory creation
+fn.Directory_creation(params.name_simulation)
 
 #%% file reading
 
@@ -53,6 +54,8 @@ Clustering=np.array(list((nx.clustering(G)).items()))
 community_frozen=nx.algorithms.community.modularity_max.greedy_modularity_communities(G)
 community=fn.Unfreeze_into_list(community_frozen)
 community_color=fn.Set_community_number(G, community)
+
+
 
 
 data={'Degree':Degree[:,1],'Closeness_Centrality':Closeness_Centrality[:,1],'Betweeness_Centrality':Betweeness_Centrality[:,1],'Clustering':Clustering[:,1],'community':list(community_color.values())}

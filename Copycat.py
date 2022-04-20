@@ -2,21 +2,24 @@ import networkx as nx
 import numpy as np
 import function as fn
 import pandas as pd
-import parameters_Copycat as paramsC
+#import parameters_Copycat as paramsC
+import pp as paramsC
 import random as rn
 
-#%% New directory creation
-fn.Directory_creation(paramsC.name_simulation)
 #%%seed
 
 seed=paramsC.seed
 rn.seed(seed)
+
+#%% New directory creation
+fn.Directory_creation(paramsC.name_simulation)
 #%% file reading
 
 file_position=paramsC.file_position
 file=pd.read_table(file_position)
 file_no_nan_raw=fn.Erase_nan_row(file)
 edges_info=fn.Divide_value(file_no_nan_raw)
+
 
 #%% Graph initialization
 
@@ -46,8 +49,6 @@ Copy_map=fn.SuperGraph()
 Copy_map.add_nodes_from(list(G.nodes))
 fn.Add_edges_from_map(Copy_map, dct_dist, distance_linking_probability)
 
-            
-
 
 #%% Copycat degree correction
 max_linking_distance=max(dct_dist_link.values())
@@ -64,6 +65,8 @@ Clustering_Copycat=np.array(list((nx.clustering(Copycat)).items()))
 community_Copycat_frozen=nx.algorithms.community.modularity_max.greedy_modularity_communities(Copycat)
 community_Copycat=fn.Unfreeze_into_list(community_Copycat_frozen)
 community_color_Copycat=fn.Set_community_number(Copycat, community_Copycat)
+
+
 
 
 data_Copycat={'Degree':Degree_Copycat[:,1],'Closeness_Centrality':Closeness_Centrality_Copycat[:,1],'Betweeness_Centrality':Betweeness_Centrality_Copycat[:,1],'Clustering':Clustering_Copycat[:,1],'community':list(community_color_Copycat.values())}
