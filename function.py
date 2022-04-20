@@ -669,19 +669,19 @@ def Equalize_strong_nodes(G_strong, G_weak):
     
     degree_ratio_weak=G_weak.Degree_ratio()    
     threshold=fn.Find_mode(degree_ratio_weak)
-    max_weak=max(np.array(list(G_strong.degree))[:,1])
-    max_strong=max(np.array(list(G_strong.degree))[:,1])
+    max_weak=len(G_weak.Degree_ratio())
+    max_strong=len(G_strong.Degree_ratio())
     
     if max_weak<max_strong:       
-        fn.Break_strongest_nodes(G_strong, max_weak) 
+        fn.Break_strongest_nodes(G_strong, max_weak-1) 
     i=max_weak    
     
-    for i in range(max_weak,threshold,-1):      
-        
+    for i in range(max_weak-1,threshold,-1):      
         while len(G_strong.Degree_ratio())>=max_weak and (G_strong.Degree_ratio()[i])>(G_weak.Degree_ratio()[i]):
+
             source=rn.choice(G_strong.Degree_dct()[i])
             node=rn.choice(list(G_strong.neighbors(source)))
-            G_strong.remove_edge(source,node)              
+            G_strong.remove_edge(source,node)         
 
             
 
@@ -1071,7 +1071,7 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
     Copycat.Relable_nodes()
     
     return Copycat
-#%% Trunk_array
+#%%23 Trunk_array
 def Trunk_array_at_nan(array):
     '''
     It takes an array n*m dimensional (m>1) , it reads each row
@@ -1102,6 +1102,7 @@ def Trunk_array_at_nan(array):
         
     return new_array
 
+#%%24 Directory_creation(name)
 def Directory_creation(name):
     name_simulation='\\'+name
     path = os.getcwd()+name_simulation
