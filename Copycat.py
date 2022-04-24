@@ -2,8 +2,7 @@ import networkx as nx
 import numpy as np
 import function as fn
 import pandas as pd
-#import parameters_Copycat as paramsC
-import pp as paramsC
+import parameters_Copycat as paramsC
 import random as rn
 
 #%%seed
@@ -40,9 +39,9 @@ edges=list(G.edges())
 map_dct=nx.spring_layout(G, dim=2, seed=seed)
 dct_dist_link=fn.Dct_dist_link(edges,map_dct)
 dct_dist=fn.Dct_dist(G=G, map_dct=map_dct)
-step=max(dct_dist_link.values())/paramsC.nstep
-distance_frequency=fn.Node_distance_frequency(dct_dist,paramsC.nstep,step)       
-distance_link_frequency=fn.Node_distance_frequency(dct_dist_link,paramsC.nstep,step) 
+step=max(dct_dist_link.values())/paramsC.n_bin
+distance_frequency=fn.Node_distance_frequency(dct_dist,paramsC.n_bin,step)       
+distance_link_frequency=fn.Node_distance_frequency(dct_dist_link,paramsC.n_bin,step) 
 
 distance_linking_probability=fn.Conditional_probability(distance_link_frequency,step,distance_frequency)
 Copy_map=fn.SuperGraph()
