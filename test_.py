@@ -640,10 +640,13 @@ def test_List_dist_link_simmetry():
 
 
 def test_List_dist_link_triangular_inequality_unit_test():
+    
     '''It builds a nx.Graph object with 3 nodes completed connected.
     Then it build a topografical map of the nodes and applies the function Dct_dist_link
     to calculate the euclidean distance among linked nodes. Finally it test the triangular 
     inequality for all the possible path'''
+    
+    
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[2,3]])
     edges=list(G.edges())
