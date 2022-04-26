@@ -95,7 +95,7 @@ As It was said in the introduction the code here presented was used as a fundame
 - random
 - os
 
-###The California road map and ERG simulation (road_map.py)
+### The California road map and ERG simulation (road_map.py)
 
 The file road_map.py contains the code useful to read the file of all the couples of nodes, deleting any bugs in the dataset, it calculates the degree, betweeness centrality, closeness centrality and clustering of each node and simulates how these features evolves with the increasing of the network size. Finally it also calculates the distribution of the features of an ER graph with the same number of nodes and same link density.
 
