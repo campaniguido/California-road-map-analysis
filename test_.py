@@ -9,8 +9,8 @@ import numpy as np
 import function as fn
 import networkx as nx
 import pytest
-
 seed=3
+
 
 
 #%%Ct  test sorted_graph (2)
@@ -60,23 +60,9 @@ def test_Relable_nodes_len():
     assert LEN==len(G)
     
 
-def test_Relable_nodes_sorted():
-    '''It builds a graph in which the nodes are in a random order and
-       it tests if the function sorts the nodes in ascending way
 
-    '''
-    G=fn.SuperGraph()
-    G.add_edges_from([[1,8],[8,3],[5,4],[8,4],[5,6],[14,14]])
-    G.Relable_nodes()
-    assert list(G.nodes)[0]==0
-    assert list(G.nodes)[1]==1
-    assert list(G.nodes)[2]==2
-    assert list(G.nodes)[3]==3
-    assert list(G.nodes)[4]==4
-    assert list(G.nodes)[5]==5
-    assert list(G.nodes)[6]==6 
     
-def test_Relable_nodes_sorted_abstract():
+def test_Relable_nodes_sorted():
     '''It builds a graph in which the nodes are in a random order and
        it tests if the function sorts the nodes in ascending way
 
@@ -131,7 +117,7 @@ def test_Degree_list_corrispondence():
     strenght_dct=G.Degree_dct()
     keys=list(strenght_dct.keys())
     '''because node 2 it is also connected with its self
-    and the degree function count it as 2 links'''
+    and the degree function counts it as 2 links'''
     assert G.degree(2)-2==keys[0]
     assert G.degree(3)==keys[1]
     assert G.degree(6)==keys[1]
@@ -144,10 +130,10 @@ def test_Degree_list_corrispondence():
     assert G.degree(1)==keys[5]
 
 
-def test_Degree_list_elements():
+def test_Degree_dct_elements():
     '''It builds a graph in which the nodes and links are in a random order
        The Degree_dct function creates a dictionary and
-       it looks if the values of the dictionary are the same of the of the graph nodes'''
+       the test looks if the values of the dictionary are the same of the of the graph nodes'''
        
     G=fn.SuperGraph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -157,10 +143,10 @@ def test_Degree_list_elements():
         values+=list(strenght_dct[i])
     assert sorted(values)==list(range(1,11))
     
-def test_Degree_list_max_degree():
+def test_Degree_dct_max_degree():
     '''It builds a graph in which the nodes and links are in a random order
        The Degree_dct function creates a dictionary and 
-       it verify the highest key value is equal to the maximum degree of the graph'''
+       the test verifies the highest key value is equal to the maximum degree of the graph'''
        
     G=fn.SuperGraph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -170,7 +156,7 @@ def test_Degree_list_max_degree():
     
 def test_Degree_list_selfconnected_nodes():
     
-    '''It builds a a graph in wich some of the node are connected
+    '''It builds a graph in wich some of the node are connected
        only to theirselves or to theriselves and to another node
        Then it looks if the function Degree_dct does not count as a link
        the node its self in the case of an selfconnected node'''
@@ -252,33 +238,23 @@ def test_divide_value():
     assert list(file[1])==['45643', '3456']
     assert list(file[2])==['34', '5']
 
-def test_divide_value_one_space():
-    '''Giving a data set, with dimension (5,2) and with some of the data written as str
-       variable with space (" ") in, it tests if after the application of the function
-        Divide_value no spaces are left.'''
-        
-    file=[['0 ','134.0'],['45643 3456',np.nan],[np.nan,'34 5'],[np.nan,np.nan],[3,4.0]]
-    file=fn.Divide_value(file)
-    for i in range(2):
-        for j in range(len(file)):
-            if type(file[j,i])==str:
-                for k in range(len(file[j,i])):
-                    assert file[j,i][k]!=' '
 
+
+                    
                     
 def test_divide_value_more_space():
     '''Giving a data set, with dimension (5,2) and with some of the data written as str
-       variable with more than one space (" ") in, it tests if after the application of the function
+       variable with just one space (" ") in, it tests if after the application of the function
         Divide_value no spaces are left.'''
-    
-    file=[[0,134.0],['45643            3456',np.nan],[np.nan,'34     5'],[3,4.0]]
+        
+    file=[['0 ','134'],['45643    3456',np.nan],[np.nan,'34      5']]
     file=fn.Divide_value(file)
-    for i in range(2):
-        for j in range(len(file)):
-            if type(file[j,i])==str:
-                for k in range(len(file[j,i])):
-                    
-                    assert file[j,i][k]!=' '
+    
+    assert list(file[0])==['0 ','134']
+    assert list(file[1])==['45643', '3456']
+    assert list(file[2])==['34', '5']
+
+
                     
 def test_divide_value_nothing_to_divide():
     '''In the datasete file the first element file[0,0] ends with a space but there
@@ -316,7 +292,7 @@ def test_erase_nan_row_no_nan():
     assert list(file_corrected[0])==['0','134.0']
     assert list(file_corrected[1])==['45643',56.7]
     assert list(file_corrected[2])==[3,4.0]
-    assert len(file_corrected)==3
+    
 
                     
 
@@ -327,7 +303,7 @@ def test_erase_nan_row_no_nan():
 
 def test_edge_list_int():
     '''Given a file of couples of numbers expressed in different ways, 
-       it tests if all the elements composing the Edge_list output are integers'''
+       it tests if all the elements composing the Edge_list function output are integers'''
        
     file=[[0,134.0],['45643',' 3456'],[3,4.0]]
     edges=fn.Edge_list(file,3)
@@ -340,7 +316,7 @@ def test_edge_list_length():
        it looks if the output length of the the function is the one expressed
        by the variable number of edges'''
        
-    file=[[0,134.0],['45643',' 3456'],[3,4.0]]
+    file=[[0,134.0],['45643',' 3456'],[3,4.0],[1,2],[3,0]]
     number_of_edges=3
     edges=fn.Edge_list(file,number_of_edges)
     assert len(edges)==number_of_edges
@@ -420,7 +396,7 @@ def test_Unfreeze_into_list_is_a_list_2():
 #%%   test_Set_community_number (6)
 
 def test_Set_community_number_corrispondence(): 
-    '''It builds a list of list of elements belonging to the same community,
+    '''It starts from a list of list of elements belonging to the same community,
     then it builds a graph  using all the elements of the list with random links.
     It apllies the Set_community_number and verifies the output dictionary of the function
     match correctly all the nodes of the graph with the community they belong to'''
@@ -442,7 +418,7 @@ def test_Set_community_number_corrispondence():
     
         
 def test_Set_community_number_length():
-    '''It builds a list of list of elements belonging to the same community,
+    '''It starts from a list of list of elements belonging to the same community,
     then it builds a graph  using all the elements of the list with random links.
     It apllies the Set_community_number and it tests the length of the output is
     the same of the one of the Graph'''
@@ -455,10 +431,10 @@ def test_Set_community_number_length():
 
         
 def test_Set_community_number_doubble():
-    '''It builds a list of list of elements belonging to the same community,
+    '''It starts from a list of list of elements belonging to the same community,
     then it builds a graph  using all the elements of the list with random links.
     It apllies the Set_community_number and it tests if the node are
-    in just one community. e.g.:the four is in two different communities'''
+    in just one community. Here the four is in two different communities'''
     
     community=[[1,3,6,9],[5,10],[7,4],[2,4,8]]
     G=nx.Graph()
@@ -467,9 +443,10 @@ def test_Set_community_number_doubble():
         fn.Set_community_number(G, community)
 
 def test_Set_community_number_missing_number():
-    '''It builds a list of list of elements belonging to the same community,
+    '''It starts from a list of list of elements belonging to the same community,
     then it builds a graph  using all the elements of the list with random links.
-    It apllies the Set_community_number and it tests if all the node are in the community variable. e.g.:the eight is missing'''
+    It apllies the Set_community_number and it tests 
+    if all the node are in the community variable. Here the eight is missing'''
     community=[[1,3,6,9],[5,10],[7],[2,4]]
     G=nx.Graph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -477,9 +454,10 @@ def test_Set_community_number_missing_number():
         fn.Set_community_number(G, community)
 
 def test_Set_community_number_extra_number():
-    '''It builds a list of list of elements belonging to the same community,
+    '''It starts from a list of list of elements belonging to the same community,
     then it builds a graph  using all the elements of the list with random links.
-    It apllies the Set_community_number and it tests if the community has only the nodes labels of the graph. e.g.:the 999 is not a node number'''
+    It apllies the Set_community_number and it tests if the community has only the nodes
+    labels of the graph. Here the 999 is not a node number'''
     community=[[1,3,6,9],[5,10],[7],[2,4,8,999]]
     G=nx.Graph()
     G.add_edges_from([[1,3],[2,2],[5,6],[4,8],[9,1],[10,1],[1,5],[4,7],[1,7]])
@@ -487,7 +465,7 @@ def test_Set_community_number_extra_number():
         fn.Set_community_number(G, community)
 
 def test_Set_community_number_all_wrong():
-    '''It builds a list of list of elements belonging to the same community,
+    '''It starts from a list of list of elements belonging to the same community,
     then it builds a graph  using all the elements of the list with random links.
     It apllies the Set_community_number and it tests tests the behaviours for the three previous mistakes'''
     community=[[1,3,6,4],[5,10],[7],[2,4,999]]
@@ -500,7 +478,7 @@ def test_Set_community_number_all_wrong():
 #%%   test_fill_with_zeros (3)
 
 def test_fill_with_zeros_length_conservation():
-    '''It builds a list of list and it verifies that after the application of Fill_with_zeros
+    '''It starts from a list of list and it verifies that after the application of Fill_with_zeros
     the length is the same
     '''
     
@@ -509,7 +487,7 @@ def test_fill_with_zeros_length_conservation():
     assert len(a)==3
     
 def test_fill_with_zeros_length_variation():
-    '''It builds a list of list and it verifies that after the application of Fill_with_zeros
+    '''It starts from a list of list and it verifies that after the application of Fill_with_zeros
     the length of each elements is the same of the longest one
     '''
     
@@ -520,7 +498,7 @@ def test_fill_with_zeros_length_variation():
     assert len(a[2])==4
     
 def test_fill_with_zeros_output():
-    '''It builds a list of list and it verifies that after the application of Fill_with_zeros
+    '''It starts from a list of list and it verifies that after the application of Fill_with_zeros
     the zeros are put in the right place.
     '''
     
@@ -592,7 +570,7 @@ def test_size_evolution_size_degree_constant_len():
 
     
 def test_List_dist_link_length():
-    '''It builds an undirect nx.Graph object with 3 nodes linking them randomly and reapiting some
+    '''It builds an undirect nx.Graph object with 3 nodes linking them randomly and repeating some
     edges reversing the couple order of some of them (e.g.: (1,2), (2,1))
     or creating some autolink edges (e.g.: (1,1)). Then it build a topografical map of the nodes
     and applies the function Dct_dist_link to calculate the euclidean distance among linked nodes.
@@ -610,7 +588,7 @@ def test_List_dist_link_non_negativity():
     '''It builds an undirect nx.Graph object with 6 nodes linking them randomly.
     Then it build a topografical map of the nodes and applies the function Dct_dist_link
     to calculate the euclidean distance among linked nodes.
-    Finally it verifies if the values the ouput distance dictionary are posives'''
+    Finally it verifies if the values the ouput distance dictionary are positives'''
     G=nx.Graph()
     G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
     edges=list(G.edges())
@@ -781,7 +759,7 @@ def test_Node_distance_frequency_I_axiom():
               (4, 5): 0.184,
               (4, 6): 1.258,
               (5, 6): 1.245}
-    step=0.026346986731500856
+    step=0.026
     nstep=50
     node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)
     for i in node_distance_frequency:
@@ -806,14 +784,14 @@ def test_Node_distance_frequency_II_axiom():
               (4, 5): 0.184,
               (4, 6): 1.258,
               (5, 6): 1.245}
-    step=0.026346986731500856
+    step=0.026
     nstep=50
     node_distance_frequency=fn.Node_distance_frequency(dct_dist,nstep,step)/len(dct_dist)
     assert 0.99999<sum(node_distance_frequency)<1
     
 def test_Node_distance_frequency_III_axiom():
     '''Given a set of distances it builds 2 discrete distributions of frequency for the distances,
-        exploting the Node_distance_frequenc. The second distribution has bins two times largerr than the first,
+        exploting the Node_distance_frequency. The second distribution has bins two times larger than the first,
         so it represents the sum of two group of distances.
         It verifies that the frequency of couples of distances of the first distribuition 
         is equal to the frequancy of one event of second.'''
@@ -845,6 +823,16 @@ def test_Node_distance_frequency_III_axiom():
 
 #%%   test_Conditional_probability (4)
 
+def test_conditional_probability_output():
+    '''Given the binned frequency of an events and the frequency of them which are 'important', it calculates
+    the probability to have an important event if an event is recorded. Then it verifies if the output is the right one:
+    so frequency important event divided by thnumber of the event'''
+    events_frequency=[0,0,2,8,24,0,]
+    important_event_frequency=[0,0,1,2,3,0]
+    step=1
+    conditional_probability_dct=fn.Conditional_probability(important_event_frequency,step,events_frequency)
+    conditional_probability=list(conditional_probability_dct.values())
+    assert conditional_probability==[0, 0, 1/2, 2/8, 3/24, 0]
    
 def test_conditional_probability_I_axiom():
     '''Given the binned frequency of an events and the frequency of them which are 'important', it calculates
@@ -976,12 +964,12 @@ def test_Break_strongest_nodes_maximum_value():
     deg=G.Degree_dct()
     assert max(deg.keys())<=2
     
-def test_Break_strongest_nodes_untouchable_edges():
+def test_Break_strongest_nodes_untouched_edges():
     '''It build a graph which has edges with no particular order and whose max degree
     is equal to three. It cuts edges until the max degree is two. So it removes one of
     the links of the node two.
     Finally it verify the edges which are not involved in the function are conserved,
-    So the neighbours of node 4 '''
+    so the neighbours of node 4 '''
     
     edges=[(1,1), (1,2), (2,1), (3,4), (1,5), (5,2), (2,7),(4,6)]    
     G=fn.SuperGraph()
@@ -1218,7 +1206,7 @@ def test_Random_target_is_not_its_self():
 def test_Merge_small_component():
     '''It builds a graph with only one component of dimension three and three smaller components.
     It tests if after the apllication of the Merge function all the components 
-    are bigger than the 3, the threshold'''
+    are bigger or equal than the 3, the threshold'''
     edges=[(1,2), (3,4), (6,7), (7,5), (8,8)]    
     G=fn.SuperGraph()
     G.add_edges_from(edges)
@@ -1269,7 +1257,7 @@ def test_Link_2_ZeroNode_reduction():
 def test_Link_2_ZeroNode_increment():
     '''Given a graoh with seven nodes, and two two of them are isolated, it applies
     Link_2_ZeroNode  connected the the isolated node with two links to the rest of the graph
-    Finally it verifies the right increasing of  '2' degree ratio
+    Finally it verifies the right increasing of the '2' degree ratio
     due to the application of the function '''
     
     edges=[(0,2),(1,2),(2,3),(4,0),(5,5),(6,6)]
@@ -1294,7 +1282,7 @@ def test_Link_2_ZeroNode_increment():
 def test_Link_2_ZeroNode_constant_degree_ratio():
     '''Given a graoh with seven nodes, and two two of them are isolated,it applies
     Link_2_ZeroNode  connected the the isolated node with three links to the rest of the graph 
-    Finally it verifies that the degree ratio of 1 and to remains constant after
+    Finally it verifies that the degree ratio of 1 and 2 remains constant after
     the application of the function '''
     
     
@@ -1331,9 +1319,7 @@ def test_Remove_edge_of_degree_local():
     edges=[(1,2), (3,1), (1,1), (1,2), (2,1), (1,4), (1,5), (5,4), (5,3), (1,6), (6,2), (5,2), (1,7)]    
     G=fn.SuperGraph()
     G.add_edges_from(edges)
-    print(G.Degree_dct())
     fn.Remove_edge_of_degree(6,G)
-    print(G.Degree_dct())
     assert list(G.Degree_ratio())[5]==1/7
     
 def test_Remove_edge_of_degree_total():
@@ -1395,19 +1381,19 @@ def test_Equalizer_top_down_no_edge():
     Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
     fn.Equalizer_top_down(G,Copycat)
     assert list(Copycat.edges()).count((0,1))==0 or list(Copycat.edges()).count((1,2))==0 or list(Copycat.edges()).count((2,3))==0
-    
+
 def test_Equalizer_top_down_right_ratio():
     '''Given two graph, G and Copycat, it applies the function fn.Equalizer_top_down,
     that removes some of the edges of Copycat in order to make each degree 
-    ratio of the graph Copycat lower or equal to the one of G.
-    Finally it tests if the ineauqlity of the degree ratios is the one expected
+    ratio of the graph Copycat lower or equal to the one of G. It should removes links
+    of nodes with degree equal to three or two.
+    Finally it tests if the ineauqlity of the degree ratios is the one expected.
     '''
     edges_G=[(0,0),(1,2),(2,3),(3,4),(3,5)]
     G=fn.SuperGraph(edges_G)
     edges_copy=[(0,0),(0,1),(0,6),(2,4),(1,2),(2,3),(3,4),(3,5),(0,5)]
     Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
     fn.Equalizer_top_down(G,Copycat)
-    
     if len(Copycat.Degree_ratio())>=2:
         assert Copycat.Degree_ratio()[1]<=G.Degree_ratio()[1]
     if len(Copycat.Degree_ratio())>=3:
@@ -1418,10 +1404,7 @@ def test_Equalizer_top_down_right_ratio():
 
 #%% test_Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link):
 
-'''numero nodi
-    non ci sia più quell'edge (so quale tolgo)
-    i ratio siano adeguati
-'''
+
 def test_Equalizer_down_top():
     
     '''Given two graph, G and Copycat, it applies the function Equalizer_down_top,
@@ -1453,8 +1436,7 @@ def test_Equalizer_down_top_edge_presence():
     G=fn.SuperGraph(edges_G)    
     Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
     map_dct=nx.spring_layout(G, dim=2, seed=seed)
-    prob_distribution={0.2:0.5, 0.4:0.5, 0.6:0.5, 0.8:0.5, 1:0.5,
-                    1.2:0.5, 1.4:0.5, 1.6:0.5, 1.8:0.5, 2:0.5,}
+    prob_distribution={2:0.5,}
     dct_dist_link=fn.Dct_dist_link(list(Copycat.edges()), map_dct)
     max_dist_link=max(dct_dist_link.values())
     fn.Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link)
@@ -1474,8 +1456,7 @@ def test_Equalizer_down_top_right_ratio():
     G=fn.SuperGraph(edges_G)    
     Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
     map_dct=nx.spring_layout(G, dim=2, seed=seed)
-    prob_distribution={0.2:0.5, 0.4:0.5, 0.6:0.5, 0.8:0.5, 1:0.5,
-                    1.2:0.5, 1.4:0.5, 1.6:0.5, 1.8:0.5, 2:0.5,}
+    prob_distribution={2:0.5,}
     dct_dist_link=fn.Dct_dist_link(list(Copycat.edges()), map_dct)
     max_dist_link=max(dct_dist_link.values())
     fn.Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link)
@@ -1493,14 +1474,14 @@ def test_Copymap_degree_correction():
     '''It test the final network has a degree distribution compatible with the distribution of the reference network'''
     
     G=fn.SuperGraph(nx.newman_watts_strogatz_graph(300, 3, p=0.4, seed=3))
-    link_dist_prob={0.2:0.5, 0.4:0.5, 0.6:0.5, 0.8:0.5, 1:0.5,
-                    1.2:0.5, 1.4:0.5, 1.6:0.5, 1.8:0.5, 2:0.5,}
+    link_dist_prob={2:0.5,}
     
     map_dct=nx.spring_layout(G, dim=2, seed=seed)
     dct_dist_link=fn.Dct_dist_link(list(G.edges),map_dct)
     new_graph=fn.SuperGraph()
     new_graph.add_nodes_from(G.nodes())
     max_dist_link=max(dct_dist_link.values())
+    
     
     edge_probability=2*G.number_of_edges()/((len(G)-1)*(len(G)))
     ERG=fn.SuperGraph(nx.fast_gnp_random_graph(len(G),edge_probability, seed=None, directed=False))
@@ -1510,13 +1491,14 @@ def test_Copymap_degree_correction():
     Copycat=fn.Copymap_degree_correction(ERG,G,map_dct,max_dist_link,link_dist_prob,Merge=False)
     
     for i in range(len(Copycat.Degree_ratio())):
-        print(G.Degree_ratio()[i]-3*(G.Degree_ratio()[i]+0.001)**0.5,'<=',Copycat.Degree_ratio()[i],'<=',G.Degree_ratio()[i]+3*(G.Degree_ratio()[i]+0.01)**0.5)
-        assert (G.Degree_ratio()[i]-3*(G.Degree_ratio()[i]+0.001)**0.5<=Copycat.Degree_ratio()[i]<=G.Degree_ratio()[i]+3*(G.Degree_ratio()[i]+0.01)**0.5)
+        std=(G.Degree_ratio()[i]+0.0001)**0.5
+        print(G.Degree_ratio()[i]-3*std,'<=',Copycat.Degree_ratio()[i],'<=',G.Degree_ratio()[i]+3*std)
+        assert (G.Degree_ratio()[i]-3*std<=Copycat.Degree_ratio()[i]<=G.Degree_ratio()[i]+3*std)
 #%% 
                
 def test_trunk_array_at_nan_len():
     '''Given a np array 4*4, the Trunk_array_at_nan trunk each row at the first nan value.
-    a list of lists is expected whose rows have different len'''
+    It is expected that the output is a list of lists is expected whose rows have different len'''
     a=np.array(([0,1,np.nan,np.nan],[1,np.nan,0,0]))
     A=fn.Trunk_array_at_nan(a)
     assert len(A[0])==2
@@ -1524,7 +1506,7 @@ def test_trunk_array_at_nan_len():
     
 def test_trunk_array_at_nan_no_nan():
     '''Given a np array 4*4, the Trunk_array_at_nan trunk each row at the first nan value.
-    a list of lists is expected whose rows have all the values before the nan value'''
+    It is expected that the output is a list of lists is expected whose rows have all the values before the nan value'''
     a=np.array(([0,1,np.nan,np.nan],[1,np.nan,0,0]))
     
     A=fn.Trunk_array_at_nan(a)
