@@ -153,6 +153,8 @@ def Divide_value(file):
 
                             break
     return file
+
+
 #%%2 Erase nan row
 def Erase_nan_row(file):
     '''It takes an array (n,2) which represents the graph edges. It returns a list of list of shape ((n-k,2))
@@ -229,6 +231,7 @@ def Edge_list(file, number_of_edges):
         raise Exception('number_of_edges must be minor of the file length')    
     if file.shape[1] != 2:
         raise Exception('file shape should be with axis=1 equal to 2')
+        
     edges = []
     for i in range((number_of_edges)):
         edges.append([int(file[i, 0]),int(file[i, 1])])
@@ -359,6 +362,7 @@ def Size_evolution(G,step, feature):
     -------
     size : np.array of integers
         Each integer is the size of the graph at that step
+        
     value_size_evolution : If feature=='degree' it returns a numpy.ndarray((#G.edges/step,max degree G +1)).
                            It represents the degree ratio of the graph at each step.
                            Else it returns a list #G.edges/step long. Each item of the list is a numpy.ndarray
@@ -535,9 +539,7 @@ def Conditional_probability(important_events_frequency,step, events_frequency):
             raise ZeroDivisionError('There is no couple of nodes with this distance')
             
     return link_distance_probability
-    
-
-
+     
 #%%12 Add_edges_from_map(G,map_dct,distance_linking_probability)                           
 def Add_edges_from_map(G,dct_dist,dist_link_prob):
     '''
@@ -568,14 +570,14 @@ def Add_edges_from_map(G,dct_dist,dist_link_prob):
     max_distance=max(dist_link_prob.keys())
     link_probabilities=list(dist_link_prob.values())
     
-    for i in dct_dist:       
+    for i in dct_dist: 
         dist=dct_dist[i]
         if dist<=max_distance:
             for k in range(nstep):
                 if dist>k*step and dist<=(k+1)*step:                    
                     uniform=rn.uniform(0,1)
                     if uniform<= link_probabilities[k]:                        
-                        G.add_edge(i[0],i[1])  
+                        G.add_edge(i[0],i[1])
 
 
 
@@ -672,6 +674,7 @@ def Equalize_strong_nodes(G_strong, G_weak):
     max_weak=len(G_weak.Degree_ratio())
     max_strong=len(G_strong.Degree_ratio())
     
+    'otherwise we compare ratio of degree wich do not exist in the weak graph'
     if max_weak<max_strong:       
         fn.Break_strongest_nodes(G_strong, max_weak-1) 
     i=max_weak    
@@ -735,21 +738,28 @@ def Max_prob_target (source,degree,map_dct,distance_linking_probability,max_dist
         dist=np.linalg.norm(x0-x1)
         
         if dist<max_dist:
-            for k in range(len(distance_linking_probability)):
+            nstep=len(distance_linking_probability)
+            for k in range(nstep):
                 if dist>k*step and dist<(k+1)*step:
                     prob=list(distance_linking_probability.values())[k]
                     if prob>max_prob and i!=source and list(G.neighbors(source)).count(i)!=1:
                         max_prob=prob
                         target=i                    
 
+                            
     '''In the case there was no nodes with the right conditions to link to'''
     if target==-5:
 
         target=fn.Min_distance_target(source,degree, map_dct,G)
     return target
+    
+
+    
+                
+        
 
 
-
+                        
 #%%15 Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_list)
 
 def Min_distance_target (source,degree,map_dct,G):
@@ -976,8 +986,7 @@ def Equalizer_top_down(G,Copycat):
 
     '''
     for i in range(len(G.Degree_ratio())-1,0,-1):
-        if i< len(Copycat.Degree_ratio()):            
-            while len(Copycat.Degree_ratio())>=i and Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:
+            while i<= len(Copycat.Degree_ratio())-1 and Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:
                 fn.Remove_edge_of_degree(i, Copycat) 
 
 #%%21 Equalizer_down_top
@@ -1104,6 +1113,25 @@ def Trunk_array_at_nan(array):
 
 #%%24 Directory_creation(name)
 def Directory_creation(name):
+    '''It creates a new directory in the directory where the function in launched.
+    The name of hte directory is the argument of the function. If the directory already exists it raise an exception
+    
+
+    Parameters
+    ----------
+    name : str
+        name of the new directory.
+
+    Raises
+    ------
+    Exception
+        The exception raises if there is already a directory with the name chosen
+
+    Returns
+    -------
+    None.
+
+    '''
     name_simulation='\\'+name
     path = os.getcwd()+name_simulation
     # Check whether the specified path exists or not
