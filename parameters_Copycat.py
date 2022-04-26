@@ -29,7 +29,7 @@ file_to_plot=os.getcwd()+'\\'+name_simulation
 #bool-> save_fig=True it saves the plot in the directory file_to_plot ||| save_fig=False it just shows the plot
 save_fig=True
 #extention of the plot files
-extention='pdf'
+extention='png'
 
 
 
