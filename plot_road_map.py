@@ -70,10 +70,10 @@ fplot.Feature_cumulative_evolution(CC_evolution[:,4:], 'Closeness centrality',pa
 #%% Histograms
 data_ERG=pd.read_csv(params.file_to_plot+'\data_ERG.csv')
 
-fplot.Hist_plot(data_ERG.Degree,color[1], 'Degree_ERG distribution',params.file_to_plot, params.save_fig, params.extention)
-fplot.Hist_plot(data_ERG.Betweeness_Centrality,color[1], 'Betweeness_Centrality_ERG distribution',params.file_to_plot, params.save_fig, params.extention)
-fplot.Hist_plot(data_ERG.Closeness_Centrality,color[1], 'Closeness_Centrality_ERG distribution',params.file_to_plot, params.save_fig, params.extention)
-fplot.Hist_plot(data_ERG.Clustering,color[1], 'Clustering_ERG distribution',params.file_to_plot, params.save_fig, params.extention)
+fplot.Hist_plot(data_ERG.Degree,color[0], 'Degree_ERG distribution',params.file_to_plot, params.save_fig, params.extention)
+fplot.Hist_plot(data_ERG.Betweeness_Centrality,color[0], 'Betweeness_Centrality_ERG distribution',params.file_to_plot, params.save_fig, params.extention)
+fplot.Hist_plot(data_ERG.Closeness_Centrality,color[0], 'Closeness_Centrality_ERG distribution',params.file_to_plot, params.save_fig, params.extention)
+fplot.Hist_plot(data_ERG.Clustering,color[0], 'Clustering_ERG distribution',params.file_to_plot, params.save_fig, params.extention)
 
 #%% Scatterplot
 
