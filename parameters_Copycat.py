@@ -31,8 +31,6 @@ save_fig=True
 #extention of the plot files
 extention='pdf'
 
-#number of bins of the distance distribution
-nstep=50
 
 
 
