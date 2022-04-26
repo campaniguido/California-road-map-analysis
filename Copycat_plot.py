@@ -15,11 +15,11 @@ import parameters_Copycat as paramsC
 
 data_Copycat=pd.read_csv(paramsC.path_to_save_data+'\data_Copycat.csv')
 
-color=[cm.CMRmap(0.46),cm.CMRmap(0.08),cm.CMRmap(0.8)]
-fplot.Hist_plot(data_Copycat.Degree,color[1], 'Degree_Copycat distribution',paramsC.file_to_plot, paramsC.save_fig, paramsC.extention)
+color=[cm.CMRmap(0.46)]
+fplot.Hist_plot(data_Copycat.Degree,color[0], 'Degree_Copycat distribution',paramsC.file_to_plot, paramsC.save_fig, paramsC.extention)
 fplot.Hist_plot(data_Copycat.Betweeness_Centrality,color[0], 'Betweeness_Centrality_Copycat distribution',paramsC.file_to_plot, paramsC.save_fig, paramsC.extention)
-fplot.Hist_plot(data_Copycat.Closeness_Centrality,color[1], 'Closeness_Centrality_Copycat distribution',paramsC.file_to_plot, paramsC.save_fig, paramsC.extention)
-fplot.Hist_plot(data_Copycat.Clustering,color[2], 'Clustering_Copycat distribution',paramsC.file_to_plot, paramsC.save_fig, paramsC.extention)
+fplot.Hist_plot(data_Copycat.Closeness_Centrality,color[0], 'Closeness_Centrality_Copycat distribution',paramsC.file_to_plot, paramsC.save_fig, paramsC.extention)
+fplot.Hist_plot(data_Copycat.Clustering,color[0], 'Clustering_Copycat distribution',paramsC.file_to_plot, paramsC.save_fig, paramsC.extention)
 
 #%% Scatterplot
 

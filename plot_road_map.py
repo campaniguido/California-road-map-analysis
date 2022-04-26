@@ -16,7 +16,7 @@ import parameters as params
 
 
 #%% Histograms
-color=[cm.CMRmap(0.46),cm.CMRmap(0.08)]
+color=[cm.CMRmap(0.08)]
 data_road=pd.read_csv(params.file_to_plot+'\data_road.csv')
 fplot.Hist_plot(data_road.Degree,color[0],'Degree distribution',params.file_to_plot, params.save_fig, params.extention)
 fplot.Hist_plot(data_road.Betweeness_Centrality,color[0], 'Betweeness_Centrality distribution',params.file_to_plot,params.save_fig, params.extention)
