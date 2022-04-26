@@ -111,7 +111,7 @@ class SuperGraph(nx.Graph):
      
 #%%1  Divide value
 
-def Divide_value(file):
+def Divide_value(file_to_correct):
     '''It takes an array (n,2) which represents the graph edges. It looks for any case in which
     two linked nodes are written in the same cell in a string variable and put the two variables
     in the two columns of the same row. It substitutes any full nan row with the previous row
@@ -130,13 +130,14 @@ def Divide_value(file):
 
     Returns
     -------
-    TYPE
+    
         
-        numpy.ndarray ((n,2))
+    file: numpy.ndarray ((n,2))
+        file with corrected entries
 
     '''
-    file=pd.DataFrame(file)
-    file=np.array(file)
+    file_dataFrame=pd.DataFrame(file_to_correct)
+    file=np.array(file_dataFrame)
     
     if file.shape[1] != 2:
         raise Exception('file shape should be with axis=1 equal to 2')
@@ -156,7 +157,7 @@ def Divide_value(file):
 
 
 #%%2 Erase nan row
-def Erase_nan_row(file):
+def Erase_nan_row(file_to_correct):
     '''It takes an array (n,2) which represents the graph edges. It returns a list of list of shape ((n-k,2))
        erasing all the k full nan row.
     
@@ -176,11 +177,10 @@ def Erase_nan_row(file):
 
     Returns
     -------
-    TYPE
-        list ((n-k,2)) with  0<=k<=n
-
+    file: list ((n-k,2)) with  0<=k<=n
+         file with no nan row
     '''
-    file=pd.DataFrame(file)
+    file=pd.DataFrame(file_to_correct)
     file=np.array(file)
     
     if file.shape[1] != 2:
@@ -253,7 +253,6 @@ def Unfreeze_into_list(comunity):
     Returns
     -------
     comunity : It returns the same variable but each item is a list
-        DESCRIPTION.
 
     '''
     for i in range(len(comunity)):
@@ -723,7 +722,7 @@ def Max_prob_target (source,degree,map_dct,distance_linking_probability,max_dist
 
     Returns
     -------
-    target : integer
+    target : int
         It is the label of node chosen
 
     '''
@@ -787,7 +786,7 @@ def Min_distance_target (source,degree,map_dct,G):
 
     Returns
     -------
-    target : integer
+    target : int
         It is the label of node chosen for the linkage
 
     '''
@@ -1096,7 +1095,7 @@ def Trunk_array_at_nan(array):
     Returns
     -------
     new_array : list of lists
-        DESCRIPTION.
+        
 
     '''
     new_array=[] #np.zeros([len(array),])
