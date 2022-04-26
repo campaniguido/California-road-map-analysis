@@ -93,7 +93,7 @@ def Scatter_plot(distribution1, name_distribution1, distribution2, name_distribu
         plt.savefig(path+'\\'+name_distribution1+ ' vs '+  name_distribution2 +"."+ extention, dpi=100)
     else:
         plt.show()
-       
+    plt.close()   
 #%%22 Feature_mean_evolution
 
 def Feature_mean_evolution(feature_size,feature_mean, feature_name,path=None, save_fig=False, extention='pdf'):
@@ -135,6 +135,7 @@ def Feature_mean_evolution(feature_size,feature_mean, feature_name,path=None, sa
         plt.savefig(path+'\\'+"Mean"+feature_name+"."+ extention, dpi=100)
     else:
         plt.show()
+    plt.close()
 #%%23 Feature_cumulative_evolution
 
 
@@ -186,7 +187,7 @@ def Feature_cumulative_evolution(feature, feature_name,path=None, save_fig=False
         plt.savefig(path+'\\'+feature_name+"cumulative-convergence""."+ extention, dpi=100)
     else:
         plt.show()
-
+    plt.close()
 #%%24 Feature_ratio_evolution
 
 
@@ -239,3 +240,4 @@ def Feature_ratio_evolution(feature_position,feature_ratio, feature_name,path=No
     else:
         plt.show()
 
+    plt.close()
