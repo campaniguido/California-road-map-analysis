@@ -30,6 +30,17 @@ class SuperGraph(nx.Graph):
         Returns
         -------
         None.
+        
+        example:
+            
+        G=fn.SuperGraph()
+        G.add_edges_from(([(9, 1), (9, 0), (9, 4), (1, 2), (4,4)]))
+        G.Sorted_graph()
+        G.edges(), G.nodes()
+        
+        >output:
+        
+        (EdgeView([(0, 9), (1, 2), (1, 9), (4, 4), (4, 9)]), NodeView((0, 1, 2, 4, 9)))
 
 
         '''
@@ -42,12 +53,25 @@ class SuperGraph(nx.Graph):
         
     def Relable_nodes(self):
         '''It orders nodes list and edges list of the SuperGraph and it renames the nodes
-        in order to remove any jump in the labels (e.g.: G((5,4),(4,0)->G((0,1),(1,2)) )
+        in order to remove any jump in the labels (e.g.: G((5,4),(4,0))->G((0,1),(1,2)) ) 
         
                                                    
         Returns
         -------
+    
         None.
+        
+        
+        example:
+            
+        G=fn.SuperGraph()
+        G.add_edges_from(([(9, 1), (9, 0), (9, 4), (1, 2), (4,4)]))
+        G.Relable_nodes()
+        G.edges(), G.nodes()
+        
+        >output:
+        
+        (EdgeView([(0, 4), (1, 4), (1, 2), (3, 4), (3, 3)]), NodeView((0, 1, 2, 3, 4)))
         '''
         nodes=sorted(list(self.nodes()))    
         edges=list(self.edges())
@@ -63,13 +87,23 @@ class SuperGraph(nx.Graph):
 
         '''It returns a dictionary. The keys are the degree of the SuperGraph from 0 to the maximum.
         The values are all and only the nodes with the key degree.
-        It doesn't take into account as a link a self connected node
-                
+        It doesn't take into account as a link a self connected node.
+        
+
+
+        
         Returns
         -------
         degree_dct : dct
             The keys are the degree of the SuperGraph,the values are all and only the nodes with the key degree
-            
+        
+        example:
+        G=fn.SuperGraph()
+        G.add_edges_from(([(0, 1), (0, 3), (0, 4), (1, 2), (4,4)]))
+        G.Degree_dct()
+        
+        >output:
+        {0: [], 1: [3, 4, 2], 2: [1], 3: [0]}    
         '''
 
         
@@ -97,6 +131,14 @@ class SuperGraph(nx.Graph):
         Returns
         -------
         degree_ratio : np.array
+        
+        example:
+        G=fn.SuperGraph()
+        G.add_edges_from(([(0, 1), (0, 3), (0, 4), (1, 2), (4,4)]))
+        G.Degree_ratio()
+        
+        >output:
+        array([0. , 0.6, 0.2, 0.2])
 
         '''
         degree_dct=self.Degree_dct()
@@ -118,7 +160,7 @@ def Divide_value(file_to_correct):
     
     Parameters
     ----------
-    file : Dict can contain Series, arrays, constants, dataclass or list-like objects.
+    file_to_correct : Dict can contain Series, arrays, constants, dataclass or list-like objects.
            If data is a dict, column order follows insertion-order. 
            If a dict contains Series which have an index defined, it is aligned by its index.
            Its shape must be (n,2)
@@ -165,7 +207,7 @@ def Erase_nan_row(file_to_correct):
 
     Parameters
     ----------
-    file : Dict can contain Series, arrays, constants, dataclass or list-like objects.
+    file_to_correct : Dict can contain Series, arrays, constants, dataclass or list-like objects.
            If data is a dict, column order follows insertion-order. 
            If a dict contains Series which have an index defined, it is aligned by its index.
            Its shape mut be (n,2)
@@ -180,8 +222,8 @@ def Erase_nan_row(file_to_correct):
     file: list ((n-k,2)) with  0<=k<=n
          file with no nan row
     '''
-    file=pd.DataFrame(file_to_correct)
-    file=np.array(file)
+    file_data=pd.DataFrame(file_to_correct)
+    file=np.array(file_data)
     
     if file.shape[1] != 2:
         raise Exception('file shape should be with axis=1 equal to 2')
@@ -225,16 +267,16 @@ def Edge_list(file, number_of_edges):
         
 
     '''
-    file=pd.DataFrame(file)
-    file=np.array(file)
-    if number_of_edges>len(file):
+    file_data=pd.DataFrame(file)
+    file_array=np.array(file_data)
+    if number_of_edges>len(file_array):
         raise Exception('number_of_edges must be minor of the file length')    
-    if file.shape[1] != 2:
+    if file_array.shape[1] != 2:
         raise Exception('file shape should be with axis=1 equal to 2')
         
     edges = []
     for i in range((number_of_edges)):
-        edges.append([int(file[i, 0]),int(file[i, 1])])
+        edges.append([int(file_array[i, 0]),int(file_array[i, 1])])
     edges = sorted(edges)
     return edges
 
@@ -320,10 +362,10 @@ def Fill_with_zeros(list_):
     
     example:
     input:
-    >list_=[[1,1],[3,3,3],[4,4,4,4]]
-    >fill_the_holes(list_)
-    >list_
-    output:
+    list_=[[1,1],[3,3,3],[4,4,4,4]]
+    fill_the_holes(list_)
+    list_
+    >output:
     [[ 1, 1, 0], [3, 3, 3, 0], [4, 4, 4, 4]]
             
 
@@ -391,7 +433,6 @@ def Size_evolution(G,step, feature):
     else:
         for i in range(n_step):
             G=fn.SuperGraph(edges[:(i+1)*step])
-            G.Sorted_graph()
             G.Relable_nodes()            
             value_size=np.array(list((getattr(nx, feature)(G)).items()))[:,1]
             evolution_mean.append([np.mean(value_size),np.std(value_size)])
@@ -673,7 +714,7 @@ def Equalize_strong_nodes(G_strong, G_weak):
     max_weak=len(G_weak.Degree_ratio())
     max_strong=len(G_strong.Degree_ratio())
     
-    'otherwise we compare ratio of degree wich do not exist in the weak graph'
+    'otherwise we compare ratio of degree which do not exist in the weak graph'
     if max_weak<max_strong:       
         fn.Break_strongest_nodes(G_strong, max_weak-1) 
     i=max_weak    
@@ -692,7 +733,7 @@ def Equalize_strong_nodes(G_strong, G_weak):
     
 def Max_prob_target (source,degree,map_dct,distance_linking_probability,max_dist,G):
     '''
-    It finds the best linking target for a surce node of the graph G. The target,
+    It finds the best linking target for a source node of the graph G. The target,
     if it is possible, has the degree chosen in the input, it's not a source's neighbour, 
     it's not its self and among the the nodes with the previous three characteristic is the most
     probable one
@@ -1090,7 +1131,7 @@ def Trunk_array_at_nan(array):
     Parameters
     ----------
     array :np.array n*m dimensional (m>1)
-        DESCRIPTION.
+        
 
     Returns
     -------
