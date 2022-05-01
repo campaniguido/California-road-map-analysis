@@ -85,7 +85,7 @@ edges E, the probability to get a specified graph is it equal to:
 
 As It was said in the introduction the code here presented was used as a fundamental first step for the visualization of the features of the California road map, to visually compare it with an Erdős–Rényi graph and to generate a network which tries to emulate the characteristics of the real one. In the following rows we explain with more details how the four main scripts(road_map.py, plot_road_map.py, Copycat.py Copycat_plot.py) work, for more details about why this procedure was chosen we suggest reading the report Campani-Califonia_road_map.pdf.
 
-## The libraries used 
+### The libraries used 
 - math
 - matplotlib
 - networkx
