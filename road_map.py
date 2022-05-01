@@ -29,7 +29,7 @@ fn.Directory_creation(params.name_simulation)
 #%% file reading
 
 file_position=params.file_position
-file=pd.read_table(file_position)
+file=pd.read_table(file_position,low_memory=(False))
 file_no_nan_raw=fn.Erase_nan_row(file)
 edges_info=fn.Divide_value(file_no_nan_raw)
 
