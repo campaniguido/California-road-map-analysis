@@ -1026,6 +1026,9 @@ def Equalizer_top_down(G,Copycat):
 
     '''
     for i in range(len(G.Degree_ratio())-1,0,-1):
+            
+            '''the first condition avoid to calculate the ratio of a degre that does not exist
+             the second condition discriminates if the remove of the edge has to be done'''
             while i<= len(Copycat.Degree_ratio())-1 and Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:
                 fn.Remove_edge_of_degree(i, Copycat) 
 
@@ -1063,6 +1066,8 @@ def Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link):
     
     for i in range(1,len(G.Degree_ratio())):
         if i< len(Copycat.Degree_ratio()):
+            '''the first condition avoids to enter in an endless loop 
+             the second condition discriminate if the Link_2_ZeroNode has to be done'''
             while len(Copycat.Degree_dct()[0])>0 and Copycat.Degree_ratio()[i]< G.Degree_ratio()[i]:  
                 fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,Copycat,i, Copycat.Degree_dct())
 
@@ -1139,7 +1144,7 @@ def Trunk_array_at_nan(array):
         
 
     '''
-    new_array=[] #np.zeros([len(array),])
+    new_array=[] 
     for i in range(len(array)):
         cutter=len(array[i])
         j=0
