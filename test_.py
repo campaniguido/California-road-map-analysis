@@ -710,33 +710,7 @@ def test_List_dist_triangular_inequality_unit_test():
     assert dct_dist[(2,3)]<=dct_dist[(1,2)]+dct_dist[(1,3)]
     
     
-def test_List_dist_triangular_inequality_abstract():
-    '''It builds a nx.Graph object with 6 nodes linking them randomly.
-    Then it build a topografical map of the nodes and applies the function Dct_dist_link
-    to calculate the euclidean distance among linked nodes. Finally it test the triangular 
-    inequality for all the possible distances'''
-    G=nx.Graph()
-    G.add_edges_from([[1,2],[1,3],[1,4],[2,4],[3,4],[4,5],[6,6],[3,1],[2,5]])
-    edges=list(G.edges())
-    map_dct=nx.spring_layout(G, dim=2, seed=seed)
-    dct_dist=fn.Dct_dist(G, map_dct)
-    a=list(G.nodes())
-    for node in list(G.nodes()) :
 
-        a.remove(node)
-        for next_node in a:
-            all_simple_paths=sorted(list(nx.all_simple_paths(G,node,next_node)),key=len)
-            if len(all_simple_paths)>0:
-                if len(all_simple_paths[0])==2 and len(all_simple_paths)>1:
-                    dist=dct_dist[(all_simple_paths[0][0],all_simple_paths[0][1])]
-                    for i in range(1,len(all_simple_paths)):
-                        dist2=0
-                        for j in range(len(all_simple_paths[i])-1):
-                            if edges.count((all_simple_paths[i][j],all_simple_paths[i][j+1]))==1:
-                                dist2+=dct_dist[(all_simple_paths[i][j],all_simple_paths[i][j+1])]
-                            else:
-                                dist2+=dct_dist[(all_simple_paths[i][j+1],all_simple_paths[i][j])]
-                assert dist<dist2
 
 #%%   test_Node_distance_frequency (3)
 
