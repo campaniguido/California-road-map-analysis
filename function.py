@@ -30,6 +30,7 @@ class SuperGraph(nx.Graph):
         Returns
         -------
         None.
+        ___________________________________
         
         example:
             
@@ -60,7 +61,7 @@ class SuperGraph(nx.Graph):
         -------
     
         None.
-        
+        ___________________________________
         
         example:
             
@@ -96,7 +97,8 @@ class SuperGraph(nx.Graph):
         -------
         degree_dct : dct
             The keys are the degree of the SuperGraph,the values are all and only the nodes with the key degree
-        
+        ___________________________________
+            
         example:
         G=fn.SuperGraph()
         G.add_edges_from(([(0, 1), (0, 3), (0, 4), (1, 2), (4,4)]))
@@ -131,7 +133,7 @@ class SuperGraph(nx.Graph):
         Returns
         -------
         degree_ratio : np.array
-        
+        ___________________________________
         example:
         G=fn.SuperGraph()
         G.add_edges_from(([(0, 1), (0, 3), (0, 4), (1, 2), (4,4)]))
@@ -176,6 +178,18 @@ def Divide_value(file_to_correct):
         
     file: numpy.ndarray ((n,2))
         file with corrected entries
+        
+    ___________________________________
+    example:
+        
+    file=[['0 ','134'],['45643    3456',np.nan],[np.nan,'34      5']]
+    file=fn.Divide_value(file)
+    file
+    
+    >Output: 
+    array([['0 ', '134'],
+           ['45643', '3456'],
+           ['34', '5']], dtype=object)
 
     '''
     file_dataFrame=pd.DataFrame(file_to_correct)
@@ -221,7 +235,17 @@ def Erase_nan_row(file_to_correct):
     -------
     file: list ((n-k,2)) with  0<=k<=n
          file with no nan row
+         
+    ___________________________________
+    example:   
+    file=[['0','134.0'],[np.nan,np.nan],['45643',56.7],[np.nan,np.nan],[3,4.0],[np.nan,np.nan]]
+    file_corrected=fn.Erase_nan_row(file)
+    file_corrected
+    
+    >Output:
+    [['0', '134.0'], ['45643', 56.7], [3, 4.0]]
     '''
+    
     file_data=pd.DataFrame(file_to_correct)
     file=np.array(file_data)
     
@@ -264,6 +288,17 @@ def Edge_list(file, number_of_edges):
     Returns
     -------
     edges : list of shape (n,2)
+    
+    ___________________________________
+    example:  
+    
+    file=[[0,1],[0,2],[1,3],[2,4]]
+    number_of_edges=3
+    fn.Edge_list(file,number_of_edges)
+    
+    >Output:
+    [[0, 1], [0, 2], [1, 3]]
+        
         
 
     '''
@@ -295,6 +330,20 @@ def Unfreeze_into_list(comunity):
     Returns
     -------
     comunity : It returns the same variable but each item is a list
+    ___________________________________
+    example: 
+    A = frozenset([1, 2, 3, 4])
+    B = frozenset([3, 4, 5, 6])
+    C = frozenset([5, 6])    
+    list_=[A,B,C]
+    fn.Unfreeze_into_list(list_)
+    
+    >Output:
+    [[1, 2, 3, 4], [3, 4, 5, 6], [5, 6]]
+    
+    
+    
+    
 
     '''
     for i in range(len(comunity)):
@@ -323,7 +372,16 @@ def Set_community_number(G, community):
     -------
     comunity_number : dictionary key:item<->node number: community number
         
-
+    ___________________________________
+    example: 
+    community=[[1,25,6,9],[5,14],[7],[2,4,8]]
+    G=nx.Graph()
+    G.add_edges_from([[1,25],[2,2],[5,6],[4,8],[9,1],[14,1],[1,5],[4,7],[1,7]])
+    fn.Set_community_number(G, community)
+    
+    >Output:
+    
+    {1: 0, 25: 0, 6: 0, 9: 0, 5: 1, 14: 1, 7: 2, 2: 3, 4: 3, 8: 3}
     '''    
     community_number={}
     tot_elem=[]
@@ -359,9 +417,8 @@ def Fill_with_zeros(list_):
     Returns
     -------
     None.
-    
-    example:
-    input:
+    ___________________________________
+    example: 
     list_=[[1,1],[3,3,3],[4,4,4,4]]
     fill_the_holes(list_)
     list_
@@ -411,9 +468,30 @@ def Size_evolution(G,step, feature):
         
     value_size_evolution_mean : It returns numpy.ndarray((#G.edges/step,2)). 
                                 Each entry is the mean value of the degree and its std
+    
                                 
+    ___________________________________
+    example:    
         
+    G=fn.SuperGraph()
+    G.add_edges_from([[1,8],[8,3],[8,4],[5,4],[5,6],[2,3]])
+    step=2
+    nstep=int(len(G.edges)/step)
+    feature='degree'
+    fn.Size_evolution(G, step, feature)
+    
+    >Output:
 
+    ([3, 5, 7],
+     
+     [[0.0, 0.6666666666666666, 0.3333333333333333, 0],
+      [0.0, 0.6, 0.2, 0.2],
+      [0.0, 0.42857142857142855, 0.42857142857142855, 0.14285714285714285]],
+     
+     [[1.3333333333333333, 0.4714045207910317],
+      [1.6, 0.8],
+      [1.7142857142857142, 0.6998542122237652]])
+    
     '''
     distribution_evolution=[]
     n_step=int(len(G.edges)/step)
@@ -456,8 +534,22 @@ def Dct_dist_link(edges,map_dct):
 
     Returns
     -------
+    
+    ___________________________________
+    example:
+        
     dct_dist_link : dictionary of all the nodes linked together. key:value= edge:distance
 
+    edges=[(1,2),(3,1),(1,1),(1,2),(2,1)] 
+    map_dct={0: np.array([ 0, 0]),
+             1: np.array([-1, -1]),
+             2: np.array([-0.5, -0.2]),
+             3: np.array([1, 2])}
+    fn.Dct_dist_link (edges,map_dct)
+    
+    >Output:
+    {(3, 1): 3.605551275463989, (1, 2): 0.9433981132056605}
+    
     '''
     for i in edges:
         if edges.count((i[1],i[0])):
@@ -489,7 +581,23 @@ def Dct_dist(G,map_dct):
     Returns
     -------
     dct_dist : dictionary of all the nodes linked together. key:value= (node_i,node_j):distance
+    
+    ___________________________________
+    example:
         
+    edges=[(1,2),(3,1),(1,1),(1,2),(2,1)]    
+    G=nx.Graph()
+    G.add_edges_from(edges)
+    map_dct={0: np.array([ 0, 0]),
+             1: np.array([-1, -1]),
+             2: np.array([-0.5, -0.2]),
+             3: np.array([1, 2])}
+    fn.Dct_dist(G, map_dct)
+    
+    >Output:
+    {(1, 2): 0.9433981132056605,
+     (1, 3): 3.605551275463989,
+     (2, 3): 2.6627053911388696}
 
     '''
     
@@ -528,6 +636,22 @@ def Node_distance_frequency(dct_dist,nstep,step):
     node_distance_frequency : numpy.ndarray
         Each entry is the frequency of elements with the same distance inside the bin of length==step.
         It puts all the elements>nstep*step in the last bin 
+    
+    ___________________________________
+    example:
+    
+    dct_dist={(1, 2): 0.178,
+              (1, 3): 0.162,
+              (1, 4): 0.150,
+              (2, 3): 0.302,
+              (2, 4): 0.149,
+              (3, 4): 0.184}
+    step=0.05
+    nstep=7
+    fn.Node_distance_frequency(dct_dist,nstep,step)
+    
+    >Output:
+    array([0, 0, 2, 3, 0, 0, 1])
     '''
     n=[0]*nstep
     for key in (dct_dist):
@@ -566,7 +690,18 @@ def Conditional_probability(important_events_frequency,step, events_frequency):
     -------
     link_distance_probability : dct
         the keys are the the bin positions the values are the probabilities
-
+    
+    ___________________________________
+    example:
+    
+    events_frequency=[0,0,2,8,24,0,]
+    important_event_frequency=[0,0,1,2,3,0]
+    step=1
+   fn.Conditional_probability(important_event_frequency,step,events_frequency)
+    
+   >Output:
+    {1: 0, 2: 0, 3: 0.5, 4: 0.25, 5: 0.125, 6: 0}
+        
     '''     
     link_distance_probability={}
     
@@ -603,6 +738,20 @@ def Add_edges_from_map(G,dct_dist,dist_link_prob):
     -------
     None
 
+    ___________________________________
+    example:
+        
+    G=nx.Graph()
+    G.add_nodes_from([0,1,2])
+    dct_dist={(0,1): 1,
+              (0,2): 1,
+              (1,2): 3}
+    probability={1: 0.9, 2: 0.5, 3: 0.1}
+    fn.Add_edges_from_map(G, dct_dist,probability)
+    G.edges()
+    
+    >Output:
+    EdgeView([(0, 1), (0, 2)])
     '''
 
     step=list(dist_link_prob.keys())[0]
@@ -642,10 +791,21 @@ def Break_strongest_nodes(G, threshold):
     -------
     None.
 
+    
+    ___________________________________
+    example:
+        
+    edges=[(1,2), (3,1), (1,1), (1,2), (2,1), (1,4), (1,5), (5,4), (5,3), (1,6), (6,2), (5,2)]    
+    G=fn.SuperGraph()
+    G.add_edges_from(edges)
+    fn.Break_strongest_nodes(G,2)
+    G.edges()
+    
+    >Output:
+    EdgeView([(1, 3), (1, 1), (1, 5), (2, 6), (2, 5)])
+    
+    
     '''
-    
-
-    
     dct_degree=G.Degree_dct()
     while threshold<max(dct_degree):
         source=rn.choice(list(dct_degree.values())[len(dct_degree)-1])
@@ -654,7 +814,7 @@ def Break_strongest_nodes(G, threshold):
         dct_degree=G.Degree_dct()
         
 
-#%%12 Find_mode(pfd) 
+#%%14 Find_mode(pfd) 
 def Find_mode(pdf):
     '''
     It returns the x value of the maximum of function p(x). Where x represent a bin 
@@ -662,18 +822,28 @@ def Find_mode(pdf):
     Parameters
     ----------
     pdf : indexable variable
-        DESCRIPTION.
+        
 
     Raises
     ------
     ValueError
-        DESCRIPTION.
+        it could not find the mode
 
     Returns
     -------
     mode : int
         the mode of the function
-
+    
+    ___________________________________
+    example:
+        
+    a=[-1,-5,-0.1,-3,]
+    fn.Find_mode(a)
+    
+    >Output:
+    2
+    
+    
     '''
     max_pdf=max(pdf)
     mode=np.nan
@@ -687,7 +857,7 @@ def Find_mode(pdf):
 
 
         
-#%%13 Equalize_strong_nodes
+#%%15 Equalize_strong_nodes
 def Equalize_strong_nodes(G_strong, G_weak):
     '''
     It compares two graph. It breaks links of the highest degree nodes of G_strong, until the maximum degree of G_strong
@@ -705,6 +875,22 @@ def Equalize_strong_nodes(G_strong, G_weak):
     Returns
     -------
     None.
+    
+    ___________________________________
+    example:
+        
+    edges_strong=[(1,2), (3,1), (6,3), (4,2), (2,3), (1,4), (1,5), (5,4), (5,3), (1,6), (5,3), (5,2), (5,6), (7,1)]    
+    G_strong=fn.SuperGraph()
+    G_strong.add_edges_from(edges_strong)
+    edges=[(1,2), (5,7), (3,4), (4,5), (2,4), (5,6), (6,2)]
+    G_weak=fn.SuperGraph()
+    G_weak.add_edges_from(edges)
+    fn.Equalize_strong_nodes(G_strong, G_weak)
+    G_strong.edges()
+    
+    >Output:
+    EdgeView([(1, 2), (1, 3), (1, 6), (2, 3), (2, 5), (6, 5), (4, 5)])
+    
 
     '''
     
@@ -728,7 +914,7 @@ def Equalize_strong_nodes(G_strong, G_weak):
 
             
 
-#%%14 Max_prob_target
+#%%16 Max_prob_target
 
     
 def Max_prob_target (source,degree,map_dct,distance_linking_probability,max_dist,G):
@@ -765,7 +951,28 @@ def Max_prob_target (source,degree,map_dct,distance_linking_probability,max_dist
     -------
     target : int
         It is the label of node chosen
+    
+    ___________________________________
+    example:
 
+    edges=[(0,2),(1,2),(2,3),(4,0)]
+    G=fn.SuperGraph()
+    G.add_edges_from(edges)    
+    map_dct={0: np.array([0, 0]),
+             1: np.array([1, 0]),
+             2: np.array([2, 0]),
+             3: np.array([3, 0]),
+             4: np.array([4, 0]) }    
+    
+    dct_dist_link=fn.Dct_dist_link(list(G.edges()), map_dct)
+    max_dist=max(dct_dist_link.values())
+    degree=3  
+    source=4
+    prob_distribution={1: 0.4, 2: 0.4, 3: 0.4, 4: 0.4}     
+    fn.Max_prob_target (source,degree,map_dct,prob_distribution,max_dist,G)
+    
+    >Output:
+    2
     '''
     x0=map_dct[source]
     max_prob=-1
@@ -800,7 +1007,7 @@ def Max_prob_target (source,degree,map_dct,distance_linking_probability,max_dist
 
 
                         
-#%%15 Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_list)
+#%%17 Min_distance_target (source,strenght_dct,degree,map_dct,source_neighbour_list)
 
 def Min_distance_target (source,degree,map_dct,G):
     '''
@@ -829,7 +1036,24 @@ def Min_distance_target (source,degree,map_dct,G):
     -------
     target : int
         It is the label of node chosen for the linkage
-
+    
+    ___________________________________
+    example:
+        
+    edges=[(0,1),(0,2),(1,3),(4,4)]
+    G=fn.SuperGraph()
+    G.add_edges_from(edges)
+    
+    map_dct={0: np.array([ 0, 0]),
+         1: np.array([-1, -1]),
+         2: np.array([-0.5, -0.2]),
+         3: np.array([1, 2]),
+         4: np.array([5, 5])}
+    source=0
+    fn.Min_distance_target (source,1,map_dct,G)
+    
+    >Output:
+    3
     '''
     
     x0=map_dct[source]
@@ -853,7 +1077,7 @@ def Min_distance_target (source,degree,map_dct,G):
         target=fn.Random_target(G, source)    
         
     return target
-#%%16 Random target
+#%%18 Random target
 
 def Random_target(G,source):
     '''
@@ -870,7 +1094,18 @@ def Random_target(G,source):
     -------
     target : int
         it represent the target of the link
-
+        
+    ___________________________________
+    example:
+        
+    edges=[(0,1),(1,3),(4,4)]
+    G=fn.SuperGraph()
+    G.add_edges_from(edges)
+    source=0
+    fn.Random_target(G, source)
+    
+    >Output:
+    4
     '''
     target=-5
     while target<0:
@@ -884,7 +1119,7 @@ def Random_target(G,source):
 
 
     
-#%%17 Merge_small_component
+#%%19 Merge_small_component
 def Merge_small_component(G, deg,map_dct,threshold):
     '''
     It merge all the graph component smaller than a given threshold, by linking a random node of
@@ -911,7 +1146,24 @@ def Merge_small_component(G, deg,map_dct,threshold):
     Returns
     -------
     None.
-
+    
+    ___________________________________
+    example:
+        
+    edges=[(0,4),(1,2), (3,3)]    
+    G=fn.SuperGraph()
+    G.add_edges_from(edges)
+    map_dct={0: np.array([0, 0]),
+             1: np.array([1, 0]),
+             2: np.array([2, 0]),
+             3: np.array([3, 0]),
+             4: np.array([4, 0]) } 
+    fn.Merge_small_component(G, 1,map_dct,threshold=3)
+    list(nx.connected_components(G))
+    
+    >Output:
+    [{0, 1, 2, 3, 4}]
+    
     '''
     
     all_components=list(nx.connected_components(G))
@@ -930,7 +1182,7 @@ def Merge_small_component(G, deg,map_dct,threshold):
         
 
     
-#%%18 Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_dct)
+#%%20 Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_dct)
 def Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_dct):
     '''
     It takes an isolated node of the graph and it creates n links (n=n_links) with n different nodes.
@@ -964,7 +1216,30 @@ def Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_
     Returns
     -------
     None.
-
+    
+    
+    ___________________________________
+    example:
+        
+    edges=[(0,2),(1,2),(2,3),(4,0),(5,5),(6,6)]
+    G=fn.SuperGraph()
+    G.add_edges_from(edges)    
+    map_dct={0: np.array([0, 0]),
+             1: np.array([1, 0]),
+             2: np.array([2, 0]),
+             3: np.array([3, 0]),
+             4: np.array([4, 0]),
+             5: np.array([5, 0]),
+             6: np.array([6, 0])}    
+    
+    prob_distribution={1: 0.4, 2: 0.4, 3: 0.4, 4: 0.4}  
+    max_dist_link=4
+    n_links=2
+    fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G, n_links , G.Degree_dct())
+    G.edges()
+    
+    >Output:
+    EdgeView([(0, 2), (0, 4), (2, 1), (2, 3), (4, 6), (5, 5), (5, 6), (6, 6)])
     '''
     if len(degree_dct[0])!=0:
         source=rn.choice(degree_dct[0])
@@ -974,7 +1249,7 @@ def Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,G,n_links, degree_
             degree_dct=G.Degree_dct()
 
 
-#%%19 Remove_edge_of_degree 
+#%%21 Remove_edge_of_degree 
 def Remove_edge_of_degree(degree,G):
     '''
     It removes a link of a node with a given degree
@@ -982,7 +1257,7 @@ def Remove_edge_of_degree(degree,G):
 
     Parameters
     ----------
-    degree : integer
+    degree : int
             Degree of the node of which we wants to remove a link
         
     G : function.SuperGraph
@@ -991,7 +1266,18 @@ def Remove_edge_of_degree(degree,G):
     Returns
     -------
         None.
-
+        
+    ___________________________________
+    example:
+    
+    edges=[(1, 2), (1, 3), (1,4), (1,5), (2, 6), (2, 5), (4,5)]    
+    G=fn.SuperGraph()
+    G.add_edges_from(edges)
+    fn.Remove_edge_of_degree(4,G)
+    G.edges()
+    
+    >Output:
+    EdgeView([(1, 2), (1, 3), (1, 5), (2, 6), (2, 5), (4, 5)])
     ''' 
     
     degree_dct=G.Degree_dct()
@@ -1003,7 +1289,7 @@ def Remove_edge_of_degree(degree,G):
     G.remove_edge(source,node)   
             
     
-#%%20 Equalizer_top_down
+#%%22 Equalizer_top_down
 
 def Equalizer_top_down(G,Copycat):
     '''
@@ -1024,6 +1310,19 @@ def Equalizer_top_down(G,Copycat):
     -------
     None.
 
+    ___________________________________
+    example:
+    
+    edges_G=[(0,0),(1,2),(2,3),(3,4),(3,5)]
+    G=fn.SuperGraph(edges_G)
+    edges_copy=[(0,0),(0,1),(1,2),(2,3),(3,4),(3,5)]
+    Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
+    fn.Equalizer_top_down(G,Copycat)
+    Copycat.edges()
+    
+    >Output:        
+    EdgeView([(0, 0), (1, 2)])
+    
     '''
     for i in range(len(G.Degree_ratio())-1,0,-1):
             
@@ -1032,7 +1331,7 @@ def Equalizer_top_down(G,Copycat):
             while i<= len(Copycat.Degree_ratio())-1 and Copycat.Degree_ratio()[i]> G.Degree_ratio()[i]:
                 fn.Remove_edge_of_degree(i, Copycat) 
 
-#%%21 Equalizer_down_top
+#%%23 Equalizer_down_top
 def Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link):
     '''
     It makes each degree ratio of the network Copycat equal or bigger than
@@ -1061,7 +1360,34 @@ def Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link):
     Returns
     -------
     None.
-
+    
+    ___________________________________
+    example:
+    
+    edges_G=[(0,1),(1,2),(1,5),(2,3),(4,5)]
+    edges_copy=[(0,1),(2,2),(3,3),(4,4),(5,5)]
+    G=fn.SuperGraph(edges_G)
+    Copycat=fn.SuperGraph(fn.SuperGraph(edges_copy))
+    
+    map_dct={0: np.array([0.47694386, 0.04210225]),
+     1: np.array([ 0.011, -0.066]),
+     2: np.array([0.323, 0.456]),
+     3: np.array([0.496, 1.     ] ),
+     4: np.array([-0.850, -0.904]),     
+     5: np.array([-0.457, -0.526]),}
+               
+    prob_distribution={0.2:0.5, 0.4:0.5, 0.6:0.5, 0.8:0.5, 1:0.5,
+                    1.2:0.5, 1.4:0.5, 1.6:0.5, 1.8:0.5, 2:0.5,}
+    
+    dct_dist_link=fn.Dct_dist_link(list(Copycat.edges()), map_dct)
+    max_dist_link=max(dct_dist_link.values())
+    fn.Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link)
+    Copycat.edges()
+    
+    >Output:
+    EdgeView([(0, 1), (2, 2), (3, 3), (4, 4), (4, 5), (5, 5)])
+        
+    
     '''
     
     for i in range(1,len(G.Degree_ratio())):
@@ -1071,7 +1397,7 @@ def Equalizer_down_top(G,Copycat,map_dct,prob_distribution,max_dist_link):
             while len(Copycat.Degree_dct()[0])>0 and Copycat.Degree_ratio()[i]< G.Degree_ratio()[i]:  
                 fn.Link_2_ZeroNode(map_dct, prob_distribution, max_dist_link,Copycat,i, Copycat.Degree_dct())
 
-#%%22 Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False):
+#%%24 Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False):
 
 
 def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution,Merge=False):
@@ -1125,7 +1451,7 @@ def Copymap_degree_correction(Copy_map,G,map_dct,max_dist_link,prob_distribution
     Copycat.Relable_nodes()
     
     return Copycat
-#%%23 Trunk_array
+#%%25 Trunk_array
 def Trunk_array_at_nan(array):
     '''
     It takes an array n*m dimensional (m>1) , it reads each row
@@ -1141,7 +1467,16 @@ def Trunk_array_at_nan(array):
     Returns
     -------
     new_array : list of lists
-        
+    
+    ___________________________________
+    example: 
+    
+    a=np.array(([0,1,np.nan,np.nan],[1,np.nan,0,0]))
+    fn.Trunk_array_at_nan(a)
+    
+    >Output:
+    [[0.0, 1.0], [1.0]]
+    
 
     '''
     new_array=[] 
@@ -1156,7 +1491,7 @@ def Trunk_array_at_nan(array):
         
     return new_array
 
-#%%24 Directory_creation(name)
+#%%26 Directory_creation(name)
 def Directory_creation(name):
     '''It creates a new directory in the directory where the function in launched.
     The name of hte directory is the argument of the function. If the directory already exists it raise an exception
