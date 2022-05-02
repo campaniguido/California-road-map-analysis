@@ -731,11 +731,25 @@ def Add_one_edge(G,link_probability,node_couple):
     Returns
     -------
     None.
+    
+    ___________________________________
+    example:
+    
+    G=nx.Graph()
+    G.add_nodes_from([0,1,2,3])        
+    link_prob=1
+    fn.Add_one_edge(G, link_prob, (0,1))
+    G.edges()
+
+    >Output:
+    EdgeView([(0, 1)])
+    
 
     '''
     uniform=rn.uniform(0,1)
     if uniform<= link_probability:                        
-        G.add_edge(node_couple[0],node_couple[1])    
+        G.add_edge(node_couple[0],node_couple[1])  
+        
 #%%12 Add_edges_from_map(G,map_dct,distance_linking_probability)                           
 def Add_edges_from_map(G,dct_dist,dist_link_prob):
     '''
