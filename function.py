@@ -714,7 +714,28 @@ def Conditional_probability(important_events_frequency,step, events_frequency):
             raise ZeroDivisionError('There is no couple of nodes with this distance')
             
     return link_distance_probability
-     
+#%%
+def Add_one_edge(G,link_probability,node_couple):
+    '''It links a couple of node of a graph with a probability defined by the link probability
+    
+
+    Parameters
+    ----------
+    G : nx.Graph
+        
+    link_probabilities : indexable
+        probability to have a link between the couple of node
+    node_couple : indexable
+        
+
+    Returns
+    -------
+    None.
+
+    '''
+    uniform=rn.uniform(0,1)
+    if uniform<= link_probability:                        
+        G.add_edge(node_couple[0],node_couple[1])    
 #%%12 Add_edges_from_map(G,map_dct,distance_linking_probability)                           
 def Add_edges_from_map(G,dct_dist,dist_link_prob):
     '''
@@ -762,13 +783,15 @@ def Add_edges_from_map(G,dct_dist,dist_link_prob):
     for i in dct_dist: 
         dist=dct_dist[i]
         if dist<=max_distance:
-            for k in range(nstep):
+            for k in range(nstep):                
                 if dist>k*step and dist<=(k+1)*step:                    
-                    uniform=rn.uniform(0,1)
-                    if uniform<= link_probabilities[k]:                        
-                        G.add_edge(i[0],i[1])
+                    Add_one_edge(G,link_probabilities[k],i)
 
+                    
+                    
+                    
 
+    
 
 
 #%%13 Break_strong_nodes
