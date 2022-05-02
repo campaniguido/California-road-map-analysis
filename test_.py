@@ -832,36 +832,73 @@ def test_Conditional_probability_bin_value():
     bins=list(conditional_probability_dct.keys())
     assert  bins==[1, 2, 3, 4, 5, 6]
 
-#%%   test_Copymap_linking (3)
+#%% Add_one_edge(G,link_probability,node_couple)
+
+def test_Add_one_edge_length():
+    '''Given a graph with no edges it applies the function Add_one_edge. It expected it does not change the len of the graph'''
+    G=nx.Graph()
+    G.add_nodes_from([0,1,2,3])        
+    link_prob=0.5
+    fn.Add_one_edge(G, link_prob, (0,1))
+    assert len(G)==4
+
+def test_Add_one_edge_one_link():
+    '''Given a graph with no edges it applies the function Add_one_edge with a probability equal to one to make a link.
+    It expected a link between the node 0 and one'''
+    
+    G=nx.Graph()
+    G.add_nodes_from([0,1,2,3])        
+    link_prob=1
+    fn.Add_one_edge(G, link_prob, (0,1))
+    assert list(G.edges).count((0, 1))==1
+
+def test_Add_one_edge_bernoulli_trials():
+    '''Given a graph with no edges it applies the function Add_one_edge n times equal to trials,
+    with a probability equal to 0.3. It expected that average the number of times the link is made over the trials
+    is 0.3'''
+       
+    link_prob=0.3
+    trials=100
+    prob=0
+    for i in range(trials):
+        G=nx.Graph()
+        G.add_nodes_from([0,1,2,3])
+        fn.Add_one_edge(G, link_prob, (0,1))
+        prob+=list((G.edges)).count((0, 1))
+    prob=prob/trials
+    
+    'using the binomial variance'    
+    std=(0.3*0.7/trials**0.5)**0.5
+    assert     link_prob-3*std<prob<link_prob+3*std
+
+
+    
+    
+
+#%%   test_Add_edges_from_map (3)
 
 
 def test_Add_edges_from_map_nodes_number():
-    '''Given a graph with random links, a dictionary of the distances among nodes and the conditional probabilities to have
-    a links in function of the distance,it builds a new graph with same nodes of the old one
-    and adds edges exploiting the function Add_edges_from_map.
-    Finally it tests the number of nodes is the same of the old one
+    '''Given a graph with 3 nodes and no links, a dictionary of the distances among nodes and the conditional probabilities to have
+    a links in function of the distance,it adds edges exploiting the function Add_edges_from_map.
+    Finally it tests the list of nodes is not changed
     '''
       
-    G=nx.Graph()
-    G.add_edges_from([[0,2],[0,1]])
     dct_dist={(0,1): 1,
               (0,2): 1,
               (1,2): 3}
     probability={1: 0.9, 2: 0.5, 3: 0.1}
     Copy_map=nx.Graph()
-    Copy_map.add_nodes_from(list(G.nodes))
+    Copy_map.add_nodes_from([0,1,2])
     fn.Add_edges_from_map(Copy_map, dct_dist,probability)
-    assert list(Copy_map.nodes())==list(G.nodes)
+    assert list(Copy_map.nodes())==[0,1,2]
     
 def test_Add_edges_from_map_completed():
-    '''Given a graph with 4 nodes randomly connected, a dictionary of the distances among nodes and the conditional probabilities to have
-    a links in function of the distance equal to one for all the possible distance,it builds
-    the graph Copy_map exploiting the function Add_edges from_map.
+    '''Given a graph with 4 nodes and no links, a dictionary of the distances among nodes and the conditional probabilities to have
+    a links in function of the distance equal to one for all the possible distance,it adds links exploiting the function Add_edges from_map.
     Finally it tests that the new graph Copy_map is fully conected
     '''
       
-    G=nx.Graph()
-    G.add_edges_from([[0,1],[1,2],[2,3],[1,3]])
     dct_dist={(0,1): 1,
               (0,2): 2,
               (0,3): 3,
@@ -871,44 +908,11 @@ def test_Add_edges_from_map_completed():
         
     probability_distribution={1: 1, 2: 1, 3: 1}
     Copy_map=fn.SuperGraph()
-    Copy_map.add_nodes_from(list(G.nodes))
+    Copy_map.add_nodes_from([0,1,2,3])
     fn.Add_edges_from_map(Copy_map, dct_dist,probability_distribution)
     assert list(Copy_map.edges)==[(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]
 
-def test_Add_edges_from_map_Bernulli_trials():
-    '''Given a graph with 3 nodes randomly connected, a dictionary of the distances among nodes and the conditional probabilities to have
-    a links in function of the distance,it builds 1000 the graph Copy_map exploiting 
-    the function Add_edges from_map. It test that the average number of link in function of the distance
-    follows the conditonal probabilities.
-    '''
-      
-    G=nx.Graph()
-    G.add_edges_from([[0,1],[1,2]])
-    dct_dist={(0,1): 1,
-              (0,2): 2,
-              (1,2): 1}
-        
-    link_prob={1: 0.4, 2: 0.8}
-    prob_link1=0
-    prob_link2=0
-    trials=1000
-    
-    for i in range(trials):
-        Copy_map=fn.SuperGraph()
-        Copy_map.add_nodes_from(list(G.nodes))
-        fn.Add_edges_from_map(Copy_map, dct_dist,link_prob)
-        edges=list(Copy_map.edges)
-        prob_link1+=(edges.count((0,1))+edges.count((1,2)))/2
-        prob_link2+=edges.count((0,2))
-        
-    prob_link1=prob_link1/trials
-    prob_link2=prob_link2/trials
-    
-    'using the binomial variance and the central limit theorem'
-    std1=(0.4*0.6/trials**0.5)**0.5
-    std2=(0.8*0.2/trials**0.5)**0.5
-    assert     0.4-3*std1<prob_link1<0.4+3*std1
-    assert     0.8-3*std2<prob_link2<0.8+3*std2
+
 
         
 #%%   test_Break_strongest_nodes (2)
